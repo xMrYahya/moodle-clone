@@ -1,0 +1,37 @@
+@startuml
+hide footbox
+
+title RDCU pour démarrerJeu
+
+participant ":JeuDeDes" as J
+participant "j:Joueur" as P
+participant "joueurs:\nMap<String,Joueur>" as M
+
+-> J : demarrerJeu(nom : String)
+activate J
+
+note right
+  selon Contrôleur
+  (JeuDeDes est
+  l'objet racine)
+end note
+
+Create P
+J -> P : j = new Joueur(nom : String)
+
+note right
+  selon Créateur
+  (JeuDeDes
+  agrège Joueur)
+end note
+
+J -> M : add(j : Joueur)
+activate M
+deactivate M
+
+note right
+  selon Expert
+end note
+
+deactivate J
+@enduml
