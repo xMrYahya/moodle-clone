@@ -12,3 +12,4 @@
 Alexandre Gamache
 Alex Boulianne
 Kassem Kandil
+Raphael Hoffmann
