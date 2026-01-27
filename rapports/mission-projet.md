@@ -9,7 +9,7 @@
 
 **Communication :** Une communication ouverte et transparente sera maintenue au sein de l’équipe pour assurer la clarté, résoudre rapidement les problèmes et rester alignés sur les objectifs du projet.
 
-Alexandre Gamache
-Alex Boulianne
-Kassem Kandil
-Raphael Hoffmann
+**Alexandre Gamache**
+**Alex Boulianne**
+**Kassem Kandil**
+**Raphael Hoffmann**
