@@ -7,9 +7,10 @@
 
 **Qualité :** Nous nous engageons à produire un travail de haute qualité, en respectant les normes académiques et en nous améliorant continuellement grâce aux commentaires et aux révisions.
 
-**Communication :** Une communication ouverte et transparente sera maintenue au sein de l’équipe pour assurer la clarté, résoudre rapidement les problèmes et rester alignés sur les objectifs du projet.
+**Communication :** Réponse aux questions dans un délai de 24h. Essayer de se réunir à chaque semaine.
 
 **Alexandre Gamache**
 **Alex Boulianne**
 **Kassem Kandil**
 **Raphael Hoffmann**
+**Yahya Ardy**
