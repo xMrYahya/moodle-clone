@@ -11,3 +11,4 @@
 
 Alexandre Gamache
 Alex Boulianne
+Kassem Kandil
