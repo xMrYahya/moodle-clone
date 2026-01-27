@@ -1,4 +1,4 @@
-# Plan d'itération 1 (exemple)
+# Plan d'itération 1
 
 ## Étapes jalons
 
@@ -30,13 +30,13 @@ Les éléments de travail suivants seront abordés dans cette itération:
 | Nom / Description                | Priorité | [Taille estimée (points)](#commentEstimer "Comment estimer?") | Assigné à (nom) | Documents de référence |
 | -------------------------------- | -------: | --------------------------: | --------------- | ---------------------- |
 | CU01                             | 1        | 1                           | (tous)          | Exigences pour le lab  |
-|   CU01 - conception                |          |                             | Kassem Kandil,Raphael    |                        |
-|   CU01 - test et implémentation     |          |                             | Kassem Kandil          |                        |
-|   CU01 - mise à jour des modèles |          |                             | Alex          |                        |
-| CU02a                             | 2        | 2                           | (tous)          | Exigences pour le lab  |
-| CU02a - conception                |          |                             | Alexandre, Yahya,Raphael        |                        |
-| CU02a - test et implémentation     |          |                             | Alexandre, Yahya          |                        |
-| CU02a - mise à jour des modèles |          |                             | Alexandre,           |                        |
+|   CU01 - conception              |          |                             | Kassem Kandil,Raphael|                   |
+|   CU01 - test et implémentation  |          |                             | Kassem Kandil   |                        |
+|   CU01 - mise à jour des modèles |          |                             | Alex            |                        |
+| CU02a                            | 2        | 2                           | (tous)          | Exigences pour le lab  |
+| CU02a - conception               |          |                             | Alexandre, Yahya,Raphael|                |
+| CU02a - test et implémentation   |          |                             | Alexandre, Yahya|                        |
+| CU02a - mise à jour des modèles  |          |                             | Alexandre,      |                        |
 
 ## Problèmes
 
