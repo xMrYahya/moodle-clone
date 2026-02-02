@@ -1,0 +1,14 @@
+@startuml
+title Ajouter une question
+actor ":Enseignant" as e
+participant ":Systeme" as s
+' Ajout des Pre conditions ici si nécessaire
+e->s : gestionQuestions();
+s-->>e : Liste des questions associées au cours
+loop Tant que l'enseignant veut ajouter des questions
+
+e->s : ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Booléen, rétroactionVrai : String, rétroactionFaux : String)
+
+end loop
+
+@enduml

@@ -1,20 +1,40 @@
 @startuml MDD
 skinparam style strictuml
-skinparam ArrowThickness 2
-skinparam ArrowColor #gray
-hide empty members
-title Modèle du domaine (adapté du Jeu de dés du Ch. 1 de Larman)
-class Joueur {
+title Modèle du domaine
+class Enseignant{
+
+}
+class Cours{
+  identifiantGroupe : String
+  local : String
+  ' Les suivants pouraient etre dans l'horaire
+  aDistance : bool
+  deJour : bool  
+}
+class Groupe-cours{
+
+}
+class Étudiant{
+  prenom : String
   nom : String
-  nbParties : int
-  nbPartiesGagnées : int
+  codePermanent : String
+  email : String
 }
-class Dé {
-  valeur : int
+class Université{
+
 }
-class JeuDeDés
-' associations
-Joueur "*" -down- "1" JeuDeDés : joue >
-Joueur "1" -right- "2" Dé : lance >
-JeuDeDés "1" -up- "2" Dé : inclut >
+class Horaire{
+
+}
+
+Enseignant "*" -- "1" Université : Employé par >
+
+Étudiant "*" -- "1" Université : Inscrit à >
+
+Cours "1" -- "1" Horaire :  Suis l' >
+
+Étudiant "*" -- "*" "Groupe-cours" : Inscrit à >
+
+Cours "1" -- "1" "Groupe-cours" : associé à >
+
 @enduml
