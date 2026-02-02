@@ -5,6 +5,8 @@ participant ":Systeme" as s
 
 e->s : supprimerCours(idCours : String);
 
+s-->>e : Demande de confirmation
+
 e->s : confirmerSuppressionCours();
 
 s-->>e : Liste des cours et message \nde confirmation de la suppression du cours
