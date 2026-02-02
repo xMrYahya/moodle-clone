@@ -24,28 +24,4 @@ window.addEventListener("load", function()
             });
         });
     });
-
-    demarrer.addEventListener("click", function()
-    {
-        nomDuFormulaire = formNouveauJoueur.elements["nom"].value.trim();
-
-        if (nomDuFormulaire.length > 0)
-        {
-            fetch("/api/v1/jeu/demarrerJeu", {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({nom: nomDuFormulaire})
-            }).then(function()
-            {
-                location.reload();
-            })
-        }
-        else
-        {
-            alert("Spécifier un nom, SVP.");
-        }
-    });
 });
