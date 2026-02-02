@@ -12,7 +12,8 @@ class Cours{
   deJour : bool  
 }
 class Groupe-cours{
-
+  ' Selon le mdd du SGB
+  idGroupe : String
 }
 class Étudiant{
   prenom : String
@@ -36,5 +37,23 @@ Cours "1" -- "1" Horaire :  Suis l' >
 Étudiant "*" -- "*" "Groupe-cours" : Inscrit à >
 
 Cours "1" -- "1" "Groupe-cours" : associé à >
+
+Groupe-cours "*" -- "1" Enseignant :  assignés à >
+
+' En lien avec la cu02
+
+class Question{
+  nom : String
+  énoncé : String
+  ' reponse a la question
+  rétroactionValide : String
+  rétroactionInvalide : String
+  
+}
+class tags{
+
+}
+
+Question "*" -- "*" tags : catégorisé par >
 
 @enduml

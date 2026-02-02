@@ -1,0 +1,14 @@
+@startuml
+title Ajouter un cours
+actor ":Enseignant" as e
+participant ":Systeme" as s
+
+e->s : creerCours();
+
+s-->>e : liste des groupes-cours assignés à l'enseignant
+loop Tant qu'n cours correspondant au groupe-cours sélectionné existe déjà.
+e->s : sélectionnerGroupeCours(idGroupe : String)
+end loop
+s-->>e : Informations du cours associé au groupe-cours sélectionné \net la liste des Étudiants inscrits dans ce groupeCours
+
+@enduml
