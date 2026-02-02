@@ -7,8 +7,10 @@ e->s : gestionQuestions();
 s-->>e : Liste des questions associées au cours
 loop Tant que l'enseignant veut ajouter des questions
 
+alt 
 e->s : ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Booléen, rétroactionVrai : String, rétroactionFaux : String)
-
+else
+end alt
 end loop
 
 @enduml
