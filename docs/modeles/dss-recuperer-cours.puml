@@ -1,0 +1,12 @@
+@startuml
+title Recuperer un cours
+actor ":Enseignant" as e
+participant ":Systeme" as s
+
+e->s : afficherListeCours();
+s-->>e : Liste des cours créés et assignés à l'enseignant
+
+e->s : afficherDetailsCours(idCours : String);
+s-->>e : Informations du cours sélectionné \net la liste des Étudiants inscrits dans ce cours
+
+@enduml

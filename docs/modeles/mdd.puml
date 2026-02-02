@@ -5,7 +5,7 @@ class Enseignant{
 
 }
 class Cours{
-  identifiantGroupe : String
+  idCours : String
   local : String
   ' Les suivants pouraient etre dans l'horaire
   aDistance : bool

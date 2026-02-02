@@ -1,0 +1,12 @@
+@startuml
+title Retirer un cours
+actor ":Enseignant" as e
+participant ":Systeme" as s
+
+e->s : supprimerCours(idCours : String);
+
+e->s : confirmerSuppressionCours();
+
+s-->>e : Liste des cours et message \nde confirmation de la suppression du cours
+
+@enduml
