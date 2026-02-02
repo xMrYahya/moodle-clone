@@ -1,8 +1,23 @@
 @startuml MDD
 skinparam style strictuml
 title Modèle du domaine
-class Enseignant{
+package "SGB"{
+  class Enseignant{
 
+  }
+  class Groupe-cours{
+    ' Selon le mdd du SGB
+    idGroupe : String
+  }
+  class Étudiant{
+    prenom : String
+    nom : String
+    codePermanent : String
+    email : String
+  }
+  class Université{
+
+  }
 }
 class Cours{
   idCours : String
@@ -10,19 +25,6 @@ class Cours{
   ' Les suivants pouraient etre dans l'horaire
   aDistance : bool
   deJour : bool  
-}
-class Groupe-cours{
-  ' Selon le mdd du SGB
-  idGroupe : String
-}
-class Étudiant{
-  prenom : String
-  nom : String
-  codePermanent : String
-  email : String
-}
-class Université{
-
 }
 class Horaire{
 
@@ -38,7 +40,7 @@ Cours "1" -- "1" Horaire :  Suis l' >
 
 Cours "1" -- "1" "Groupe-cours" : associé à >
 
-Groupe-cours "*" -- "1" Enseignant :  assignés à >
+"Groupe-cours" "*" -- "1" Enseignant :  assignés à >
 
 ' En lien avec la cu02
 
