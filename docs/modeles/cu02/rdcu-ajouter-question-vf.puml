@@ -1,0 +1,25 @@
+@startuml
+title RDCU pour Ajouter une question Vrai ou Faux
+participant ":Enseignant" as e
+participant "c:CoursSGA" as c
+participant "b:BanqueQuestions" as b
+participant ":Question" as q
+
+-->e : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
+activate e
+    e->c : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
+    activate c
+      c->b : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
+        activate b
+            alt Nom de question unique 
+                b-> q : <<create>> Question(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[])
+                activate q
+                deactivate q
+                b-->> c : true
+            else Nom de question déjà utilisé
+                b-->> c : false
+            end alt
+        deactivate b
+    deactivate c
+deactivate e
+@enduml

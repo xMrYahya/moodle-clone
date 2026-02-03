@@ -9,9 +9,8 @@ DSS – Ajouter une question
 MDD – Question, Cours  
 
 **Préconditions:**  
-- L’enseignant est authentifié.  
-- Un cours courant est sélectionné.  
-- Le nom de la question n’existe pas déjà dans la banque de questions du cours courant.
+- L’enseignant.token est pas vide.  
+- Un cours c sélectionné.
 
 **PostConditions:**  
 - Une instance `qvf` de `Question` a été créée.  
@@ -21,3 +20,5 @@ MDD – Question, Cours
 - `qvf.rétroactionValide` est devenu `rétroactionVrai`.  
 - `qvf.rétroactionInvalide` est devenu `rétroactionFaux`.  
 - `qvf` a été associée au `Cours` courant via l’association *contient*.
+
+
