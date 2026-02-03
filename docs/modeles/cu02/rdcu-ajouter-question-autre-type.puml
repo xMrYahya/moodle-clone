@@ -1,0 +1,55 @@
+@startuml
+hide footbox
+title RDCU - ajouterQuestionAutreType
+
+participant ":Cours" as C
+participant "questions:List<Question>" as LQ
+participant "q:Question" as Q
+
+-> C : ajouterQuestionAutreType(nom, enonce, type,\n  retroactionValide, retroactionInvalide, tags)
+activate C
+
+note right of C
+  selon Contrôleur
+  (Cours est l'objet racine)
+end note
+
+C -> LQ : contains(nom)
+activate LQ
+LQ --> C : nomExiste:boolean
+deactivate LQ
+
+alt nom unique
+  
+  note right
+    selon Créateur
+    (Cours agrège Question)
+  end note
+  
+  create Q
+  C -> Q : new Question(nom, enonce, type,\n  retroactionValide, retroactionInvalide)
+  activate Q
+  deactivate Q
+  
+  C -> LQ : add(q)
+  activate LQ
+  deactivate LQ
+  
+  note right
+    selon Expert
+    (List connaît ses éléments)
+  end note
+  
+  C --> : questions:List<Question>
+  
+else nom déjà utilisé
+  
+  C --> : AlreadyExistsError
+  
+end
+
+deactivate C
+
+
+
+@enduml
