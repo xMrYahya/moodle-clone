@@ -3,7 +3,7 @@ title Ajouter un cours
 actor ":Enseignant" as e
 participant ":Systeme" as s
 
-e->s : creerCours();
+e->s : demarrerAjoutCours();
 
 s-->>e : liste des groupes-cours assignés à l'enseignant
 loop Tant qu'n cours correspondant au groupe-cours sélectionné existe déjà.
