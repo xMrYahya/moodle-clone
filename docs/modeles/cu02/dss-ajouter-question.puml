@@ -6,10 +6,16 @@ participant ":Systeme" as s
 e->s : gestionQuestions();
 s-->>e : Liste des questions associées au cours
 loop Tant que l'enseignant veut ajouter des questions
+alt Ajout de Question Vrai ou Faux
+e->s : ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Booléen, rétroactionVrai : String, rétroactionFaux : String, tags : String[])
+else Ajout d'autre type de question
+ e->s : ajouterQuestionAutreType(nom : String, énoncé : String, type : String, rétroactionValide :String, rétroactionInvalide : String, tags : String[])
+end alt
 
-alt 
-e->s : ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Booléen, rétroactionVrai : String, rétroactionFaux : String)
-else
+alt Nom de question unique
+    s-->>e : Liste des questions associées au cours mise à jour et confirmation de l'ajout
+else Nom de question déjà utilisé
+    s-->>e : Signalement d'erreur
 end alt
 end loop
 
