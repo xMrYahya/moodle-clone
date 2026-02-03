@@ -1,0 +1,15 @@
+@startuml
+title RDCU pour Ajouter une question Vrai ou Faux
+participant ":Enseignant" as e
+participant "c:CoursSGA" as c
+participant "b:BanqueQuestions" as b
+
+-->e : gestionQuestion()
+activate e
+    e->c : recupererQuestions() : BanqueQuestions
+    activate c
+      c->b : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
+        b-->>c b:BanqueQuestions
+    deactivate c
+deactivate e
+@enduml
