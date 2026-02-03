@@ -1,0 +1,20 @@
+@startuml
+skinparam Style strictuml
+skinparam sequenceMessageAlign center
+
+participant ":Enseignant"  as enseignant
+participant "sga:SGA" as sga
+
+ -> enseignant : afficherListeCours() : cours[]
+note right: controlleur \n selon expert
+activate enseignant
+enseignant -> sga : getListeCours(teacher_id:string): Cours[]
+note right: selon expert
+activate sga
+sga -->> enseignant : ListeCours : cours[]
+
+deactivate sga
+ <<-- enseignant : ListeCours : cours[] 
+
+deactivate enseignant
+@enduml
