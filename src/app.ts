@@ -2,8 +2,7 @@ import express, { NextFunction } from 'express';
 import ExpressSession from 'express-session';
 import logger from 'morgan';
 import flash from 'express-flash-plus';
-
-import { jeuRoutes } from './routes/jeuRouter';
+import { SgbClient } from "./core/sgbClient";
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -37,69 +36,80 @@ class App {
 
   // Configure API endpoints.
   private routes(): void {
-    const titreBase = 'Jeu de dés';
+    const titreBase = 'Moodle';
     let router = express.Router();
-    // Le squelette ne traite pas la gestion des connexions d'utilisateur, mais
-    // les gabarits Pug (navbar) supportent l'affichage selon l'état de connexion 
-    // dans l'objet user, qui peut avoir deux valeurs (p.ex. admin ou normal)
-    let user;
-    // Si l'utilisateur est connecté, le gabarit Pug peut afficher des options, 
-    // le nom de l'utilisateur et une option pour se déconnecter.
-    user = { nom: 'Pierre Trudeau', hasPrivileges: true, isAnonymous: false };
+    const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200"; // change to real SGB host
+    const sgbClient = new SgbClient(sgbBaseUrl);
     // Si user.isAnonymous est vrai, le gabarit Pug affiche une option pour se connecter.
     // user = { isAnonymous: true }; // utilisateur quand personne n'est connecté
 
+
+    function requireAuth(req: any, res: any, next: any) {
+      if (!req.session?.token) return res.redirect('/signin');
+      next();
+    }
+
+    router.get('/signin', (req: any, res) => {
+      if (req.session?.token) return res.redirect('/index');
+      res.render('signin', { title: titreBase });
+    });
+
+    router.get('/index', requireAuth, (req: any, res) => {
+      const teacher = req.session.user; // on va stocker ça au login
+      const displayName = teacher
+        ? `${teacher.first_name} ${teacher.last_name}`
+        : (req.session.email ?? "Enseignant");
+
+      res.render('index', {
+        title: titreBase,
+        displayName // ✅ pour navbar
+      });
+    });
+
+
     // Route pour jouer (index)
-    router.get('/', (req, res, next) => {
-      res.render('index',
-        // passer objet au gabarit (template) Pug
-        {
-          title: `${titreBase}`,
-          user: user,
-          joueurs: JSON.parse(jeuRoutes.controleurJeu.joueurs)
-        });
+    router.get('/', (req: any, res) => {
+      const user = req.session?.token
+        ? { nom: req.session.email ?? "Teacher", hasPrivileges: true, isAnonymous: false }
+        : { isAnonymous: true, hasPrivileges: false };
+
+      res.render('signin', {
+        title: titreBase,
+        user,
+        messages: req.flash()
+      });
     });
 
-    // Route pour classement (stats)
-    router.get('/stats', (req, res, next) => {
-      res.render('stats',
-        // passer objet au gabarit (template) Pug
-        {
-          title: `${titreBase}`,
-          user: user,
-          // créer nouveau tableau de joueurs qui est trié par ratio
-          joueurs: JSON.parse(jeuRoutes.controleurJeu.joueurs)
-        });
-    });
+    router.post('/signin', async (req: any, res: any): Promise<void> => {
+      try {
+        const { email, password } = req.body;
+        const login = await sgbClient.loginTeacher(email, password);
 
-    // Route to login
-    router.get('/signin', async function (req, res) {
-      if (user.isAnonymous) {
-        // simuler un login
-        res.render('signin', {
-          title: `${titreBase}`
-        })
-      } else {
-        return res.redirect('/');
+        req.session.token = login.token;
+        req.session.user = login.user;   // {first_name,last_name,id}
+        req.session.email = email;
+
+        res.status(200).json({ ok: true });
+        return;
+      } catch (e: any) {
+        res.status(401).json({ ok: false, message: e?.message ?? "Login failed" });
+        return;
       }
     });
 
     // Route to login
-    router.get('/signout', async function (req, res) {
-      // simuler une déconnexion
-      user = { isAnonymous: true };
-      return res.redirect('/');
+    router.get('/signout', (req: any, res) => {
+      req.session.destroy(() => res.redirect('/'));
     });
 
 
     this.expressApp.use('/', router);  // routage de base
-
-    this.expressApp.use('/api/v1/jeu', jeuRoutes.router);  // tous les URI pour le scénario jeu (DSS) commencent ainsi
   }
 
   private handleErrors(error: any, req: any, res: any, next: NextFunction) {
     req.flash('error', error.message);
-    res.status(error.code).json({ error: error.toString() });
+    res.status(error.code ?? 500).json({ error: error.toString() });
+
   }
 }
 

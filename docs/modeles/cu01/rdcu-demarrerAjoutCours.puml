@@ -1,0 +1,18 @@
+@startuml
+skinparam Style strictuml
+skinparam sequenceMessageAlign center
+
+participant ":Enseignant"  as enseignant
+participant "sga:SGA" as sga
+
+ -> enseignant : demarrerAjoutCours() : ListeGroup-Cours[]
+activate enseignant
+enseignant -> sga : getCours(teacher_id:string, token:string): ListeGroup-Cours[]
+activate sga
+sga -->> enseignant : ListeGroup-Cours[]
+
+deactivate sga
+ <<-- enseignant : ListeGroup-Cours[] 
+
+deactivate enseignant
+@enduml

@@ -1,0 +1,22 @@
+@startuml
+hide footbox
+title RDCU - selectionnerGroupeCours(idGroupe : String)
+
+participant ": Enseignant" as E
+participant "sga : Sga" as S
+participant "c : Cours" as C
+
+-> E : selectionnerGroupeCours(idGroupe : String)
+
+E -> S : getCours(idGroupe : String, token:string): ListeGroup-Cours
+S -->> E : InfoGroupeCours
+
+E -> C : <<create>> Cours(InfoGroupeCours)
+
+E -> E : associerCoursAEnseignant(C)
+
+loop pour chaque etudiant dans etudiants
+  E -> E : associerEtudiantACours(C, etudiant)
+end
+
+@enduml

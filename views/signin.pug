@@ -3,14 +3,39 @@ html
   body
     div.container.login-container.h-100.d-flex.justify-content-center.align-items-center
       div.col-md-6.login-form-1.my-auto.rounded.shadow.mb-4
-        p
-          h1 Connexion : #{title}
+        h1 Connexion
+
         form#formLogin
           .form-group
-            input.form-control(name='email' type='text' placeholder='Courriel' required='')
+            input.form-control(name="email", type="email", placeholder="Courriel", required)
           .form-group
-            input.form-control(name='password' type='password' placeholder='Mot de passe' required='')
-        p
-          button.btn.btn-primary.btn-block.login Se connecter
-        p
-          em Cette partie ne fonctionne pas encore
+            input.form-control(name="password", type="password", placeholder="Mot de passe", required)
+          button.btn.btn-primary.btn-block(type="submit") Se connecter
+
+    script.
+      const form = document.getElementById("formLogin");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault(); 
+
+        const email = form.elements["email"].value;
+        const password = form.elements["password"].value;
+
+        try {
+          const resp = await fetch("/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+
+          const data = await resp.json();
+
+          if (resp.ok) {
+            window.location.href = "/index";
+          } else {
+            alert(data.message);
+          }
+        } catch (err) {
+          alert("Erreur réseau");
+        }
+      });
