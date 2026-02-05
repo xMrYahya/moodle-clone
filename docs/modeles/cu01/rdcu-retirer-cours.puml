@@ -3,13 +3,23 @@ hide footbox
 title RDCU – Retirer un cours
 
 participant Enseignant as Ens
-participant "sga:SGA" as sga
+participant controlleurCours as ctrl
+participant catalogueCours as cours
 
--> Ens : retirerCours(idCours : String)
-Ens -> Ens : confirmation()
-Ens -> sga : retirerCours(idCours : String)
+ -> Ens : retirerCours(idCours : String)
+ <-- Ens : demandeConfirmation()
+ -> Ens : confirmationSuppression()
 
-Ens -> sga : getListeCours(teacher_id:string): Cours[]
-activate sga
-sga -->> Ens : ListeCours : cours[]
+Ens -> ctrl : suppressionCours(idCours : String)
+activate  ctrl
+
+ctrl -> cours : suppressionCours(idCours : String)
+activate cours
+cours --> ctrl : coursSupprimer()
+deactivate cours
+
+ctrl --> Ens : messageSuppressionConfirmer()
+
+Ens -> ctrl : getListeCours(teacher_id:string): Cours[]
+ctrl -->> Ens : ListeCours : cours[]
 @enduml
