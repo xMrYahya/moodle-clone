@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 
 export type SgbTeacherLoginResponse = {
-  message: string; // "Success"
+  message: string;
   token: string;
   user: {
     first_name: string;
@@ -11,7 +11,7 @@ export type SgbTeacherLoginResponse = {
 };
 
 export class SgbClient {
-  constructor(private readonly baseUrl: string) {}
+  constructor(private readonly baseUrl: string) { }
 
   async loginTeacher(email: string, password: string): Promise<SgbTeacherLoginResponse> {
     const url = new URL("/api/v3/teacher/login", this.baseUrl);
@@ -32,5 +32,32 @@ export class SgbClient {
     }
 
     return data;
+  }
+
+  async getSchedules(token: string) {
+    const res = await fetch(`${this.baseUrl}/api/v3/Schedule/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json"
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error("Unable to fetch schedules");
+    }
+
+    return res.json();
+  }
+
+  async getCourses(token: string): Promise<{ data: { id: string; titre: string }[] }> {
+    const res = await fetch(`${this.baseUrl}/api/v3/course/all`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    if (!res.ok) throw new Error("Unable to fetch courses");
+    return res.json();
   }
 }
