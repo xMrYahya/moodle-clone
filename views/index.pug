@@ -18,15 +18,17 @@ html
       if createdGroups && createdGroups.length
         .row.mt-3
           each g in createdGroups
-            .col-12.col-md-6.col-lg-4.mb-3
-              .card
+            a.col-12.col-md-6.col-lg-4.mb-3(href=`/cours/${g.group_id}/questions` style="text-decoration: none; color: inherit;")
+              .card.h-100
                 .card-body
                   h5.card-title.mb-1 #{g.course_id} · #{g.course_titre || g.activity}
-                  p.card-text.text-muted.mb-2 #{g.group_id}
+                  p.card-text.text-muted.mb-3 #{g.group_id}
 
-                  a.btn.btn-sm.btn-outline-danger(
-                    href=`/index?confirmRemove=${encodeURIComponent(g.group_id)}`
-                  ) Retirer
+                  .d-flex.gap-2
+                    button.btn.btn-sm.btn-outline-danger(
+                      type="button"
+                      onclick=`event.preventDefault(); window.location.href='/index?confirmRemove=${encodeURIComponent(g.group_id)}'`
+                    ) Retirer
       else
         p.text-muted.mt-3 Aucun cours pour l’instant.
 

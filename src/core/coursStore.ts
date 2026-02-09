@@ -43,6 +43,11 @@ export async function getStoredForTeacher(teacherId: string): Promise<StoredCour
   return all.filter(c => String(c.teacher_id) === String(teacherId));
 }
 
+export async function getStoredByGroupId(groupId: string): Promise<StoredCours | undefined> {
+  const all = await getAllStored();
+  return all.find(c => c.group_id === String(groupId));
+}
+
 export async function addStored(course: StoredCours): Promise<void> {
   const all = await getAllStored();
   const exists = all.some(c => c.group_id === course.group_id);

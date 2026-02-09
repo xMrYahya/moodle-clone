@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { SgbClient } from "../core/sgbClient";
-import { addStored, removeStored } from "../core/coursStore";
+import { addStored, removeStored, getStoredByGroupId } from "../core/coursStore";
+import { getQuestionsForCours } from "../core/questionsStore";
 import { CourseDto, ScheduleDto } from "../types/sgbTypes";
 
 const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
@@ -81,6 +82,40 @@ export class CoursController {
     } catch (e: any) {
       res.status(500).send(e?.message ?? "Delete failed");
       return;
+    }
+  }
+
+  static async afficherQuestions(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = req.params;
+      const teacher = req.session.user;
+
+      if (!groupId || !teacher?.id) {
+        res.status(400).send("Missing groupId or userInfo");
+        return;
+      }
+
+      const cours = await getStoredByGroupId(groupId);
+      if (!cours) {
+        res.status(404).send("Course not found");
+        return;
+      }
+
+      const questions = await getQuestionsForCours(groupId);
+      const showAddQuestionModal = req.query.addQuestion === "1";
+      const displayName = `${teacher.first_name} ${teacher.last_name}`;
+
+      res.render("questions", {
+        title: "Questions",
+        displayName,
+        groupId,
+        coursId: cours.course_id,
+        coursTitre: cours.course_titre || cours.activity,
+        questions,
+        showAddQuestionModal,
+      });
+    } catch (e: any) {
+      res.status(500).send(e?.message ?? "Failed to load questions");
     }
   }
 }

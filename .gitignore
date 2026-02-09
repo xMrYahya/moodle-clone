@@ -137,3 +137,16 @@ dist
 
 # runtime data
 data/*.json
+docs/modeles/cu02/aj qstvf.md
+docs/modeles/cu02/rdcu-ajouter-question-autre-type.puml
+documents projet/dss-ajouter-question.puml
+documents projet/mdd sgb sga.puml
+documents projet/PLAN_CU02a_YAHYA.md
+documents projet/rdcu-ajouter-question.puml
+documents projet/README-cahier-technique.md
+documents projet/README-exigences-client.md
+documents projet/Squelette.md
+docs/modeles/cu02/rdcu-ajouter-question-autre-type.puml
+documents projet/aj qstvf.md
+test-api-questions.http
+TESTS_MANUELS.md

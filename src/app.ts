@@ -5,8 +5,10 @@ import flash from "express-flash-plus";
 
 import indexRoutes from "./routes/indexRoutes";
 import coursRoutes from "./routes/coursRoutes";
+import questionsRoutes from "./routes/questionsRoutes";
 
 import { clearStoreOnStartup } from "./core/coursStore";
+import { clearQuestionsOnStartup } from "./core/questionsStore";
 
 class App {
   public expressApp: express.Application;
@@ -15,14 +17,16 @@ class App {
     this.expressApp = express();
 
     clearStoreOnStartup().catch(console.error);
+    clearQuestionsOnStartup().catch(console.error);
 
     this.middleware();
-
+    
     this.expressApp.set("view engine", "pug");
     this.expressApp.use(express.static(__dirname + "/public") as express.RequestHandler);
 
     this.expressApp.use("/", indexRoutes);
     this.expressApp.use("/cours", coursRoutes);
+    this.expressApp.use("/questions", questionsRoutes);
 
     this.expressApp.use(this.handleErrors);
   }
