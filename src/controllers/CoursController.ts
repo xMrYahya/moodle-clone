@@ -28,6 +28,8 @@ export class CoursController {
         String(s.group_id) === String(groupId)
       );
 
+      const students = await sgbClient.getStudentsForGroup(req.session.token, String(groupId));
+
       if (schedulesForGroup.length === 0) {
         res.status(404).send("Schedule not found for this group");
         return;
@@ -59,6 +61,7 @@ export class CoursController {
 
         course_id: course ? String(course.id) : (code ?? undefined),
         course_titre: course ? String(course.titre) : undefined,
+        students,
       });
 
       res.redirect("/index");
@@ -111,6 +114,8 @@ export class CoursController {
         groupId,
         coursId: cours.course_id,
         coursTitre: cours.course_titre || cours.activity,
+        cours,                         
+        students: cours.students ?? [],
         questions,
         showAddQuestionModal,
       });
