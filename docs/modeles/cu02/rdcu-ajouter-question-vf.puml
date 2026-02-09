@@ -6,6 +6,7 @@ participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 participant "q:QuestionVraiFaux" as Q
 
+activate e
 e -> QC : ajouterQuestionVraiFaux(nom : String, enonce : String,\n reponse : bool, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
 activate QC
 
@@ -30,4 +31,5 @@ else Nom de question deja utilise
 end
 
 deactivate QC
+deactivate e
 @enduml
