@@ -1,11 +1,12 @@
 @startuml
+title RDCU afficher liste des cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
 participant ":Enseignant"  as enseignant
-participant "sga:SGA" as sga
+participant "sga:accesSGA" as sga
 
- -> enseignant : afficherListeCours() : cours[]
+ -> enseignant : afficherListeCours() : Cours[]
 note right: controlleur \n selon expert
 activate enseignant
 enseignant -> sga : getListeCours(teacher_id:string): Cours[]
@@ -14,7 +15,7 @@ activate sga
 sga -->> enseignant : ListeCours : cours[]
 
 deactivate sga
- <<-- enseignant : ListeCours : cours[] 
+ <<-- enseignant : listeCours : cours[] 
 
 deactivate enseignant
 @enduml

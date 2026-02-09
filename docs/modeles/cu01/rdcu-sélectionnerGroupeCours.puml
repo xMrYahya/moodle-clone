@@ -3,20 +3,22 @@ hide footbox
 title RDCU - selectionnerGroupeCours(idGroupe : String)
 
 participant ": Enseignant" as E
-participant "sga : Sga" as S
+participant "sga : accesSga" as S
 participant "c : Cours" as C
 
 -> E : selectionnerGroupeCours(idGroupe : String)
+activate E
 
-E -> S : getCours(idGroupe : String, token:string): ListeGroup-Cours
-S -->> E : InfoGroupeCours
+E -> S : getCours(idGroupe : String, token:string)
+activate S
+S -> C ** : <<create>> Cours\n(idGroupe:String, token:string)
 
-E -> C : <<create>> Cours(InfoGroupeCours)
+
+S -->> E : c : Cours
+deactivate S
 
 E -> E : associerCoursAEnseignant(C)
-
-loop pour chaque etudiant dans etudiants
-  E -> E : associerEtudiantACours(C, etudiant)
-end
-
+activate E
+deactivate E
+deactivate E
 @enduml

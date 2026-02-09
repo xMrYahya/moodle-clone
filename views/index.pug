@@ -21,13 +21,12 @@ html
             .col-12.col-md-6.col-lg-4.mb-3
               .card
                 .card-body
-                  //- affiche le titre du cours si dispo, sinon fallback
                   h5.card-title.mb-1 #{g.course_id} · #{g.course_titre || g.activity}
                   p.card-text.text-muted.mb-2 #{g.group_id}
 
-                  form(method="post" action="/cours/supprimer")
-                    input(type="hidden" name="groupId" value=g.group_id)
-                    button.btn.btn-sm.btn-outline-danger(type="submit") Retirer
+                  a.btn.btn-sm.btn-outline-danger(
+                    href=`/index?confirmRemove=${encodeURIComponent(g.group_id)}`
+                  ) Retirer
       else
         p.text-muted.mt-3 Aucun cours pour l’instant.
 
@@ -49,17 +48,35 @@ html
                 each g in groups
                   li.list-group-item.d-flex.justify-content-between.align-items-center
                     div
-                      //- affiche le vrai titre du cours
                       strong #{g.course_id} · #{g.course_titre || g.activity}
                       br
                       small.text-muted #{g.group_id}
 
                     form(method="post" action="/cours/creer" class="m-0")
                       input(type="hidden" name="groupId" value=g.group_id)
-                      //- optionnel (recommandé) si tu veux éviter refetch au POST plus tard
                       input(type="hidden" name="courseId" value=g.course_id)
                       input(type="hidden" name="courseTitre" value=g.course_titre)
                       button.btn.btn-sm.btn-outline-primary(type="submit") Créer
 
           .modal-footer
             a.btn.btn-secondary(href="/index") Fermer
+
+    // ======================
+    // POPUP : CONFIRMER RETRAIT
+    // ======================
+    if confirmRemoveGroupId
+      .modal-overlay
+        .modal-card
+          .modal-header
+            h5.mb-0 Confirmer le retrait
+            a.close(href="/index" aria-label="Fermer") ×
+
+          .modal-body
+            p.mb-0 Es-tu sûr de vouloir retirer ce cours ?
+            p.text-muted.mt-2.mb-0 #{confirmRemoveGroupId}
+
+          .modal-footer
+            a.btn.btn-secondary(href="/index") Annuler
+            form(method="post" action="/cours/supprimer" class="m-0")
+              input(type="hidden" name="groupId" value=confirmRemoveGroupId)
+              button.btn.btn-danger(type="submit") Oui, retirer

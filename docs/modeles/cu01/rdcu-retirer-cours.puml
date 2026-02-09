@@ -6,9 +6,9 @@ participant Enseignant as Ens
 participant controlleurCours as ctrl
 participant catalogueCours as cours
 
+activate Ens
  -> Ens : retirerCours(idCours : String)
- <-- Ens : demandeConfirmation()
- -> Ens : confirmationSuppression()
+
 
 Ens -> ctrl : suppressionCours(idCours : String)
 activate  ctrl
@@ -21,5 +21,6 @@ deactivate cours
 ctrl --> Ens : messageSuppressionConfirmer()
 
 Ens -> ctrl : getListeCours(teacher_id:string): Cours[]
-ctrl -->> Ens : ListeCours : cours[]
+ctrl -->> Ens : listeCours : cours[]
+
 @enduml

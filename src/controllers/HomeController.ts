@@ -21,6 +21,9 @@ export class HomeController {
 
       const showAddCourseModal = req.query.addCourse === "1";
 
+      const confirmRemoveGroupId =
+        typeof req.query.confirmRemove === "string" ? req.query.confirmRemove : null;
+
       const createdGroups = teacher?.id
         ? await getStoredForTeacher(String(teacher.id))
         : [];
@@ -75,8 +78,9 @@ export class HomeController {
         title: "Moodle",
         displayName,
         showAddCourseModal,
+        confirmRemoveGroupId, 
         groups,
-        createdGroups
+        createdGroups,
       });
       return;
     } catch (e: any) {
