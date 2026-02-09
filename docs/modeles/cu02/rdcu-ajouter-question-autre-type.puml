@@ -8,6 +8,8 @@ participant "qs:QuestionsStore" as QS
 participant "q:Question" as Q
 
 e -> QC : ajouterQuestionAutreType(nom : String, enonce : String, type : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+activate e
+
 activate QC
 
 QC -> QS : questionNameExists(nom)
@@ -31,4 +33,5 @@ else Nom de question deja utilise
 end
 
 deactivate QC
+activate e
 @enduml

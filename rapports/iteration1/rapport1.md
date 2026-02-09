@@ -70,7 +70,7 @@
 
 ![Dss retirer cours](../../docs/modeles/iteration1exports/retirer-cours.png "Dss retirer cours")
 
-![Dss Ajouter question](../../docs/modeles/iteration1exports/dss-ajouter-question.png "Dss Ajouter question")
+![Dss Ajouter question](../../docs/modeles/iteration1exports/dss-ajouter-question-v2.png "Dss Ajouter question")
 
 
 ## Contrats
@@ -245,7 +245,7 @@ MDD - Questions, Cours
 
 ![RDCU Demarrer gestion de question](../../docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png "RDCU Demarrer gestion de question")
 
-![RDCU Ajouter une question de type vrai ou faux](../../docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png "RDCU Ajouter une question de type vrai ou faux")
+![RDCU Ajouter une question de type vrai ou faux](../../docs/modeles/iteration1exports/rdcu-ajouter-vrai-faux.png "RDCU Ajouter une question de type vrai ou faux")
 
 ![RDCU Ajouter une question d'autre type](../../docs/modeles/iteration1exports/rdcu-ajouter-question-autre-type-v2.png "RDCU Ajouter une question d'autre type")
 
