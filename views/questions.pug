@@ -3,37 +3,82 @@ html
 
   body
     include includes/navbar.pug
-    +navbar(title, displayName)
+    +navbar(displayName)
 
     .container.mt-4
-      h1 Questions du cours
-      
-      .mb-3
-        strong #{coursId} · #{coursTitre}
-        br
-        small.text-muted ID du groupe: #{groupId}
+      // ======================
+      // ENTÊTE DU COURS
+      // ======================
+      .d-flex.justify-content-between.align-items-start.flex-wrap.gap-2
+        .mb-2
+          h1.mb-1 #{coursTitre}
+          .text-muted.fs-5
+            strong #{coursId}
+            |  · Groupe: #{groupId}
 
-      a.btn.btn-primary(href=`/cours/${groupId}/questions?addQuestion=1` id="btn-add-question") Ajouter une question
+          if cours
+            .mt-2
+              // un peu plus gros qu'avant
+              .text-muted.fs-5
+                | Horaire: #{cours.day} · #{cours.hours}
+                |  · Mode: #{cours.mode}
+                |  · Local: #{cours.local}
 
       hr
 
       // ======================
-      // LISTE DES QUESTIONS
+      // SECTION QUESTIONS (EN HAUT)
       // ======================
-      if questions && questions.length
-        .row.mt-3
-          each q in questions
-            .col-12.col-md-6.col-lg-4.mb-3
-              .card
-                .card-body
-                  h5.card-title.mb-1 #{q.nom}
-                  p.card-text.text-muted.mb-2 
-                    small Type: #{q.type}
-                  p.card-text.mb-2
-                    em #{q.énoncé}
+      .card.mb-4
+        .card-body
+          .d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
+            h4.mb-0 Questions
+            .d-flex.align-items-center.gap-2
+              a.btn.btn-primary(href=`/cours/${groupId}/questions?addQuestion=1` id="btn-add-question") Ajouter une question
 
-      else
-        p.text-muted.mt-3 Aucune question disponible.
+          if questions && questions.length
+            .row.mt-3
+              each q in questions
+                .col-12.col-md-6.col-lg-4.mb-3
+                  .card.h-100
+                    .card-body
+                      h5.card-title.mb-1 #{q.nom}
+                      p.card-text.text-muted.mb-2
+                        small Type: #{q.type}
+                      p.card-text.mb-2
+                        em #{q.énoncé}
+          else
+            p.text-muted.mt-3 Aucune question disponible.
+
+      // ======================
+      // SECTION ÉTUDIANTS (EN DESSOUS)
+      // ======================
+      .card.mb-4
+        .card-body
+          .d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
+            h4.mb-0 Étudiants
+            if students && students.length
+              span.badge.bg-secondary #{students.length}
+
+          if students && students.length
+            // petit champ de recherche simple côté client
+            input.form-control.mt-3(type="text" id="student-search" placeholder="Rechercher un étudiant (prénom, nom ou email)...")
+
+            .table-responsive.mt-3
+              table.table.table-sm.table-striped.mb-0
+                thead
+                  tr
+                    th Prénom
+                    th Nom
+                    th Email
+                tbody#students-tbody
+                  each st in students
+                    tr.student-row
+                      td #{st.first_name}
+                      td #{st.last_name}
+                      td #{st.email}
+          else
+            p.text-muted.mt-3 Aucun étudiant trouvé pour ce groupe.
 
     // ======================
     // MODAL : AJOUTER QUESTION
@@ -49,7 +94,6 @@ html
             // === ÉCRAN DE SÉLECTION DU TYPE ===
             #type-selection-screen
               p.text-muted.mb-4 Sélectionnez le type de question que vous souhaitez créer:
-              
               .row
                 .col-md-4.mb-3
                   .card.question-type-card(onclick="selectQuestionType('VraiFaux')" style="cursor: pointer;")
@@ -83,9 +127,7 @@ html
 
             // === FORMULAIRE VRAI/FAUX ===
             #form-screen-vraifaux(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
-                i.fas.fa-arrow-left.mr-1
-                | Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
               form(method="post" action=`/questions/${groupId}/ajouter-vrai-faux` id="form-vrai-faux")
                 h6.mb-3 Question Vrai ou Faux
@@ -121,9 +163,7 @@ html
 
             // === FORMULAIRE CHOIX MULTIPLE ===
             #form-screen-choixmultiple(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
-                i.fas.fa-arrow-left.mr-1
-                | Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
               form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-choix-multiple")
                 input(type="hidden" name="type" value="ChoixMultiple")
@@ -142,7 +182,8 @@ html
                     input.form-check-input(type="checkbox" id="seul-choix-cm" name="seulementUnChoix" value="true")
                     label.form-check-label(for="seul-choix-cm") Un seul choix correct
 
-                  .alert.alert-info.small Pour simplifier, entrez une description des choix. Format: "Choix1|Choix2|Choix3" (le premier est supposé correct)
+                  .alert.alert-info.small
+                    | Pour simplifier, entrez une description des choix. Format: "Choix1|Choix2|Choix3" (le premier est supposé correct)
                   label(for="rep-mult-cm") Description des choix:
                   input.form-control(type="text" id="rep-mult-cm" name="reponses" placeholder="Ex: Choix correct|Mauvais choix|Autre mauvais" required)
 
@@ -162,9 +203,7 @@ html
 
             // === FORMULAIRE NUMÉRIQUE ===
             #form-screen-numerique(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
-                i.fas.fa-arrow-left.mr-1
-                | Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
               form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-numerique")
                 input(type="hidden" name="type" value="Numerique")
@@ -198,9 +237,7 @@ html
 
             // === FORMULAIRE RÉPONSE COURTE ===
             #form-screen-reponsecourte(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
-                i.fas.fa-arrow-left.mr-1
-                | Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
               form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-reponse-courte")
                 input(type="hidden" name="type" value="ReponseCourte")
@@ -234,9 +271,7 @@ html
 
             // === FORMULAIRE MISE EN CORRESPONDANCE ===
             #form-screen-miseencorrespondance(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
-                i.fas.fa-arrow-left.mr-1
-                | Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
               form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-mise-correspondance")
                 input(type="hidden" name="type" value="MiseEnCorrespondance")
@@ -251,7 +286,8 @@ html
                   textarea.form-control(id="enonce-mec" name="énoncé" required rows="3")
 
                 .form-group
-                  .alert.alert-info.small Pour simplifier, entrez les paires de correspondance. Format: "Question1:Réponse1|Question2:Réponse2"
+                  .alert.alert-info.small
+                    | Pour simplifier, entrez les paires de correspondance. Format: "Question1:Réponse1|Question2:Réponse2"
                   label(for="paires-mec") Paires de correspondance:
                   input.form-control(type="text" id="paires-mec" name="paires" placeholder="Ex: Paris:France|Berlin:Allemagne|Tokyo:Japon" required)
 
@@ -271,9 +307,7 @@ html
 
             // === FORMULAIRE ESSAI ===
             #form-screen-essai(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
-                i.fas.fa-arrow-left.mr-1
-                | Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
               form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-essai")
                 input(type="hidden" name="type" value="Essai")
@@ -287,7 +321,8 @@ html
                   label(for="enonce-essai") Énoncé:
                   textarea.form-control(id="enonce-essai" name="énoncé" required rows="5")
 
-                .alert.alert-info.small Les questions de type essai sont des questions ouvertes qui nécessitent une correction manuelle.
+                .alert.alert-info.small
+                  | Les questions de type essai sont des questions ouvertes qui nécessitent une correction manuelle.
 
                 .form-group
                   label(for="retroaction-valide-essai") Rétroaction si correct:
@@ -314,16 +349,54 @@ html
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         transition: all 0.2s;
       }
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 16px;
+      }
+      .modal-card {
+        width: 100%;
+        max-width: 900px;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .modal-header, .modal-footer {
+        padding: 12px 16px;
+        border-bottom: 1px solid #eee;
+      }
+      .modal-footer {
+        border-top: 1px solid #eee;
+        border-bottom: none;
+      }
+      .modal-body {
+        padding: 16px;
+        max-height: 75vh;
+        overflow: auto;
+      }
 
     script.
       const groupId = "#{groupId}";
 
-      // Navigation entre les écrans
+      // Simple search étudiants
+      const searchInput = document.getElementById('student-search');
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          const q = (this.value || '').toLowerCase();
+          document.querySelectorAll('.student-row').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
+          });
+        });
+      }
+
       function selectQuestionType(type) {
-        // Cacher l'écran de sélection
         document.getElementById('type-selection-screen').style.display = 'none';
-        
-        // Afficher le formulaire correspondant
         const screenMap = {
           'VraiFaux': 'form-screen-vraifaux',
           'ChoixMultiple': 'form-screen-choixmultiple',
@@ -332,12 +405,9 @@ html
           'MiseEnCorrespondance': 'form-screen-miseencorrespondance',
           'Essai': 'form-screen-essai'
         };
-        
         const screenId = screenMap[type];
         if (screenId) {
           document.getElementById(screenId).style.display = 'block';
-          
-          // Changer le titre du modal
           const titleMap = {
             'VraiFaux': 'Question Vrai ou Faux',
             'ChoixMultiple': 'Question Choix Multiple',
@@ -351,29 +421,24 @@ html
       }
 
       function backToTypeSelection() {
-        // Cacher tous les formulaires
-        document.getElementById('form-screen-vraifaux').style.display = 'none';
-        document.getElementById('form-screen-choixmultiple').style.display = 'none';
-        document.getElementById('form-screen-numerique').style.display = 'none';
-        document.getElementById('form-screen-reponsecourte').style.display = 'none';
-        document.getElementById('form-screen-miseencorrespondance').style.display = 'none';
-        document.getElementById('form-screen-essai').style.display = 'none';
-        
-        // Afficher l'écran de sélection
+        ['vraifaux','choixmultiple','numerique','reponsecourte','miseencorrespondance','essai']
+          .forEach(id => {
+            const el = document.getElementById(`form-screen-${id}`);
+            if (el) el.style.display = 'none';
+          });
         document.getElementById('type-selection-screen').style.display = 'block';
-        
-        // Réinitialiser le titre
         document.getElementById('modal-title').textContent = 'Choisir le type de question';
       }
 
-      // Conversion FormData vers JSON
+      // IMPORTANT: rendre les fonctions accessibles pour les onclick=""
+      window.selectQuestionType = selectQuestionType;
+      window.backToTypeSelection = backToTypeSelection;
+
       function formDataToJson(formData) {
         const json = {};
         formData.forEach((value, key) => {
           if (json[key]) {
-            if (!Array.isArray(json[key])) {
-              json[key] = [json[key]];
-            }
+            if (!Array.isArray(json[key])) json[key] = [json[key]];
             json[key].push(value);
           } else {
             json[key] = value;
@@ -382,14 +447,12 @@ html
         return json;
       }
 
-      // Fonction générique de soumission
       async function handleFormSubmit(e, requiredFields) {
         e.preventDefault();
         try {
           const formData = new FormData(e.target);
           const data = formDataToJson(formData);
 
-          // Validation des champs obligatoires
           const missing = requiredFields.filter(field => !data[field] || String(data[field]).trim() === '');
           if (missing.length > 0) {
             alert('Erreur: Veuillez remplir tous les champs obligatoires (' + missing.join(', ') + ')');
@@ -398,47 +461,52 @@ html
 
           const response = await fetch(e.target.action, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
           });
 
           if (!response.ok) {
-            const error = await response.json();
-            alert('Erreur: ' + (error.error || 'Erreur lors de l\'ajout'));
+            let errPayload = null;
+            try { errPayload = await response.json(); } catch {}
+            alert('Erreur: ' + (errPayload?.error || response.statusText || 'Erreur lors de l\'ajout'));
             return;
           }
 
           const result = await response.json();
-          alert('✓ ' + result.message);
-          window.location.href = `/cours/${groupId}/questions`;
+
+          // cache-buster pour éviter le 304
+          window.location.href = `/cours/${groupId}/questions?ts=${Date.now()}`;
         } catch (err) {
           alert('Erreur: ' + err.message);
         }
       }
 
-      // Attacher les event listeners à tous les formulaires
-      document.getElementById('form-vrai-faux').addEventListener('submit', function(e) {
-        handleFormSubmit(e, ['nom', 'énoncé', 'reponse']);
-      });
+      const fVf = document.getElementById('form-vrai-faux');
+      if (fVf) fVf.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponse']));
 
-      document.getElementById('form-choix-multiple').addEventListener('submit', function(e) {
-        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponses']);
-      });
+      const fCm = document.getElementById('form-choix-multiple');
+      if (fCm) fCm.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponses']));
 
-      document.getElementById('form-numerique').addEventListener('submit', function(e) {
-        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']);
-      });
+      const fNum = document.getElementById('form-numerique');
+      if (fNum) fNum.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']));
 
-      document.getElementById('form-reponse-courte').addEventListener('submit', function(e) {
-        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']);
-      });
+      const fRc = document.getElementById('form-reponse-courte');
+      if (fRc) fRc.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']));
 
-      document.getElementById('form-mise-correspondance').addEventListener('submit', function(e) {
-        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'paires']);
-      });
+      const fMec = document.getElementById('form-mise-correspondance');
+      if (fMec) fMec.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'paires']));
 
-      document.getElementById('form-essai').addEventListener('submit', function(e) {
-        handleFormSubmit(e, ['nom', 'énoncé', 'type']);
-      });
+      const fEss = document.getElementById('form-essai');
+      if (fEss) fEss.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type']));
+
+      // ---- Format affichage (minimal) : Jeu->Jeudi, P/D -> Présentiel/Distance ----
+      // On modifie juste le texte déjà rendu, sans toucher au backend.
+      (function normalizeCourseInfo() {
+        const blocks = document.querySelectorAll('.container .text-muted.fs-5');
+        blocks.forEach(b => {
+          b.innerHTML = b.innerHTML
+            .replace(/\bJeu\b/g, 'Jeudi')
+            .replace(/\bP\b/g, 'Présentiel')
+            .replace(/\bD\b/g, 'Distance');
+        });
+      })();

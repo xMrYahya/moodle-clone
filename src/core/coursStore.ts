@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { StudentInfo } from "./sgbClient";
 
 export type StoredCours = {
   group_id: string;
@@ -12,6 +13,7 @@ export type StoredCours = {
 
   course_id?: string;
   course_titre?: string;
+  students: StudentInfo[];
 };
 
 
