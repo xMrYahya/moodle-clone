@@ -192,6 +192,40 @@ describe("QuestionsStore - CU02a", () => {
     expect(missing).toEqual([]);
   });
 
+  test("getQuestionsForCours returns all questions for a course only", async () => {
+    const q1: QuestionVraiFaux = {
+      nom: "Q1",
+      ["\u00e9nonc\u00e9"]: "Q1",
+      reponse: true,
+      retroaction: "OK",
+      retroactionValide: "OK",
+      retroactionInvalide: "Non",
+      tags: [],
+      type: "VraiFaux",
+    };
+    const q2: QuestionVraiFaux = {
+      nom: "Q2",
+      ["\u00e9nonc\u00e9"]: "Q2",
+      reponse: false,
+      retroaction: "OK",
+      retroactionValide: "OK",
+      retroactionInvalide: "Non",
+      tags: [],
+      type: "VraiFaux",
+    };
+
+    await store.addQuestion("COURSE-1", q1);
+    await store.addQuestion("COURSE-1", q2);
+    await store.addQuestion("COURSE-2", q1);
+
+    const { getQuestionsForCours } = require("../../src/core/questionsStore");
+    const course1 = await getQuestionsForCours("COURSE-1");
+    const course2 = await getQuestionsForCours("COURSE-2");
+
+    expect(course1.map((q: any) => q.nom)).toEqual(["Q1", "Q2"]);
+    expect(course2.map((q: any) => q.nom)).toEqual(["Q1"]);
+  });
+
   test("getAllQuestions creates file when missing", async () => {
     const filePath = path.join(process.cwd(), "data", "questions.json");
     try {
