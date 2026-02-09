@@ -1,5 +1,5 @@
 <!-- Changer le numéro de l'itération plus bas pour chaque rapport -->
-# Rapport Itération numéro i
+# Rapport Itération numéro 1
 
 ## Identification des membres de l'équipe
 
@@ -49,10 +49,10 @@
 
 | Exigence | Responsable |
 | -------- | ----------- |
-| CU01a - Ajouter cours   |      |
-| CU01b - Récupérer cours   |         |
-| CU01c - 
-| CU02a -   |         |
+| CU01a    |             |
+| CU01b    |         |
+| CU01c    | Alex Boulianne|
+| CU02a    |         |
 
 ## Modèle du domaine (MDD)
 
@@ -71,9 +71,9 @@
 
 
 ## Contrats
-### Contrat AC01 - Démarrer Ajout Cours
+### Contrat CO01 - Démarrer Ajout Cours
 ---
-**Opération:** 
+**Opération:**
 demarrerAjoutCours()
 
 **Préconditions:**
@@ -84,19 +84,18 @@ Le service SGB est accessible.
 L'enseignant a récupéré depuis SGA la liste des groupes-cours.
 
 
-### Contrat AC02 - Sélectionner Cours
+### Contrat CO02 - Sélectionner Cours
 ---
-**Opération:**  
+**Opération:**
 sélectionnerGroupeCours(idGroupe : String)
 
 **Références croisées:**
-Contrat AC01 Démarrer Ajout Cours
+Contrat CO01 - Démarrer Ajout Cours
 
 **Préconditions:**
 L'Enseignant est authentifié.
 Un jeton d'authentification valide est présent dans la session.
 La liste des groupes-cours assignés à l'enseignant a été récupérée préalablement via demarrerAjoutCours()
-
 
 **PostConditions:**
 Une instance c : Cours a été créée.
@@ -104,37 +103,82 @@ c est associée à l'Enseignant authentifié.
 Les étudiants inscrit à ce groupe-cours sont associés a c. 
 Les informations du groupe-cours(horaire, local, etc.) sont enregistrées dans c.
 
-### Contrat BC01 - Afficher la liste des cours
+
+### Contrat CO03 - Afficher la liste des cours
 ---
-**Opération:** afficherListeCours()
+**Opération:**
+afficherListeCours()
+
 **Références croisées:**
 
 **Préconditions:**
 Une instance ens d'enseignant existe.
+
 **PostConditions:**
 
-### Contrat BC02 - Afficher les détails d'un cours
+
+### Contrat CO04 - Afficher les détails d'un cours
 ---
-**Opération:** afficherDetailsCours(idCours: String)
+**Opération:**
+afficherDetailsCours(idCours: String)
+
 **Références croisées:**
 
 **Préconditions:** 
 L'enseignant a aumoins un cours qui lui est assigné.
+
 **PostConditions:** 
 
-### Contrat C02a - Gestion de Question
+### Contrat CO05 - Retirer un cours
 ---
-**Opération:**  gestionQuestions()
+**Opération:**  
+retirerCours(idCours : String)
+
+**Références croisées:**
+Contrat CO03 - Afficher la liste de cours
+
+**Préconditions:**
+L'enseignant est authentifié.
+L'enseignant a récupéré un cours (Cu01b)
+
+**PostConditions:**
+Le cours (et seulement ce cours) a été supprimé du système SGA
+
+
+### Contrat CO06 - Confirmation de la suppression d'un cours
+---
+**Opération:**  
+confirmerSuppressionCours()
+
+**Références croisées:**
+Contrat CO05 - Retirer un cours
+
+**Préconditions:**
+L'enseignant est authentifié.
+L'enseignant a récupéré un cours (Cu01b)
+
+**PostConditions:**
+Le cours (et seulement ce cours) a été supprimé du système SGA
+
+
+### Contrat CO07 - Gestion de Question
+---
+**Opération:**
+gestionQuestions()
+
 **Références croisées:**
 
 **Préconditions:**
 - Le token de l'Enseignant e.token n'est pas vide
 - Un cours c est selectioné
+
 **PostConditions:**
-### Contrat C02a - Ajouter une question vrai/faux
+
+
+### Contrat CO08 - Ajouter une question vrai/faux
 ---
-**Opération:**  
-`ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Boolean, rétroactionVrai : String, rétroactionFaux : String) : void`
+**Opération:**
+ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Boolean, rétroactionVrai : String, rétroactionFaux : String) : void
 
 **Références croisées:**  
 CU02a – Ajouter question  
@@ -142,8 +186,8 @@ DSS – Ajouter une question
 MDD – Question, Cours  
 
 **Préconditions:**  
-- L’enseignant.token est pas vide.  
-- Un cours c sélectionné.
+- L’enseignant.token n'est pas vide.  
+- Un cours c  est sélectionné.
 
 **PostConditions:**  
 - Une instance `qvf` de `Question` a été créée.  
@@ -155,10 +199,10 @@ MDD – Question, Cours
 - `qvf` a été associée au `Cours` courant via l’association *contient*.
 
 
-
-### Contrat C2a - Ajouter une question d'autre type
+### Contrat CO09 - Ajouter une question d'autre type
 ---
-**Opération:** `ajouterQuestionAutreType(nom: String, énoncé: String, type: String, rétroactionValide: String, rétroactionInvalide: String, tags: String[])`
+**Opération:**
+ajouterQuestionAutreType(nom: String, énoncé: String, type: String, rétroactionValide: String, rétroactionInvalide: String, tags: String[])
 
 **Références croisées:**
 CU02a - Ajouter question
