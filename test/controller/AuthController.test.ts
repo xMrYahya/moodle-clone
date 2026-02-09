@@ -24,7 +24,7 @@ function makeRes() {
     json: jest.Mock;
   };
 }
-
+ 
 describe("AuthController (100% coverage)", () => {
   beforeEach(() => {
     jest.resetModules();
@@ -101,6 +101,18 @@ describe("AuthController (100% coverage)", () => {
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
+  test("getSignin: session manquante => render signin", () => {
+    const { AuthController } = loadControllerWithMockedSgbClient();
+
+    const req: any = {};
+    const res = makeRes();
+
+    AuthController.getSignin(req, res);
+
+    expect(res.render).toHaveBeenCalledWith("signin", { title: "Moodle" });
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
   test("postSignin: succès => set session + 200 {ok:true}", async () => {
     const { AuthController, loginTeacherMock } = loadControllerWithMockedSgbClient();
 
@@ -149,6 +161,23 @@ describe("AuthController (100% coverage)", () => {
 
     // e?.message undefined => fallback "Login failed"
     loginTeacherMock.mockRejectedValue({});
+
+    const req: any = {
+      body: { email: "a@a.com", password: "wrong" },
+      session: {},
+    };
+    const res = makeRes();
+
+    await AuthController.postSignin(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ ok: false, message: "Login failed" });
+  });
+
+  test("postSignin: erreur undefined => 401 + 'Login failed'", async () => {
+    const { AuthController, loginTeacherMock } = loadControllerWithMockedSgbClient();
+
+    loginTeacherMock.mockRejectedValue(undefined);
 
     const req: any = {
       body: { email: "a@a.com", password: "wrong" },
