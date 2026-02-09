@@ -77,6 +77,19 @@ describe("coursStore", () => {
     expect(tA[0].group_id).toBe("gA");
   });
 
+  test("getStoredForTeacher returns all courses for the same teacher", async () => {
+    const store = require("../../src/core/coursStore");
+    const a = { group_id: "g1", day: "", hours: "", activity: "", mode: "", local: "", teacher_id: "t1" } as any;
+    const b = { group_id: "g2", day: "", hours: "", activity: "", mode: "", local: "", teacher_id: "t1" } as any;
+    const c = { group_id: "g3", day: "", hours: "", activity: "", mode: "", local: "", teacher_id: "t2" } as any;
+    await store.addStored(a);
+    await store.addStored(b);
+    await store.addStored(c);
+
+    const t1 = await store.getStoredForTeacher("t1");
+    expect(t1.map((x: any) => x.group_id).sort()).toEqual(["g1", "g2"]);
+  });
+
   test("getStoredByGroupId finds existing course or returns undefined", async () => {
     const store = require("../../src/core/coursStore");
     const course = { group_id: "gX", day: "", hours: "", activity: "Act", mode: "", local: "", teacher_id: "t" } as any;

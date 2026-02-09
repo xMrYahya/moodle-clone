@@ -75,6 +75,9 @@ describe("CoursController", () => {
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce([]);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 1 }, token: "t" }, body: { groupId: "g-1" } };
@@ -104,6 +107,9 @@ describe("CoursController", () => {
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [{ id: 123, titre: "Course 123" }] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
     const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
@@ -139,6 +145,9 @@ describe("CoursController", () => {
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [{ id: 999, titre: "Course-XYZ-special" }] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
     const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
@@ -174,6 +183,9 @@ describe("CoursController", () => {
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
     const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
@@ -209,6 +221,9 @@ describe("CoursController", () => {
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [{ id: 888, titre: "Other course" }] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
     const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
@@ -244,6 +259,9 @@ describe("CoursController", () => {
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
     jest.spyOn(coursStore, "addStored").mockRejectedValueOnce(new Error("store-fail"));
@@ -276,6 +294,77 @@ describe("CoursController", () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith("Create failed");
+  });
+
+  test("creer: associates students and teacher to stored course", async () => {
+    jest.resetModules();
+    const SgbModule = require("../../src/core/sgbClient");
+    const schedule = {
+      teacher_id: 42,
+      group_id: "g-42",
+      day: "Mon",
+      hours: "10-11",
+      activity: "Cours",
+      mode: "In-person",
+      local: "A1",
+    };
+    const students = [
+      { first_name: "Alice", last_name: "A", email: "a@x.com" },
+      { first_name: "Bob", last_name: "B", email: "b@x.com" },
+    ];
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getSchedules")
+      .mockResolvedValueOnce({ data: [schedule] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getCourses")
+      .mockResolvedValueOnce({ data: [] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce(students as any);
+
+    const coursStore = require("../../src/core/coursStore");
+    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
+    const req: any = { session: { user: { id: 42 }, token: "t" }, body: { groupId: "g-42" } };
+    const res = makeRes();
+
+    await CoursController.creer(req, res);
+
+    const arg = (addStoredSpy.mock.calls[0][0] as any);
+    expect(arg.teacher_id).toBe("42");
+    expect(arg.students).toEqual(students);
+  });
+
+  test("creer: ignores schedules from other teachers", async () => {
+    jest.resetModules();
+    const SgbModule = require("../../src/core/sgbClient");
+    const schedules = [
+      { teacher_id: 99, group_id: "g-1", day: "Mon", hours: "9-10", activity: "X", mode: "", local: "" },
+      { teacher_id: 1, group_id: "g-1", day: "Tue", hours: "10-11", activity: "Y", mode: "", local: "" },
+    ];
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getSchedules")
+      .mockResolvedValueOnce({ data: schedules });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getCourses")
+      .mockResolvedValueOnce({ data: [] });
+    jest
+      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .mockResolvedValueOnce([]);
+
+    const coursStore = require("../../src/core/coursStore");
+    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
+    const req: any = { session: { user: { id: 1 }, token: "t" }, body: { groupId: "g-1" } };
+    const res = makeRes();
+
+    await CoursController.creer(req, res);
+
+    const arg = (addStoredSpy.mock.calls[0][0] as any);
+    expect(arg.teacher_id).toBe("1");
+    expect(arg.activity).toBe("Y");
   });
 
   test("supprimer: missing groupId -> redirect to /index", async () => {
@@ -407,6 +496,44 @@ describe("CoursController", () => {
       coursTitre: "Cours 1",
       questions: [{ nom: "Q1", type: "VraiFaux" }],
       showAddQuestionModal: true,
+    }));
+  });
+
+  test("afficherQuestions: returns all questions for course", async () => {
+    jest.resetModules();
+    const coursStore = require("../../src/core/coursStore");
+    const questionsStore = require("../../src/core/questionsStore");
+    jest.spyOn(coursStore, "getStoredByGroupId").mockResolvedValueOnce({
+      group_id: "g-10",
+      activity: "Cours",
+      course_id: "C-10",
+      course_titre: "Cours 10",
+      day: "Mon",
+      hours: "10-11",
+      mode: "Online",
+      local: "A",
+      teacher_id: "1",
+      students: [],
+    });
+    const questions = [
+      { nom: "Q1", type: "VraiFaux" },
+      { nom: "Q2", type: "ChoixMultiple" },
+    ];
+    jest.spyOn(questionsStore, "getQuestionsForCours").mockResolvedValueOnce(questions as any);
+
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
+    const req: any = {
+      params: { groupId: "g-10" },
+      query: {},
+      session: { user: { id: 1, first_name: "John", last_name: "Doe" } },
+    };
+    const res = makeRes();
+
+    await CoursController.afficherQuestions(req, res);
+
+    expect(res.render).toHaveBeenCalledWith("questions", expect.objectContaining({
+      groupId: "g-10",
+      questions,
     }));
   });
 

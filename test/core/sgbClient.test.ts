@@ -192,4 +192,117 @@ describe("SgbClient", () => {
       );
     });
   });
+
+  describe("getGroupStudentLinks", () => {
+    const token = "token123";
+
+    it("should successfully fetch group-student links", async () => {
+      const mockLinks = { data: [{ group_id: "1", student_id: "s1" }] };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValueOnce(mockLinks),
+      } as any);
+
+      const result = await client.getGroupStudentLinks(token);
+
+      expect(result).toEqual(mockLinks);
+      expect(mockedFetch).toHaveBeenCalledWith(
+        `${baseUrl}/api/v3/student/groupstudent`,
+        { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
+      );
+    });
+
+    it("should throw error if response is not ok", async () => {
+      mockedFetch.mockResolvedValueOnce({ ok: false } as any);
+
+      await expect(client.getGroupStudentLinks(token)).rejects.toThrow(
+        "Unable to fetch group-student links"
+      );
+    });
+  });
+
+  describe("getAllStudents", () => {
+    const token = "token123";
+
+    it("should successfully fetch all students", async () => {
+      const mockStudents = {
+        data: [{ first_name: "A", last_name: "B", id: "a@b.com" }],
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: jest.fn().mockResolvedValueOnce(mockStudents),
+      } as any);
+
+      const result = await client.getAllStudents(token);
+
+      expect(result).toEqual(mockStudents);
+      expect(mockedFetch).toHaveBeenCalledWith(
+        `${baseUrl}/api/v3/student/all`,
+        { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
+      );
+    });
+
+    it("should throw error if response is not ok", async () => {
+      mockedFetch.mockResolvedValueOnce({ ok: false } as any);
+
+      await expect(client.getAllStudents(token)).rejects.toThrow(
+        "Unable to fetch students"
+      );
+    });
+  });
+
+  describe("getStudentsForGroup", () => {
+    const token = "token123";
+
+    it("should return students for a group, skipping missing students and sorting by name", async () => {
+      const links = {
+        data: [
+          { group_id: "10", student_id: "s1" },
+          { group_id: "10", student_id: "s2" },
+          { group_id: "99", student_id: "s3" },
+          { group_id: "10", student_id: "missing" },
+        ],
+      };
+      const students = {
+        data: [
+          { first_name: "Zoey", last_name: "Alpha", id: "s2" },
+          { first_name: "Adam", last_name: "Zulu", id: "s1" },
+        ],
+      };
+
+      mockedFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: jest.fn().mockResolvedValueOnce(links),
+        } as any)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: jest.fn().mockResolvedValueOnce(students),
+        } as any);
+
+      const result = await client.getStudentsForGroup(token, "10");
+
+      expect(result).toEqual([
+        { first_name: "Zoey", last_name: "Alpha", email: "s2" },
+        { first_name: "Adam", last_name: "Zulu", email: "s1" },
+      ]);
+    });
+
+    it("should return empty array when responses have no data", async () => {
+      mockedFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: jest.fn().mockResolvedValueOnce({}),
+        } as any)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: jest.fn().mockResolvedValueOnce({}),
+        } as any);
+
+      const result = await client.getStudentsForGroup(token, "1");
+      expect(result).toEqual([]);
+    });
+  });
 });

@@ -88,6 +88,30 @@ describe("HomeController.index", () => {
     }));
   });
 
+  test("addCourse!=1 with teacher -> renders createdGroups for that teacher", async () => {
+    jest.resetModules();
+    const store = require("../../src/core/coursStore");
+    const getStoredSpy = jest.spyOn(store, "getStoredForTeacher").mockResolvedValueOnce([
+      { group_id: "g-1" },
+      { group_id: "g-2" },
+    ] as any);
+
+    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const req: any = {
+      session: { user: { id: 7, first_name: "T", last_name: "L" } },
+      query: { addCourse: "0" },
+    };
+    const res = makeRes();
+
+    await HomeController.index(req, res);
+
+    expect(getStoredSpy).toHaveBeenCalledWith("7");
+    expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
+      showAddCourseModal: false,
+      createdGroups: [{ group_id: "g-1" }, { group_id: "g-2" }],
+    }));
+  });
+
   test("confirmRemove string is passed through", async () => {
     jest.resetModules();
     const HomeController = require("../../src/controllers/HomeController").HomeController;
