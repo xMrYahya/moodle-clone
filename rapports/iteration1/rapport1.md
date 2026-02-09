@@ -56,45 +56,152 @@
 
 ## Modèle du domaine (MDD)
 
-> Le MDD est cumulatif : vous devez y ajouter des éléments à chaque itération (ou corriger les erreurs), selon la portée (et votre meilleure compréhension du problème) visée par votre solution. 
-> Utilisez une légende dans le MDD pour indiquer la couleur de chaque itération afin de faire ressortir les changements (ce n'est pas toujours possible pour les associations et les attributs). Voir les stéréotypes personnalisés : <https://plantuml.com/fr/class-diagram> et [comment faire une légende avec couleurs en PlantUML](https://stackoverflow.com/questions/30999290/how-to-generate-a-legend-with-colors-in-plantuml).
+![Modele du domaine](../../docs/modeles/iteration1exports/mddv1.png "Modèle du domaine (MDD)")
+
 
 ## Diagramme de séquence système (DSS)
 
-> Un DSS pour chaque cas d'utilisation. 
-> Veuillez utiliser des noms d'opérations significatifs comme "ajouterCours" (pas "opération1" ou "gérerCours").
-> Veuillez typer les paramètres sans utiliser de types complexes (ex: "List<Cours>" n'est pas un type simple).
+![DSS Ajouter Cours](../../docs/modeles/iteration1exports/dss-ajouter-cours.png "DSS Ajouter Cours")
+
+![DSS Recuperer Cours](../../docs/modeles/iteration1exports/dss-recuperer-cours.png "DSS Recuperer cours")
+
+![Dss retirer cours](../../docs/modeles/iteration1exports/retirer-cours.png "Dss retirer cours")
+
+![Dss Ajouter question](../../docs/modeles/iteration1exports/dss-ajouter-question.png "Dss Ajouter question")
+
 
 ## Contrats
+### Contrat AC01 - Démarrer Ajout Cours
+---
+**Opération:** 
+demarrerAjoutCours()
 
-> Si une opération système nécessite des posconditions, il faut en faire un contrat.
-> Vos contrats doivent être écrits en utilisant le formalisme vu en classe (titre avec identifiant unique, nom de l'opération, références croisées, préconditions et postconditions)
-> La rédaction des postconditions doit respecter les règles vues en classe (écrire au passé, etc.)
+**Préconditions:**
+L'Enseignant doit être authentifié.
+Le service SGB est accessible.
+
+**PostConditions:**
+L'enseignant a récupéré depuis SGA la liste des groupes-cours.
+
+
+### Contrat AC02 - Sélectionner Cours
+---
+**Opération:**  
+sélectionnerGroupeCours(idGroupe : String)
+
+**Références croisées:**
+Contrat AC01 Démarrer Ajout Cours
+
+**Préconditions:**
+L'Enseignant est authentifié.
+Un jeton d'authentification valide est présent dans la session.
+La liste des groupes-cours assignés à l'enseignant a été récupérée préalablement via demarrerAjoutCours()
+
+
+**PostConditions:**
+Une instance c : Cours a été créée.
+c est associée à l'Enseignant authentifié.
+Les étudiants inscrit à ce groupe-cours sont associés a c. 
+Les informations du groupe-cours(horaire, local, etc.) sont enregistrées dans c.
+
+### Contrat BC01 - Afficher la liste des cours
+---
+**Opération:** afficherListeCours()
+**Références croisées:**
+
+**Préconditions:**
+Une instance ens d'enseignant existe.
+**PostConditions:**
+
+### Contrat BC02 - Afficher les détails d'un cours
+---
+**Opération:** afficherDetailsCours(idCours: String)
+**Références croisées:**
+
+**Préconditions:** 
+L'enseignant a aumoins un cours qui lui est assigné.
+**PostConditions:** 
+
+### Contrat C02a - Gestion de Question
+---
+**Opération:**  gestionQuestions()
+**Références croisées:**
+
+**Préconditions:**
+- Le token de l'Enseignant e.token n'est pas vide
+- Un cours c est selectioné
+**PostConditions:**
+### Contrat C02a - Ajouter une question vrai/faux
+---
+**Opération:**  
+`ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Boolean, rétroactionVrai : String, rétroactionFaux : String) : void`
+
+**Références croisées:**  
+CU02a – Ajouter question  
+DSS – Ajouter une question  
+MDD – Question, Cours  
+
+**Préconditions:**  
+- L’enseignant.token est pas vide.  
+- Un cours c sélectionné.
+
+**PostConditions:**  
+- Une instance `qvf` de `Question` a été créée.  
+- `qvf.nom` est devenu `nom`.  
+- `qvf.énoncé` est devenu `énoncé`.  
+- `qvf.vérité` est devenu `vérité`.  
+- `qvf.rétroactionValide` est devenu `rétroactionVrai`.  
+- `qvf.rétroactionInvalide` est devenu `rétroactionFaux`.  
+- `qvf` a été associée au `Cours` courant via l’association *contient*.
+
+
+
+### Contrat C2a - Ajouter une question d'autre type
+---
+**Opération:** `ajouterQuestionAutreType(nom: String, énoncé: String, type: String, rétroactionValide: String, rétroactionInvalide: String, tags: String[])`
+
+**Références croisées:**
+CU02a - Ajouter question
+DSS - Ajoute une question
+MDD - Questions, Cours
+
+**Préconditions:**
+- L'enseignant est authentifié
+- Un cours courant est sélectionné.  
+- Le nom de la question n’existe pas déjà dans la banque de questions du cours courant.
+
+**Postconditions:**
+- Une instance `q` de `Question` a été créée
+- `q.nom` est devenu `nom`
+- `q.énoncé` est devenu `énoncé`
+- `q.type` est devenu `type` (attribut indiquant le type de question)
+- `q.rétroactionValide` est devenu `rétroactionValide`
+- `q.rétroactionInvalide` est devenu `rétroactionInvalide`
+- `q` a été associée au `Cours` courant via l'association *contient*
+- Pour chaque élément `t` dans `tags`, une instance de `tags` a été créée ou récupérée et associée à `q` via l'association *catégorisé par*
+
 
 ## Réalisation de cas d'utilisation (RDCU)
+![RDCU Demarrer ajout de cours](../../docs/modeles/iteration1exports/rdcu-demarrer-ajout-cours.png "RDCU demarrer ajout de cours")
 
-> Chaque cas d'utilisation nécessite une RDCU.
-> Vos RDCU doivent être des diagrammes de séquences d'opérations tel que vu dans le cours de LOG121.
-> Vos diagrammes doivent inclurent: 
-> - La création des instances nécessaires pour réaliser cette séquence
-> - Toutes les objets et classes nécessaires pour réaliser cette séquences, incluant les structures de données comme des objets Map, List, Set, etc.
-> - Les appels de méthodes avec leurs paramètres et les types (paramètres et méthodes)
-> - Les valeurs de retour avec leur type
-> - L'ordre chronologique précis des messages
-> - Les barres d'activation des instances pour montrer quand chaque objet est actif
+![RDCU afficher details de cours](../../docs/modeles/iteration1exports/rdcu-afficher-details-cours.png "RDCU afficher details de cours")
 
-## Diagramme de classe logicielle (DCL)
+![RDCU Selectionner Groupe cours](../../docs/modeles/iteration1exports/rdcu-selectionner-groupe-cours.png "RDCU Selectionner groupe cours")
 
-> Facultatif, mais fortement suggéré
-> Ce diagramme vous aidera à planifier l'ordre d'implémentation des classes.  Très utile lorsqu'on utilise TDD.
+![RDCU RDCU retirer un cours](../../docs/modeles/iteration1exports/rdcu-retirer-un-cours.png "RDCU retirer un cours")
+
+![RDCU Demarrer gestion de question](../../docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png "RDCU Demarrer gestion de question")
+
+![RDCU Ajouter une question de type vrai ou faux](../../docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png "RDCU Ajouter une question de type vrai ou faux")
+
+![RDCU Ajouter une question d'autre type](../../docs/modeles/iteration1exports/rdcu-ajouter-question-autre-type.png "RDCU Ajouter une question d'autre type")
+
+
 
 ### Diagramme de classe TPLANT
 - Générer un diagramme de classe avec l'outil TPLANT et commenter celui-ci par rapport à votre MDD.
 - https://www.npmjs.com/package/tplant
   
-## Retour sur la correction du rapport précédent
-> Veuillez insérer ici les diagrammes à revalider de l'itération précédente avec les corrections apportées.
-> Démontrer que vous avez réglé les problèmes identifiés dans le rapport de l'itération précédente.
 
 ## Vérification finale
 
