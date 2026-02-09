@@ -1,5 +1,5 @@
 @startuml
-title RDCU afficher liste des cours
+title RDCU - afficher liste des cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 

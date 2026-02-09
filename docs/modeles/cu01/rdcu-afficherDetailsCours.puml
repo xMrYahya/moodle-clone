@@ -1,5 +1,5 @@
 @startuml
-title Afficher Détails d'un cours
+title Afficher - Détails d'un cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 

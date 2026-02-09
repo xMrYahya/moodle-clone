@@ -239,9 +239,9 @@ MDD - Questions, Cours
 
 ![RDCU afficher details de cours](../../docs/modeles/iteration1exports/rdcu-afficher-details-cours.png "RDCU afficher details de cours")
 
-![RDCU confirmation de retrait de cours](../../docs/modeles/iteration1exports/rdcu-confirmation-retrait-v2.png "RDCU confirmation Retrait de cours")
-
 ![RDCU RDCU retirer un cours](../../docs/modeles/iteration1exports/rdcu-retirer-cours-v2.png "RDCU retirer un cours")
+
+![RDCU confirmation de retrait de cours](../../docs/modeles/iteration1exports/rdcu-confirmation-retrait-v2.png "RDCU confirmation Retrait de cours")
 
 ![RDCU Demarrer gestion de question](../../docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png "RDCU Demarrer gestion de question")
 
