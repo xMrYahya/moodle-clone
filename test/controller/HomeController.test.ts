@@ -12,6 +12,45 @@ describe("HomeController.index", () => {
   afterEach(() => {
     jest.restoreAllMocks();
     jest.resetModules();
+    delete process.env.SGB_BASE_URL;
+    jest.dontMock("../../src/core/sgbClient");
+  });
+
+  function loadControllerWithMockedSgbClient() {
+    const getSchedulesMock = jest.fn();
+    const getCoursesMock = jest.fn();
+    const SgbClientMock = jest.fn().mockImplementation((_baseUrl: string) => {
+      return { getSchedules: getSchedulesMock, getCourses: getCoursesMock };
+    });
+
+    jest.doMock("../../src/core/sgbClient", () => ({
+      SgbClient: SgbClientMock,
+    }));
+
+    const mod = require("../../src/controllers/HomeController");
+
+    return {
+      HomeController: mod.HomeController as typeof import("../../src/controllers/HomeController").HomeController,
+      SgbClientMock,
+      getSchedulesMock,
+      getCoursesMock,
+    };
+  }
+
+  test("module init: uses fallback URL when SGB_BASE_URL is undefined", () => {
+    delete process.env.SGB_BASE_URL;
+    const { SgbClientMock } = loadControllerWithMockedSgbClient();
+
+    expect(SgbClientMock).toHaveBeenCalledTimes(1);
+    expect(SgbClientMock).toHaveBeenCalledWith("http://localhost:3200");
+  });
+
+  test("module init: uses process.env.SGB_BASE_URL when defined", () => {
+    process.env.SGB_BASE_URL = "http://example:8888";
+    const { SgbClientMock } = loadControllerWithMockedSgbClient();
+
+    expect(SgbClientMock).toHaveBeenCalledTimes(1);
+    expect(SgbClientMock).toHaveBeenCalledWith("http://example:8888");
   });
 
   test("addCourse=1 but no teacher.id -> showAddCourseModal true, no fetch, empty groups", async () => {
@@ -24,6 +63,58 @@ describe("HomeController.index", () => {
 
     expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
       showAddCourseModal: true,
+      groups: [],
+      createdGroups: []
+    }));
+  });
+
+  test("addCourse!=1 -> no fetch, uses email fallback displayName and confirmRemove null when not string", async () => {
+    jest.resetModules();
+    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const req: any = {
+      session: { email: "teacher@school.edu" },
+      query: { addCourse: "0", confirmRemove: 123 },
+    };
+    const res = makeRes();
+
+    await HomeController.index(req, res);
+
+    expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
+      showAddCourseModal: false,
+      displayName: "teacher@school.edu",
+      confirmRemoveGroupId: null,
+      groups: [],
+      createdGroups: []
+    }));
+  });
+
+  test("confirmRemove string is passed through", async () => {
+    jest.resetModules();
+    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const req: any = {
+      session: { email: "teacher@school.edu" },
+      query: { confirmRemove: "g-1" },
+    };
+    const res = makeRes();
+
+    await HomeController.index(req, res);
+
+    expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
+      confirmRemoveGroupId: "g-1",
+    }));
+  });
+
+  test("no teacher and no email -> displayName defaults to 'Enseignant'", async () => {
+    jest.resetModules();
+    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const req: any = { session: {}, query: {} };
+    const res = makeRes();
+
+    await HomeController.index(req, res);
+
+    expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
+      displayName: "Enseignant",
+      showAddCourseModal: false,
       groups: [],
       createdGroups: []
     }));
@@ -56,7 +147,9 @@ describe("HomeController.index", () => {
     const SgbModule = require("../../src/core/sgbClient");
     const schedules = [
       { teacher_id: 10, group_id: "g-123", activity: "A", mode: "M", local: "L" },
+      { teacher_id: 10, group_id: "g-123", activity: "A2", mode: "M2", local: "L2" },
       { teacher_id: 10, group_id: "g-XYZ", activity: "B", mode: "N", local: "K" },
+      { teacher_id: 10, group_id: "g-777", activity: "D", mode: "P", local: "H" },
       { teacher_id: 10, group_id: "groupNoDash", activity: "C", mode: "O", local: "J" },
       { teacher_id: 99, group_id: "other", activity: "X", mode: "Y", local: "Z" },
     ];
@@ -79,9 +172,10 @@ describe("HomeController.index", () => {
     expect(res.render).toHaveBeenCalled();
     const renderArg = (res.render.mock.calls[0][1] as any);
     expect(renderArg.createdGroups).toEqual([{ group_id: "g-123" }]);
-    expect(renderArg.groups.length).toBe(2);
+    expect(renderArg.groups.length).toBe(3);
 
     const gXYZ = renderArg.groups.find((g: any) => g.group_id === "g-XYZ");
+    const g777 = renderArg.groups.find((g: any) => g.group_id === "g-777");
     const gNoDash = renderArg.groups.find((g: any) => g.group_id === "groupNoDash");
 
     expect(gXYZ).toEqual(expect.objectContaining({
@@ -91,6 +185,16 @@ describe("HomeController.index", () => {
       activity: "B",
       mode: "N",
       local: "K",
+      teacher_id: "10"
+    }));
+
+    expect(g777).toEqual(expect.objectContaining({
+      group_id: "g-777",
+      course_id: "777",
+      course_titre: "777",
+      activity: "D",
+      mode: "P",
+      local: "H",
       teacher_id: "10"
     }));
 
@@ -123,5 +227,20 @@ describe("HomeController.index", () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith("sgb-fail");
     expect(res.render).not.toHaveBeenCalled();
+  });
+
+  test("error without message -> returns 500 with fallback message", async () => {
+    jest.resetModules();
+    const store = require("../../src/core/coursStore");
+    jest.spyOn(store, "getStoredForTeacher").mockRejectedValueOnce(undefined);
+
+    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const req: any = { session: { user: { id: 1, first_name: "A", last_name: "B" } }, query: {} };
+    const res = makeRes();
+
+    await HomeController.index(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith("Index failed");
   });
 });

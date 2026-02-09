@@ -32,6 +32,16 @@ describe("coursStore", () => {
     expect(all).toEqual([]);
   });
 
+  test("getAllStored returns empty array when courses is not an array", async () => {
+    const store = require("../../src/core/coursStore");
+    const filePath = path.join(tmpDir, "data", "cours.json");
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, JSON.stringify({ courses: { bad: true } }), "utf-8");
+
+    const all = await store.getAllStored();
+    expect(all).toEqual([]);
+  });
+
   test("addStored adds a course and avoids duplicates", async () => {
     const store = require("../../src/core/coursStore");
     const course = {
@@ -65,6 +75,18 @@ describe("coursStore", () => {
     const tA = await store.getStoredForTeacher("tA");
     expect(tA).toHaveLength(1);
     expect(tA[0].group_id).toBe("gA");
+  });
+
+  test("getStoredByGroupId finds existing course or returns undefined", async () => {
+    const store = require("../../src/core/coursStore");
+    const course = { group_id: "gX", day: "", hours: "", activity: "Act", mode: "", local: "", teacher_id: "t" } as any;
+    await store.addStored(course);
+
+    const found = await store.getStoredByGroupId("gX");
+    const notFound = await store.getStoredByGroupId("missing");
+
+    expect(found?.group_id).toBe("gX");
+    expect(notFound).toBeUndefined();
   });
 
   test("removeStored removes given group and leaves others", async () => {
