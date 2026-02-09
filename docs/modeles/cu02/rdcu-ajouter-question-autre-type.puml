@@ -2,52 +2,36 @@
 hide footbox
 title RDCU - ajouterQuestionAutreType
 
-participant ":Cours" as C
-participant "questions:List<Question>" as LQ
+actor ":Enseignant" as e
+participant "qc:QuestionsController" as QC
+participant "qs:QuestionsStore" as QS
 participant "q:Question" as Q
 
--> C : ajouterQuestionAutreType(nom, enonce, type,\n  retroactionValide, retroactionInvalide, tags)
-activate C
+e -> QC : ajouterQuestionAutreType(nom : String, enonce : String, type : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+activate e
 
-note right of C
-  selon Contrôleur
-  (Cours est l'objet racine)
-end note
+activate QC
 
-C -> LQ : contains(nom)
-activate LQ
-LQ --> C : nomExiste:boolean
-deactivate LQ
+QC -> QS : questionNameExists(nom)
+activate QS
+QS --> QC : nomExiste:boolean
+deactivate QS
 
-alt nom unique
-  
-  note right
-    selon Créateur
-    (Cours agrège Question)
-  end note
-  
+alt Nom de question unique
   create Q
-  C -> Q : new Question(nom, enonce, type,\n  retroactionValide, retroactionInvalide)
+  QC -> Q : <<create>> Question(nom, enonce, type,\n retroactionValide, retroactionInvalide, tags)
   activate Q
   deactivate Q
-  
-  C -> LQ : add(q)
-  activate LQ
-  deactivate LQ
-  note right
-    selon Expert
-    (List connaît ses éléments)
-  end note
-  
-    <-- C: true
-else nom déjà utilisé
-  
-   <-- C: false
-  
+
+  QC -> QS : addQuestion(q)
+  activate QS
+  deactivate QS
+
+  QC --> e : confirmationAjout(listeQuestions)
+else Nom de question deja utilise
+  QC --> e : signalerErreurNomExistant()
 end
 
-deactivate C
-
-
-
+deactivate QC
+activate e
 @enduml

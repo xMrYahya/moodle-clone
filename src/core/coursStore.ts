@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import { StudentInfo } from "./sgbClient";
 
-export type StoredCours = {
+export type Cours = {
   group_id: string;
   day: string;
   hours: string;
@@ -33,24 +33,26 @@ export async function clearStoreOnStartup(): Promise<void> {
   await fs.writeFile(STORE_PATH, JSON.stringify({ courses: [] }, null, 2), "utf-8");
 }
 
-export async function getAllStored(): Promise<StoredCours[]> {
+export async function getAllStored(): Promise<Cours[]> {
   await ensureFile();
   const raw = await fs.readFile(STORE_PATH, "utf-8");
   const json = JSON.parse(raw);
   return Array.isArray(json.courses) ? json.courses : [];
 }
 
-export async function getStoredForTeacher(teacherId: string): Promise<StoredCours[]> {
+export async function getStoredForTeacher(teacherId: string): Promise<Cours[]> {
   const all = await getAllStored();
   return all.filter(c => String(c.teacher_id) === String(teacherId));
 }
 
-export async function getStoredByGroupId(groupId: string): Promise<StoredCours | undefined> {
+export async function getStoredByGroupId(groupId: string): Promise<Cours | undefined> {
   const all = await getAllStored();
   return all.find(c => c.group_id === String(groupId));
 }
 
-export async function addStored(course: StoredCours): Promise<void> {
+export async function addStored(course: Cours
+
+): Promise<void> {
   const all = await getAllStored();
   const exists = all.some(c => c.group_id === course.group_id);
   if (!exists) {
