@@ -1,61 +1,91 @@
-@startuml MDD
+@startuml MDD_SGB_SGA
 skinparam style strictuml
+'skinparam backgroundcolor transparent
+hide methods
+hide empty members
+'left to right direction
 title Modèle du domaine
-package "SGB"{
-  class Enseignant{
 
-  }
-  class Groupe-cours{
-    ' Selon le mdd du SGB
-    idGroupe : String
-  }
-  class Étudiant{
-    prenom : String
-    nom : String
-    codePermanent : String
-    email : String
-  }
-  class Université{
-
-  }
+skinparam class {
+  BackgroundColor<< SGB >> #ddffdd
 }
-class Cours{
-  idCours : String
-  local : String
-  ' Les suivants pouraient etre dans l'horaire
-  aDistance : bool
-  deJour : bool  
-}
-class Horaire{
+hide stereotype
 
-}
 
-Enseignant "*" -- "1" Université : Employé par >
-
-Étudiant "*" -- "1" Université : Inscrit à >
-
-Cours "1" -- "1" Horaire :  Suis l' >
-
-Étudiant "*" -- "*" "Groupe-cours" : Inscrit à >
-
-Cours "1" -- "1" "Groupe-cours" : associé à >
-
-"Groupe-cours" "*" -- "1" Enseignant :  assignés à >
-
-' En lien avec la cu02
-
-class Question{
+  ' Le concept de "Cours" dans SGA n'est pas un groupe-cours
+  class "Question" as question {
   nom : String
   énoncé : String
   ' reponse a la question
-  rétroactionValide : String
-  rétroactionInvalide : String
+  retroactionValide : String
+  retroactionInvalide : String
+  }
+  class "Tags" as tags {
+    nom : String
+  }
+  class "questionVraiFaux" as qvf extends question {
+    reponse : boolean
+    retroaction : String
+  }
+  class "questionChoixMultiple" as qcm extends question {
+    seulementUnChoix : boolean
+  }
+  class "reponseChoixMultiple" as rcm {
+    retroaction : String
+    text : String
+    estBonneReponse : boolean
+  }
+  class "questionMiseEnCorrespondance" as qmc extends question {
+    
+  }
+  class "pairDeCorrespondance" as pdc {
+    question : String
+    reponse : String
+  }
+  class "questionReponseCourte" as qrc extends question {
+    reponseAttendue : String
+    retroaction : String
+  }
+  class "questionNumerique" as qn extends question {
+    reponseAttendue : int
+    retroaction : String
+  }
+  class "questionEssai" as qe extends question {
+    
+  }
+  class "Enseignant" as ens {
+    token : String
+  }
+  class "cours" as cours {
+    sigle : String
+    titre : String
+  }
+  class "Etudiant" as etudiant {
+    prenom : String
+    nom : String
+    courriel : String
+    codePermanent : String
+  }
+  class "InformationCours" as infocours {
+    identifiant : String
+    jour : String
+    local : String
+    enPresence : boolean
+  }
+  class "horaire" as horaire {
+    lundi : String
+    mardi : String
+    mercredi : String
+    jeudi : String
+    vendredi : String
+  }
   
-}
-class tags{
-
-}
-
-Question "*" -- "*" tags : catégorisé par >
-
+  etudiant "*" -- "*" cours : associé-à >
+  infocours "1" -- "1" cours : décrit >
+  infocours "1" -- "1" horaire : contient >
+  cours "1" -- "1" question :contient >
+  cours "*" -- "1" ens : est associé-à >
+  question "*" -- "*" tags : appartient-à >
+  qcm "1" -- "*" rcm : contient >
+  qmc "1" -- "*" pdc : contient >
 @enduml

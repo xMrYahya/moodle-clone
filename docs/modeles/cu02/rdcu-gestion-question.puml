@@ -9,7 +9,7 @@ activate e
     e->c : recupererQuestions() : BanqueQuestions
     activate c
       c->b : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
-        b-->>c b:BanqueQuestions
+        b-->>c :BanqueQuestions
     deactivate c
 deactivate e
 @enduml
