@@ -79,12 +79,14 @@
 **Opération:**
 demarrerAjoutCours()
 
+**Références croisées:**
+
 **Préconditions:**
 L'Enseignant doit être authentifié.
 Le service SGB est accessible.
 
 **PostConditions:**
-L'enseignant a récupéré depuis SGA la liste des groupes-cours.
+L'enseignant a récupéré depuis le SGA la liste des groupes-cours.
 
 
 ### Contrat CO02 - Sélectionner Cours
@@ -128,17 +130,17 @@ afficherDetailsCours(idCours: String)
 **Références croisées:**
 
 **Préconditions:** 
-L'enseignant a aumoins un cours qui lui est assigné.
+L'enseignant a au moins un cours qui lui est assigné.
 
 **PostConditions:** 
 
 ### Contrat CO05 - Retirer un cours
 ---
-**Opération:**  
+**Opération:**
 retirerCours(idCours : String)
 
 **Références croisées:**
-Contrat CO03 - Afficher la liste de cours
+Contrat CO03 - Afficher la liste des cours
 
 **Préconditions:**
 L'enseignant est authentifié.
@@ -150,7 +152,7 @@ Le cours (et seulement ce cours) a été supprimé du système SGA
 
 ### Contrat CO06 - Confirmation de la suppression d'un cours
 ---
-**Opération:**  
+**Opération:**
 confirmerSuppressionCours()
 
 **Références croisées:**
@@ -246,6 +248,7 @@ MDD - Questions, Cours
 
 
 ### Diagramme de classe TPLANT
+![Diagramme de classe](../../docs/modeles/iteration1exports/diagramme-de-classe.png "Diagramme de classe")
 - Générer un diagramme de classe avec l'outil TPLANT et commenter celui-ci par rapport à votre MDD.
 - https://www.npmjs.com/package/tplant
   

@@ -1,0 +1,35 @@
+@startuml
+class SgbClient {
+    -baseUrl: string
+    +loginTeacher(email: string, password: string): Promise<SgbTeacherLoginResponse>
+    +getSchedules(token: string): Promise<any>
+    +getCourses(token: string): Promise<{ data: {    id: string;    titre: string;}[]; }>
+}
+class CoursStore {
+    +{static} ensureFile(): Promise<void>
+    +{static} clearStoreOnStartup(): Promise<void>
+    +{static} getAllStored(): Promise<StoredCours[]>
+    +{static} getStoredForTeacher(teacherId: string): Promise<StoredCours[]>
+    +{static} addStored(course: StoredCours): Promise<void>
+    +{static} removeStored(groupId: string): Promise<void>
+    +{static} extractCourseCode(groupId: string): string
+}
+class AuthController {
+    +{static} getSignin(req: any, res: Response<any, Record<string, any>>): void
+    +{static} postSignin(req: any, res: Response<any, Record<string, any>>): Promise<void>
+    +{static} signout(req: any, res: Response<any, Record<string, any>>): void
+}
+class HomeController {
+    +{static} index(req: any, res: Response<any, Record<string, any>>): Promise<void>
+}
+class CoursController {
+    +{static} creer(req: any, res: Response<any, Record<string, any>>): Promise<void>
+    +{static} supprimer(req: any, res: Response<any, Record<string, any>>): Promise<void>
+}
+
+AuthController "1" -- "1" SgbClient
+HomeController "1" --- "1" SgbClient
+CoursController "1" -- "1" SgbClient
+HomeController "1" ..> "1" CoursStore
+CoursController "1" ..> "1" CoursStore
+@enduml
