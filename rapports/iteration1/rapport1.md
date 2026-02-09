@@ -3,22 +3,18 @@
 
 ## Identification des membres de l'équipe
 
-Veuillez éditer ce fichier afin de fournir les informations nécessaires à votre évaluation.
-
-Assurez-vous d'utiliser toujours le même compte GitHub pour accéder à ce projet.
-
 ## Membre 1
 
 - <nomComplet1>Ardy, Yahya</nomComplet1>
 - <courriel1>yahya.ardy.1@ens.etsmtl.ca</courriel1>
-- <codeMoodle1>Saisissez votre code Moodle (code universel) obtenu à partir de SIGNETS</codeMoodle1>
+- <codeMoodle1>AT73950</codeMoodle1>
 - <githubAccount1>xMrYahya</githubAccount1>
 
 ## Membre 2
 
 - <nomComplet2>Boulianne, Alex</nomComplet2>
 - <courriel2>alex.boulianne.1@ens.etsmtl.ca</courriel2>
-- <codeMoodle2>Saisissez votre code Moodle (code universel) obtenu à partir de SIGNETS</codeMoodle2>
+- <codeMoodle2>AT72810</codeMoodle2>
 - <githubAccount2>c4tiki</githubAccount2>
 
 ## Membre 3
@@ -32,32 +28,31 @@ Assurez-vous d'utiliser toujours le même compte GitHub pour accéder à ce proj
 
 - <nomComplet4>Hoffmann, Raphaël</nomComplet4>
 - <courriel4>raphael.hoffmann.1@ens.etsmtl.ca</courriel4>
-- <codeMoodle4>Saisissez votre code Moodle (code universel) obtenu à partir de SIGNETS</codeMoodle4>
+- <codeMoodle4>AU65470</codeMoodle4>
 - <githubAccount4>WishPib</githubAccount4>
 
 ## Membre 5
 
 - <nomComplet5>Kandil, Kassem</nomComplet5>
 - <courriel5>kassem.kandil.1@ens.etsmtl.ca</courriel5>
-- <codeMoodle5>Saisissez votre code Moodle (code universel) obtenu à partir de SIGNETS</codeMoodle5>
+- <codeMoodle5>AU84220</codeMoodle5>
 - <githubAccount5>kassem0303,kassem03-ets</githubAccount5>
 
 ## Membre 6
 
 - <nomComplet6>Montion, Lucas</nomComplet6>
 - <courriel6>lucas.montion.1@ens.etsmtl.ca</courriel6>
-- <codeMoodle6>Saisissez votre code Moodle (code universel) obtenu à partir de SIGNETS</codeMoodle6>
+- <codeMoodle6>AT98200</codeMoodle6>
 - <githubAccount6>LucasMontion</githubAccount6>
 
 ## Exigences
 
-> Liste des exigences et personnes responsables de celles-ci.
-
 | Exigence | Responsable |
 | -------- | ----------- |
-| CU01a - Ajouter cours   | Patrice     |
-| CU01b - Récupérer cours   | Yvan        |
-| U1 - Affichage adaptatif (responsive design)   | Christopher        |
+| CU01a - Ajouter cours   |      |
+| CU01b - Récupérer cours   |         |
+| CU01c - 
+| CU02a -   |         |
 
 ## Modèle du domaine (MDD)
 

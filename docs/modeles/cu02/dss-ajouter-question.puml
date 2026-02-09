@@ -3,7 +3,9 @@ title Ajouter une question
 actor ":Enseignant" as e
 participant ":Systeme" as s
 ' Ajout des Pre conditions ici si nécessaire
+activate e
 e->s : gestionQuestions();
+activate s
 s-->>e : Liste des questions associées au cours
 loop Tant que l'enseignant veut ajouter des questions
 alt Ajout de Question Vrai ou Faux
@@ -18,5 +20,6 @@ else Nom de question déjà utilisé
     s-->>e : Signalement d'erreur
 end alt
 end loop
-
+deactivate s
+deactivate e
 @enduml
