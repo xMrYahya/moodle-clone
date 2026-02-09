@@ -42,114 +42,331 @@ html
       .modal-overlay
         .modal-card
           .modal-header
-            h5.mb-0 Ajouter une question
+            h5.mb-0#modal-title Choisir le type de question
             a.close(href=`/cours/${groupId}/questions` aria-label="Fermer") ×
 
           .modal-body
-            // === FORM 1: VRAI/FAUX ===
-            form(method="post" action=`/questions/${groupId}/ajouter-vrai-faux` id="form-vrai-faux")
-              h6.mb-3 Vrai ou Faux
+            // === ÉCRAN DE SÉLECTION DU TYPE ===
+            #type-selection-screen
+              p.text-muted.mb-4 Sélectionnez le type de question que vous souhaitez créer:
+              
+              .row
+                .col-md-4.mb-3
+                  .card.question-type-card(onclick="selectQuestionType('VraiFaux')" style="cursor: pointer;")
+                    .card-body.text-center
+                      h5.card-title.mb-0 Vrai ou Faux
 
-              .form-group
-                label(for="nom-vf") Nom de la question:
-                input.form-control(type="text" id="nom-vf" name="nom" required)
+                .col-md-4.mb-3
+                  .card.question-type-card(onclick="selectQuestionType('ChoixMultiple')" style="cursor: pointer;")
+                    .card-body.text-center
+                      h5.card-title.mb-0 Choix Multiple
 
-              .form-group
-                label(for="enonce-vf") Énoncé:
-                textarea.form-control(id="enonce-vf" name="énoncé" required rows="3")
+                .col-md-4.mb-3
+                  .card.question-type-card(onclick="selectQuestionType('MiseEnCorrespondance')" style="cursor: pointer;")
+                    .card-body.text-center
+                      h5.card-title.mb-0 Mise en Correspondance
 
-              .form-group
-                label(for="reponse-vf") Réponse correcte:
-                select.form-control(id="reponse-vf" name="reponse" required)
-                  option(value="") -- Sélectionner --
-                  option(value="true") Vrai
-                  option(value="false") Faux
+                .col-md-4.mb-3
+                  .card.question-type-card(onclick="selectQuestionType('ReponseCourte')" style="cursor: pointer;")
+                    .card-body.text-center
+                      h5.card-title.mb-0 Réponse Courte
 
-              .form-group
-                label(for="retroaction-valide-vf") Rétroaction si correct:
-                input.form-control(type="text" id="retroaction-valide-vf" name="retroactionValide" placeholder="Optionnel")
+                .col-md-4.mb-3
+                  .card.question-type-card(onclick="selectQuestionType('Numerique')" style="cursor: pointer;")
+                    .card-body.text-center
+                      h5.card-title.mb-0 Numérique
 
-              .form-group
-                label(for="retroaction-invalide-vf") Rétroaction si incorrect:
-                input.form-control(type="text" id="retroaction-invalide-vf" name="retroactionInvalide" placeholder="Optionnel")
+                .col-md-4.mb-3
+                  .card.question-type-card(onclick="selectQuestionType('Essai')" style="cursor: pointer;")
+                    .card-body.text-center
+                      h5.card-title.mb-0 Essai
 
-              .form-group
-                label(for="tags-vf") Tags (séparés par des virgules):
-                input.form-control(type="text" id="tags-vf" name="tags" placeholder="Optionnel")
+            // === FORMULAIRE VRAI/FAUX ===
+            #form-screen-vraifaux(style="display: none;")
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
+                i.fas.fa-arrow-left.mr-1
+                | Retour
 
-              button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+              form(method="post" action=`/questions/${groupId}/ajouter-vrai-faux` id="form-vrai-faux")
+                h6.mb-3 Question Vrai ou Faux
 
-            hr.my-4
-
-            // === FORM 2: AUTRES TYPES ===
-            form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-autre")
-              h6.mb-3 Autre type de question
-
-              .form-group
-                label(for="type") Type de question:
-                select.form-control(id="type" name="type" required onchange="updateFormForType(this.value)")
-                  option(value="") -- Sélectionner --
-                  option(value="ChoixMultiple") Choix multiple
-                  option(value="Numerique") Question numérique
-                  option(value="ReponseCourte") Réponse courte
-
-              .form-group
-                label(for="nom-at") Nom de la question:
-                input.form-control(type="text" id="nom-at" name="nom" required)
-
-              .form-group
-                label(for="enonce-at") Énoncé:
-                textarea.form-control(id="enonce-at" name="énoncé" required rows="3")
-
-              // Choix multiple
-              #div-choix-multiple.form-group(style="display: none;")
-                label Choix multiples:
-                .form-check.mb-2
-                  input.form-check-input(type="checkbox" id="seul-choix" name="seulementUnChoix" value="true")
-                  label.form-check-label(for="seul-choix") Un seul choix correct
-
-                .alert.alert-info.small Pour simplifier, entrez une description des choix. Format: "Choix1|Choix2|Choix3" (le premier est supposé correct)
                 .form-group
-                  label(for="rep-mult") Description des choix:
-                  input.form-control(type="text" id="rep-mult" name="reponses" placeholder="Ex: Choix correct|Mauvais choix|Autre mauvais")
+                  label(for="nom-vf") Nom de la question:
+                  input.form-control(type="text" id="nom-vf" name="nom" required)
 
-              // Question numérique
-              #div-numerique.form-group(style="display: none;")
-                label(for="reponse-num") Réponse numérique:
-                input.form-control(type="number" id="reponse-num" name="reponse" placeholder="Ex: 42" step="any")
+                .form-group
+                  label(for="enonce-vf") Énoncé:
+                  textarea.form-control(id="enonce-vf" name="énoncé" required rows="3")
 
-              // Réponse courte
-              #div-reponsecourte.form-group(style="display: none;")
-                label(for="reponse-courte") Réponse attendue:
-                input.form-control(type="text" id="reponse-courte" name="reponse" placeholder="La réponse correcte")
+                .form-group
+                  label(for="reponse-vf") Réponse correcte:
+                  select.form-control(id="reponse-vf" name="reponse" required)
+                    option(value="") -- Sélectionner --
+                    option(value="true") Vrai
+                    option(value="false") Faux
 
-              // Rétroaction commune
-              .form-group
-                label(for="retroaction-valide-at") Rétroaction si correct:
-                input.form-control(type="text" id="retroaction-valide-at" name="retroactionValide" placeholder="Optionnel")
+                .form-group
+                  label(for="retroaction-valide-vf") Rétroaction si correct:
+                  input.form-control(type="text" id="retroaction-valide-vf" name="retroactionValide" placeholder="Optionnel")
 
-              .form-group
-                label(for="retroaction-invalide-at") Rétroaction si incorrect:
-                input.form-control(type="text" id="retroaction-invalide-at" name="retroactionInvalide" placeholder="Optionnel")
+                .form-group
+                  label(for="retroaction-invalide-vf") Rétroaction si incorrect:
+                  input.form-control(type="text" id="retroaction-invalide-vf" name="retroactionInvalide" placeholder="Optionnel")
 
-              .form-group
-                label(for="tags-at") Tags (séparés par des virgules):
-                input.form-control(type="text" id="tags-at" name="tags" placeholder="Optionnel")
+                .form-group
+                  label(for="tags-vf") Tags (séparés par des virgules):
+                  input.form-control(type="text" id="tags-vf" name="tags" placeholder="Optionnel")
 
-              button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+                button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+
+            // === FORMULAIRE CHOIX MULTIPLE ===
+            #form-screen-choixmultiple(style="display: none;")
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
+                i.fas.fa-arrow-left.mr-1
+                | Retour
+
+              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-choix-multiple")
+                input(type="hidden" name="type" value="ChoixMultiple")
+                h6.mb-3 Question Choix Multiple
+
+                .form-group
+                  label(for="nom-cm") Nom de la question:
+                  input.form-control(type="text" id="nom-cm" name="nom" required)
+
+                .form-group
+                  label(for="enonce-cm") Énoncé:
+                  textarea.form-control(id="enonce-cm" name="énoncé" required rows="3")
+
+                .form-group
+                  .form-check.mb-2
+                    input.form-check-input(type="checkbox" id="seul-choix-cm" name="seulementUnChoix" value="true")
+                    label.form-check-label(for="seul-choix-cm") Un seul choix correct
+
+                  .alert.alert-info.small Pour simplifier, entrez une description des choix. Format: "Choix1|Choix2|Choix3" (le premier est supposé correct)
+                  label(for="rep-mult-cm") Description des choix:
+                  input.form-control(type="text" id="rep-mult-cm" name="reponses" placeholder="Ex: Choix correct|Mauvais choix|Autre mauvais" required)
+
+                .form-group
+                  label(for="retroaction-valide-cm") Rétroaction si correct:
+                  input.form-control(type="text" id="retroaction-valide-cm" name="retroactionValide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="retroaction-invalide-cm") Rétroaction si incorrect:
+                  input.form-control(type="text" id="retroaction-invalide-cm" name="retroactionInvalide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="tags-cm") Tags (séparés par des virgules):
+                  input.form-control(type="text" id="tags-cm" name="tags" placeholder="Optionnel")
+
+                button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+
+            // === FORMULAIRE NUMÉRIQUE ===
+            #form-screen-numerique(style="display: none;")
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
+                i.fas.fa-arrow-left.mr-1
+                | Retour
+
+              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-numerique")
+                input(type="hidden" name="type" value="Numerique")
+                h6.mb-3 Question Numérique
+
+                .form-group
+                  label(for="nom-num") Nom de la question:
+                  input.form-control(type="text" id="nom-num" name="nom" required)
+
+                .form-group
+                  label(for="enonce-num") Énoncé:
+                  textarea.form-control(id="enonce-num" name="énoncé" required rows="3")
+
+                .form-group
+                  label(for="reponse-num") Réponse numérique:
+                  input.form-control(type="number" id="reponse-num" name="reponse" placeholder="Ex: 42" step="any" required)
+
+                .form-group
+                  label(for="retroaction-valide-num") Rétroaction si correct:
+                  input.form-control(type="text" id="retroaction-valide-num" name="retroactionValide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="retroaction-invalide-num") Rétroaction si incorrect:
+                  input.form-control(type="text" id="retroaction-invalide-num" name="retroactionInvalide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="tags-num") Tags (séparés par des virgules):
+                  input.form-control(type="text" id="tags-num" name="tags" placeholder="Optionnel")
+
+                button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+
+            // === FORMULAIRE RÉPONSE COURTE ===
+            #form-screen-reponsecourte(style="display: none;")
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
+                i.fas.fa-arrow-left.mr-1
+                | Retour
+
+              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-reponse-courte")
+                input(type="hidden" name="type" value="ReponseCourte")
+                h6.mb-3 Question Réponse Courte
+
+                .form-group
+                  label(for="nom-rc") Nom de la question:
+                  input.form-control(type="text" id="nom-rc" name="nom" required)
+
+                .form-group
+                  label(for="enonce-rc") Énoncé:
+                  textarea.form-control(id="enonce-rc" name="énoncé" required rows="3")
+
+                .form-group
+                  label(for="reponse-rc") Réponse attendue:
+                  input.form-control(type="text" id="reponse-rc" name="reponse" placeholder="La réponse correcte" required)
+
+                .form-group
+                  label(for="retroaction-valide-rc") Rétroaction si correct:
+                  input.form-control(type="text" id="retroaction-valide-rc" name="retroactionValide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="retroaction-invalide-rc") Rétroaction si incorrect:
+                  input.form-control(type="text" id="retroaction-invalide-rc" name="retroactionInvalide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="tags-rc") Tags (séparés par des virgules):
+                  input.form-control(type="text" id="tags-rc" name="tags" placeholder="Optionnel")
+
+                button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+
+            // === FORMULAIRE MISE EN CORRESPONDANCE ===
+            #form-screen-miseencorrespondance(style="display: none;")
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
+                i.fas.fa-arrow-left.mr-1
+                | Retour
+
+              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-mise-correspondance")
+                input(type="hidden" name="type" value="MiseEnCorrespondance")
+                h6.mb-3 Question Mise en Correspondance
+
+                .form-group
+                  label(for="nom-mec") Nom de la question:
+                  input.form-control(type="text" id="nom-mec" name="nom" required)
+
+                .form-group
+                  label(for="enonce-mec") Énoncé:
+                  textarea.form-control(id="enonce-mec" name="énoncé" required rows="3")
+
+                .form-group
+                  .alert.alert-info.small Pour simplifier, entrez les paires de correspondance. Format: "Question1:Réponse1|Question2:Réponse2"
+                  label(for="paires-mec") Paires de correspondance:
+                  input.form-control(type="text" id="paires-mec" name="paires" placeholder="Ex: Paris:France|Berlin:Allemagne|Tokyo:Japon" required)
+
+                .form-group
+                  label(for="retroaction-valide-mec") Rétroaction si correct:
+                  input.form-control(type="text" id="retroaction-valide-mec" name="retroactionValide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="retroaction-invalide-mec") Rétroaction si incorrect:
+                  input.form-control(type="text" id="retroaction-invalide-mec" name="retroactionInvalide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="tags-mec") Tags (séparés par des virgules):
+                  input.form-control(type="text" id="tags-mec" name="tags" placeholder="Optionnel")
+
+                button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+
+            // === FORMULAIRE ESSAI ===
+            #form-screen-essai(style="display: none;")
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()")
+                i.fas.fa-arrow-left.mr-1
+                | Retour
+
+              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-essai")
+                input(type="hidden" name="type" value="Essai")
+                h6.mb-3 Question Essai
+
+                .form-group
+                  label(for="nom-essai") Nom de la question:
+                  input.form-control(type="text" id="nom-essai" name="nom" required)
+
+                .form-group
+                  label(for="enonce-essai") Énoncé:
+                  textarea.form-control(id="enonce-essai" name="énoncé" required rows="5")
+
+                .alert.alert-info.small Les questions de type essai sont des questions ouvertes qui nécessitent une correction manuelle.
+
+                .form-group
+                  label(for="retroaction-valide-essai") Rétroaction si correct:
+                  input.form-control(type="text" id="retroaction-valide-essai" name="retroactionValide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="retroaction-invalide-essai") Rétroaction si incorrect:
+                  input.form-control(type="text" id="retroaction-invalide-essai" name="retroactionInvalide" placeholder="Optionnel")
+
+                .form-group
+                  label(for="tags-essai") Tags (séparés par des virgules):
+                  input.form-control(type="text" id="tags-essai" name="tags" placeholder="Optionnel")
+
+                button.btn.btn-primary.w-100(type="submit") Ajouter cette question
 
           .modal-footer
-            a.btn.btn-secondary(href=`/cours/${groupId}/questions`) Annuler
+            a.btn.btn-secondary(href=`/cours/${groupId}/questions`) Fermer
+
+    style.
+      .question-type-card:hover {
+        background-color: #f8f9fa;
+        border-color: #007bff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+      }
 
     script.
       const groupId = "#{groupId}";
 
-      function updateFormForType(type) {
-        document.getElementById('div-choix-multiple').style.display = type === 'ChoixMultiple' ? 'block' : 'none';
-        document.getElementById('div-numerique').style.display = type === 'Numerique' ? 'block' : 'none';
-        document.getElementById('div-reponsecourte').style.display = type === 'ReponseCourte' ? 'block' : 'none';
+      // Navigation entre les écrans
+      function selectQuestionType(type) {
+        // Cacher l'écran de sélection
+        document.getElementById('type-selection-screen').style.display = 'none';
+        
+        // Afficher le formulaire correspondant
+        const screenMap = {
+          'VraiFaux': 'form-screen-vraifaux',
+          'ChoixMultiple': 'form-screen-choixmultiple',
+          'Numerique': 'form-screen-numerique',
+          'ReponseCourte': 'form-screen-reponsecourte',
+          'MiseEnCorrespondance': 'form-screen-miseencorrespondance',
+          'Essai': 'form-screen-essai'
+        };
+        
+        const screenId = screenMap[type];
+        if (screenId) {
+          document.getElementById(screenId).style.display = 'block';
+          
+          // Changer le titre du modal
+          const titleMap = {
+            'VraiFaux': 'Question Vrai ou Faux',
+            'ChoixMultiple': 'Question Choix Multiple',
+            'Numerique': 'Question Numérique',
+            'ReponseCourte': 'Question Réponse Courte',
+            'MiseEnCorrespondance': 'Question Mise en Correspondance',
+            'Essai': 'Question Essai'
+          };
+          document.getElementById('modal-title').textContent = titleMap[type];
+        }
       }
 
+      function backToTypeSelection() {
+        // Cacher tous les formulaires
+        document.getElementById('form-screen-vraifaux').style.display = 'none';
+        document.getElementById('form-screen-choixmultiple').style.display = 'none';
+        document.getElementById('form-screen-numerique').style.display = 'none';
+        document.getElementById('form-screen-reponsecourte').style.display = 'none';
+        document.getElementById('form-screen-miseencorrespondance').style.display = 'none';
+        document.getElementById('form-screen-essai').style.display = 'none';
+        
+        // Afficher l'écran de sélection
+        document.getElementById('type-selection-screen').style.display = 'block';
+        
+        // Réinitialiser le titre
+        document.getElementById('modal-title').textContent = 'Choisir le type de question';
+      }
+
+      // Conversion FormData vers JSON
       function formDataToJson(formData) {
         const json = {};
         formData.forEach((value, key) => {
@@ -165,18 +382,21 @@ html
         return json;
       }
 
-      document.getElementById('form-vrai-faux').addEventListener('submit', async function(e) {
+      // Fonction générique de soumission
+      async function handleFormSubmit(e, requiredFields) {
         e.preventDefault();
         try {
-          const formData = new FormData(this);
+          const formData = new FormData(e.target);
           const data = formDataToJson(formData);
 
-          if (!data.nom || !data.énoncé || !data.reponse) {
-            alert('Erreur: Veuillez remplir tous les champs obligatoires (nom, énoncé, réponse)');
+          // Validation des champs obligatoires
+          const missing = requiredFields.filter(field => !data[field] || String(data[field]).trim() === '');
+          if (missing.length > 0) {
+            alert('Erreur: Veuillez remplir tous les champs obligatoires (' + missing.join(', ') + ')');
             return;
           }
 
-          const response = await fetch(this.action, {
+          const response = await fetch(e.target.action, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -196,37 +416,29 @@ html
         } catch (err) {
           alert('Erreur: ' + err.message);
         }
+      }
+
+      // Attacher les event listeners à tous les formulaires
+      document.getElementById('form-vrai-faux').addEventListener('submit', function(e) {
+        handleFormSubmit(e, ['nom', 'énoncé', 'reponse']);
       });
 
-      document.getElementById('form-autre').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        try {
-          const formData = new FormData(this);
-          const data = formDataToJson(formData);
+      document.getElementById('form-choix-multiple').addEventListener('submit', function(e) {
+        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponses']);
+      });
 
-          if (!data.nom || !data.énoncé || !data.type) {
-            alert('Erreur: Veuillez remplir tous les champs obligatoires (type, nom, énoncé)');
-            return;
-          }
+      document.getElementById('form-numerique').addEventListener('submit', function(e) {
+        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']);
+      });
 
-          const response = await fetch(this.action, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          });
+      document.getElementById('form-reponse-courte').addEventListener('submit', function(e) {
+        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']);
+      });
 
-          if (!response.ok) {
-            const error = await response.json();
-            alert('Erreur: ' + (error.error || 'Erreur lors de l\'ajout'));
-            return;
-          }
+      document.getElementById('form-mise-correspondance').addEventListener('submit', function(e) {
+        handleFormSubmit(e, ['nom', 'énoncé', 'type', 'paires']);
+      });
 
-          const result = await response.json();
-          alert('✓ ' + result.message);
-          window.location.href = `/cours/${groupId}/questions`;
-        } catch (err) {
-          alert('Erreur: ' + err.message);
-        }
+      document.getElementById('form-essai').addEventListener('submit', function(e) {
+        handleFormSubmit(e, ['nom', 'énoncé', 'type']);
       });
