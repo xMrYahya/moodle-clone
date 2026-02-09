@@ -13,5 +13,6 @@ function requireAuth(req: any, res: any, next: any) {
 
 router.post("/creer", requireAuth, CoursController.creer);
 router.post("/supprimer", requireAuth, CoursController.supprimer);
+router.get("/:groupId/questions", requireAuth, CoursController.afficherQuestions);
 
 export default router;

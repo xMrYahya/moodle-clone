@@ -1,0 +1,232 @@
+html
+  include includes/head.pug
+
+  body
+    include includes/navbar.pug
+    +navbar(title, displayName)
+
+    .container.mt-4
+      h1 Questions du cours
+      
+      .mb-3
+        strong #{coursId} · #{coursTitre}
+        br
+        small.text-muted ID du groupe: #{groupId}
+
+      a.btn.btn-primary(href=`/cours/${groupId}/questions?addQuestion=1` id="btn-add-question") Ajouter une question
+
+      hr
+
+      // ======================
+      // LISTE DES QUESTIONS
+      // ======================
+      if questions && questions.length
+        .row.mt-3
+          each q in questions
+            .col-12.col-md-6.col-lg-4.mb-3
+              .card
+                .card-body
+                  h5.card-title.mb-1 #{q.nom}
+                  p.card-text.text-muted.mb-2 
+                    small Type: #{q.type}
+                  p.card-text.mb-2
+                    em #{q.énoncé}
+
+      else
+        p.text-muted.mt-3 Aucune question disponible.
+
+    // ======================
+    // MODAL : AJOUTER QUESTION
+    // ======================
+    if showAddQuestionModal
+      .modal-overlay
+        .modal-card
+          .modal-header
+            h5.mb-0 Ajouter une question
+            a.close(href=`/cours/${groupId}/questions` aria-label="Fermer") ×
+
+          .modal-body
+            // === FORM 1: VRAI/FAUX ===
+            form(method="post" action=`/questions/${groupId}/ajouter-vrai-faux` id="form-vrai-faux")
+              h6.mb-3 Vrai ou Faux
+
+              .form-group
+                label(for="nom-vf") Nom de la question:
+                input.form-control(type="text" id="nom-vf" name="nom" required)
+
+              .form-group
+                label(for="enonce-vf") Énoncé:
+                textarea.form-control(id="enonce-vf" name="énoncé" required rows="3")
+
+              .form-group
+                label(for="reponse-vf") Réponse correcte:
+                select.form-control(id="reponse-vf" name="reponse" required)
+                  option(value="") -- Sélectionner --
+                  option(value="true") Vrai
+                  option(value="false") Faux
+
+              .form-group
+                label(for="retroaction-valide-vf") Rétroaction si correct:
+                input.form-control(type="text" id="retroaction-valide-vf" name="retroactionValide" placeholder="Optionnel")
+
+              .form-group
+                label(for="retroaction-invalide-vf") Rétroaction si incorrect:
+                input.form-control(type="text" id="retroaction-invalide-vf" name="retroactionInvalide" placeholder="Optionnel")
+
+              .form-group
+                label(for="tags-vf") Tags (séparés par des virgules):
+                input.form-control(type="text" id="tags-vf" name="tags" placeholder="Optionnel")
+
+              button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+
+            hr.my-4
+
+            // === FORM 2: AUTRES TYPES ===
+            form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-autre")
+              h6.mb-3 Autre type de question
+
+              .form-group
+                label(for="type") Type de question:
+                select.form-control(id="type" name="type" required onchange="updateFormForType(this.value)")
+                  option(value="") -- Sélectionner --
+                  option(value="ChoixMultiple") Choix multiple
+                  option(value="Numerique") Question numérique
+                  option(value="ReponseCourte") Réponse courte
+
+              .form-group
+                label(for="nom-at") Nom de la question:
+                input.form-control(type="text" id="nom-at" name="nom" required)
+
+              .form-group
+                label(for="enonce-at") Énoncé:
+                textarea.form-control(id="enonce-at" name="énoncé" required rows="3")
+
+              // Choix multiple
+              #div-choix-multiple.form-group(style="display: none;")
+                label Choix multiples:
+                .form-check.mb-2
+                  input.form-check-input(type="checkbox" id="seul-choix" name="seulementUnChoix" value="true")
+                  label.form-check-label(for="seul-choix") Un seul choix correct
+
+                .alert.alert-info.small Pour simplifier, entrez une description des choix. Format: "Choix1|Choix2|Choix3" (le premier est supposé correct)
+                .form-group
+                  label(for="rep-mult") Description des choix:
+                  input.form-control(type="text" id="rep-mult" name="reponses" placeholder="Ex: Choix correct|Mauvais choix|Autre mauvais")
+
+              // Question numérique
+              #div-numerique.form-group(style="display: none;")
+                label(for="reponse-num") Réponse numérique:
+                input.form-control(type="number" id="reponse-num" name="reponse" placeholder="Ex: 42" step="any")
+
+              // Réponse courte
+              #div-reponsecourte.form-group(style="display: none;")
+                label(for="reponse-courte") Réponse attendue:
+                input.form-control(type="text" id="reponse-courte" name="reponse" placeholder="La réponse correcte")
+
+              // Rétroaction commune
+              .form-group
+                label(for="retroaction-valide-at") Rétroaction si correct:
+                input.form-control(type="text" id="retroaction-valide-at" name="retroactionValide" placeholder="Optionnel")
+
+              .form-group
+                label(for="retroaction-invalide-at") Rétroaction si incorrect:
+                input.form-control(type="text" id="retroaction-invalide-at" name="retroactionInvalide" placeholder="Optionnel")
+
+              .form-group
+                label(for="tags-at") Tags (séparés par des virgules):
+                input.form-control(type="text" id="tags-at" name="tags" placeholder="Optionnel")
+
+              button.btn.btn-primary.w-100(type="submit") Ajouter cette question
+
+          .modal-footer
+            a.btn.btn-secondary(href=`/cours/${groupId}/questions`) Annuler
+
+    script.
+      const groupId = "#{groupId}";
+
+      function updateFormForType(type) {
+        document.getElementById('div-choix-multiple').style.display = type === 'ChoixMultiple' ? 'block' : 'none';
+        document.getElementById('div-numerique').style.display = type === 'Numerique' ? 'block' : 'none';
+        document.getElementById('div-reponsecourte').style.display = type === 'ReponseCourte' ? 'block' : 'none';
+      }
+
+      function formDataToJson(formData) {
+        const json = {};
+        formData.forEach((value, key) => {
+          if (json[key]) {
+            if (!Array.isArray(json[key])) {
+              json[key] = [json[key]];
+            }
+            json[key].push(value);
+          } else {
+            json[key] = value;
+          }
+        });
+        return json;
+      }
+
+      document.getElementById('form-vrai-faux').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+          const formData = new FormData(this);
+          const data = formDataToJson(formData);
+
+          if (!data.nom || !data.énoncé || !data.reponse) {
+            alert('Erreur: Veuillez remplir tous les champs obligatoires (nom, énoncé, réponse)');
+            return;
+          }
+
+          const response = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            alert('Erreur: ' + (error.error || 'Erreur lors de l\'ajout'));
+            return;
+          }
+
+          const result = await response.json();
+          alert('✓ ' + result.message);
+          window.location.href = `/cours/${groupId}/questions`;
+        } catch (err) {
+          alert('Erreur: ' + err.message);
+        }
+      });
+
+      document.getElementById('form-autre').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+          const formData = new FormData(this);
+          const data = formDataToJson(formData);
+
+          if (!data.nom || !data.énoncé || !data.type) {
+            alert('Erreur: Veuillez remplir tous les champs obligatoires (type, nom, énoncé)');
+            return;
+          }
+
+          const response = await fetch(this.action, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            alert('Erreur: ' + (error.error || 'Erreur lors de l\'ajout'));
+            return;
+          }
+
+          const result = await response.json();
+          alert('✓ ' + result.message);
+          window.location.href = `/cours/${groupId}/questions`;
+        } catch (err) {
+          alert('Erreur: ' + err.message);
+        }
+      });

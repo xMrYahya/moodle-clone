@@ -13,28 +13,35 @@ export class QuestionsController {
     try {
       const teacher = req.session.user;
       const { groupId } = req.params;
-      const { nom, énoncé, reponse, retroactionVrai, retroactionFaux, tags } = req.body;
+      const { nom, énoncé, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
 
       if (!teacher?.id || !groupId) {
         throw new InvalidParameterError("Enseignant ou cours manquant");
       }
 
-      if (!nom || !énoncé || reponse === undefined || !retroactionVrai || !retroactionFaux) {
-        throw new InvalidParameterError("Tous les champs sont obligatoires");
+      const missingFields: string[] = [];
+      if (!nom || String(nom).trim() === "") missingFields.push("nom");
+      if (!énoncé || String(énoncé).trim() === "") missingFields.push("énoncé");
+      if (reponse === undefined || reponse === "") missingFields.push("reponse");
+
+      if (missingFields.length > 0) {
+        throw new InvalidParameterError(`Champs manquants: ${missingFields.join(", ")}`);
       }
 
       if (await questionNameExists(groupId, nom)) {
         throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
       }
 
+      const reponseBoolean = reponse === "true" || reponse === true;
+
       const newQuestion: QuestionVraiFaux = {
-        nom: String(nom),
-        énoncé: String(énoncé),
-        reponse: Boolean(reponse),
-        retroaction: String(retroactionVrai),
-        retroactionValide: String(retroactionVrai),
-        retroactionInvalide: String(retroactionFaux),
-        tags: Array.isArray(tags) ? tags.map(String) : [],
+        nom: String(nom).trim(),
+        énoncé: String(énoncé).trim(),
+        reponse: reponseBoolean,
+        retroaction: String(retroactionValide || "").trim(),
+        retroactionValide: String(retroactionValide || "").trim(),
+        retroactionInvalide: String(retroactionInvalide || "").trim(),
+        tags: Array.isArray(tags) ? tags.map(String) : (tags ? String(tags).split(",").map(t => t.trim()).filter(t => t) : []),
         type: "VraiFaux",
       };
 
@@ -68,21 +75,33 @@ export class QuestionsController {
         throw new InvalidParameterError("Enseignant ou cours manquant");
       }
 
-      if (!nom || !énoncé || !type || !retroactionValide || !retroactionInvalide) {
-        throw new InvalidParameterError("Tous les champs sont obligatoires");
+      const missingFields: string[] = [];
+      if (!nom || String(nom).trim() === "") missingFields.push("nom");
+      if (!énoncé || String(énoncé).trim() === "") missingFields.push("énoncé");
+      if (!type || String(type).trim() === "") missingFields.push("type");
+
+      if (missingFields.length > 0) {
+        throw new InvalidParameterError(`Champs manquants: ${missingFields.join(", ")}`);
       }
 
       if (await questionNameExists(groupId, nom)) {
         throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
       }
 
+      let parsedTags: string[] = [];
+      if (Array.isArray(tags)) {
+        parsedTags = tags.map(String).filter(t => t.trim());
+      } else if (tags) {
+        parsedTags = String(tags).split(",").map(t => t.trim()).filter(t => t.length > 0);
+      }
+
       const newQuestion: AnyQuestion = {
-        nom: String(nom),
-        énoncé: String(énoncé),
-        type: String(type) as any,
-        retroactionValide: String(retroactionValide),
-        retroactionInvalide: String(retroactionInvalide),
-        tags: Array.isArray(tags) ? tags.map(String) : [],
+        nom: String(nom).trim(),
+        énoncé: String(énoncé).trim(),
+        type: String(type).trim() as any,
+        retroactionValide: String(retroactionValide || "").trim(),
+        retroactionInvalide: String(retroactionInvalide || "").trim(),
+        tags: parsedTags,
         ...otherData,
       } as AnyQuestion;
 

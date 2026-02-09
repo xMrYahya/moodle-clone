@@ -20,7 +20,7 @@ class App {
     clearQuestionsOnStartup().catch(console.error);
 
     this.middleware();
-
+    
     this.expressApp.set("view engine", "pug");
     this.expressApp.use(express.static(__dirname + "/public") as express.RequestHandler);
 

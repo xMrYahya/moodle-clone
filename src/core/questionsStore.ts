@@ -25,7 +25,7 @@ export async function getAllQuestions(): Promise<StoredQuestions[]> {
   return Array.isArray(json.questionsStore) ? json.questionsStore : [];
 }
 
-async function getQuestionsForCours(groupId: string): Promise<AnyQuestion[]> {
+export async function getQuestionsForCours(groupId: string): Promise<AnyQuestion[]> {
   const all = await getAllQuestions();
   const courseQuestions = all.find(sq => sq.group_id === String(groupId));
   return courseQuestions ? courseQuestions.questions : [];
