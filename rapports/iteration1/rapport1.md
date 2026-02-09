@@ -86,7 +86,7 @@ L'Enseignant doit être authentifié.
 Le service SGB est accessible.
 
 **PostConditions:**
-L'enseignant e a été récupéré depuis le SGA la liste des groupes-cours.
+L'Enseignant a été récupéré depuis le SGA la liste des groupes-cours.
 
 
 ### Contrat CO02 - Sélectionner Cours
@@ -100,7 +100,7 @@ Contrat CO01 - Démarrer Ajout Cours
 **Préconditions:**
 L'Enseignant est authentifié.
 Un jeton d'authentification valide est présent dans la session.
-La liste des groupes-cours assignés à l'enseignant a été récupérée préalablement via demarrerAjoutCours()
+La liste des groupes-cours assignés à l'Enseignant a été récupérée préalablement via demarrerAjoutCours()
 
 **PostConditions:**
 Une instance c : Cours a été créée.
@@ -117,7 +117,7 @@ afficherListeCours()
 **Références croisées:**
 
 **Préconditions:**
-Une instance ens d'enseignant existe.
+Une instance ens d'Enseignant existe.
 
 **PostConditions:**
 
@@ -130,7 +130,7 @@ afficherDetailsCours(idCours: String)
 **Références croisées:**
 
 **Préconditions:** 
-L'enseignant a eu au moins un cours qui lui est assigné.
+L'Enseignant a eu au moins un cours qui lui est assigné.
 
 **PostConditions:** 
 
@@ -143,8 +143,8 @@ retirerCours(idCours : String)
 Contrat CO03 - Afficher la liste des cours
 
 **Préconditions:**
-L'enseignant est authentifié.
-L'enseignant a récupéré un cours (Cu01b)
+L'Enseignant est authentifié.
+L'Enseignant a récupéré un cours (Cu01b)
 
 **PostConditions:**
 Le cours c a été associcé à idCours
@@ -159,8 +159,8 @@ confirmerSuppressionCours()
 Contrat CO05 - Retirer un cours
 
 **Préconditions:**
-L'enseignant est authentifié.
-L'enseignant a récupéré un cours (Cu01b)
+L'Enseignant est authentifié.
+L'Enseignant a récupéré un cours (Cu01b)
 
 **PostConditions:**
 Le cours (et seulement ce cours) a été supprimé du système SGA
@@ -191,7 +191,7 @@ DSS – Ajouter une question
 MDD – Question, Cours  
 
 **Préconditions:**  
-- L’enseignant.token n'est pas vide.  
+- L’Enseignant.token n'est pas vide.  
 - Un cours c  est sélectionné.
 
 **PostConditions:**  
@@ -215,7 +215,7 @@ DSS - Ajoute une question
 MDD - Questions, Cours
 
 **Préconditions:**
-- L'enseignant est authentifié
+- L'Enseignant est authentifié
 - Un cours courant est sélectionné.  
 - Le nom de la question n’existe pas déjà dans la banque de questions du cours courant.
 
@@ -253,7 +253,7 @@ MDD - Questions, Cours
 
 ### Diagramme de classe TPLANT
 ![Diagramme de classe](../../docs/modeles/iteration1exports/diagramme-de-classe.png "Diagramme de classe")
-Il est possible de constater plusieurs différence entre notre MDD et notre diagramme de classes. La pluspart d'entre elles comme le AuthController sont causé par les accès avec le SGB. L'authentification qui doit être fait n'est pas non plus dans le mdd puisqu'il découle de la récupération de l'enseignant dans le SGB.
+Il est possible de constater plusieurs différence entre notre MDD et notre diagramme de classes. La pluspart d'entre elles comme le AuthController sont causé par les accès avec le SGB. L'authentification qui doit être fait n'est pas non plus dans le mdd puisqu'il découle de la récupération de l'Enseignant dans le SGB.
   
 
 ## Vérification finale
