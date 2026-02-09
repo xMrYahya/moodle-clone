@@ -49,10 +49,13 @@
 
 | Exigence | Responsable |
 | -------- | ----------- |
+| MDD     | Raphael Hoffman, Alexandre Gamache |
+| DSS CU1a,b,c,CU2a | Alexandre Gamache |
+| Rapport | Alexandre Gamache, Alex Boulianne | 
 | CU01a - Ajouter cours   |      |
 | CU01b - Récupérer cours   |         |
-| CU01c - 
-| CU02a -   |         |
+| CU01c - Supprimer cours
+| CU02a - Ajouter Question  |       Alexandre Gamache(rdcu et CO seulement)   |
 
 ## Modèle du domaine (MDD)
 
