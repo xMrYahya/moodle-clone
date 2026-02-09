@@ -20,7 +20,7 @@
 ## Membre 3
 
 - <nomComplet3>Gamache, Alexandre</nomComplet3>
-- <courriel3>Saisissez votre courriel</courriel3>
+- <courriel3>alexandre.gamache.1@ens.etsmtl.ca</courriel3>
 - <codeMoodle3>AU74150</codeMoodle3>
 - <githubAccount3>AlexandreG17</githubAccount3>
 
@@ -52,10 +52,10 @@
 | MDD     | Raphael Hoffman, Alexandre Gamache |
 | DSS CU1a,b,c,CU2a | Alexandre Gamache |
 | Rapport | Alexandre Gamache, Alex Boulianne | 
-| CU01a - Ajouter cours   |      |
-| CU01b - Récupérer cours   |         |
-| CU01c - Supprimer cours
-| CU02a - Ajouter Question  |       Alexandre Gamache(rdcu et CO seulement)   |
+| CU01a - Ajouter cours   | Kassem Kandil     |
+| CU01b - Récupérer cours   | Kassem Kandil,   Lucas Montion (RDCU)     |
+| CU01c - Supprimer cours | Kassem Kandil, Alex Boulianne (RDCU)
+| CU02a - Ajouter Question  | Alexandre Gamache (rdcu et CO seulement), Yahya Ardy     |
 
 ## Modèle du domaine (MDD)
 
@@ -86,7 +86,7 @@ L'Enseignant doit être authentifié.
 Le service SGB est accessible.
 
 **PostConditions:**
-L'enseignant a récupéré depuis le SGA la liste des groupes-cours.
+L'enseignant e a été récupéré depuis le SGA la liste des groupes-cours.
 
 
 ### Contrat CO02 - Sélectionner Cours
@@ -104,9 +104,9 @@ La liste des groupes-cours assignés à l'enseignant a été récupérée préal
 
 **PostConditions:**
 Une instance c : Cours a été créée.
-c est associée à l'Enseignant authentifié.
-Les étudiants inscrit à ce groupe-cours sont associés a c. 
-Les informations du groupe-cours(horaire, local, etc.) sont enregistrées dans c.
+c a été associée à l'Enseignant authentifié.
+Les étudiants inscrit à ce groupe-cours étaient associés a c. 
+Les informations du groupe-cours(horaire, local, etc.) ont étés enregistrées dans c.
 
 
 ### Contrat CO03 - Afficher la liste des cours
@@ -130,7 +130,7 @@ afficherDetailsCours(idCours: String)
 **Références croisées:**
 
 **Préconditions:** 
-L'enseignant a au moins un cours qui lui est assigné.
+L'enseignant a eu au moins un cours qui lui est assigné.
 
 **PostConditions:** 
 
@@ -147,7 +147,7 @@ L'enseignant est authentifié.
 L'enseignant a récupéré un cours (Cu01b)
 
 **PostConditions:**
-Le cours (et seulement ce cours) a été supprimé du système SGA
+Le cours c a été associcé à idCours
 
 
 ### Contrat CO06 - Confirmation de la suppression d'un cours
@@ -233,40 +233,43 @@ MDD - Questions, Cours
 ## Réalisation de cas d'utilisation (RDCU)
 ![RDCU Demarrer ajout de cours](../../docs/modeles/iteration1exports/rdcu-demarrer-ajout-cours.png "RDCU demarrer ajout de cours")
 
-![RDCU afficher details de cours](../../docs/modeles/iteration1exports/rdcu-afficher-details-cours.png "RDCU afficher details de cours")
-
 ![RDCU Selectionner Groupe cours](../../docs/modeles/iteration1exports/rdcu-selectionner-groupe-cours.png "RDCU Selectionner groupe cours")
 
-![RDCU RDCU retirer un cours](../../docs/modeles/iteration1exports/rdcu-retirer-un-cours.png "RDCU retirer un cours")
+![RDCU afficher liste de cours](../../docs/modeles/iteration1exports/afficher-liste-cours.png "RDCU afficher liste de cours")
+
+![RDCU afficher details de cours](../../docs/modeles/iteration1exports/rdcu-afficher-details-cours.png "RDCU afficher details de cours")
+
+![RDCU confirmation de retrait de cours](../../docs/modeles/iteration1exports/rdcu-confirmation-retrait-v2.png "RDCU confirmation Retrait de cours")
+
+![RDCU RDCU retirer un cours](../../docs/modeles/iteration1exports/rdcu-retirer-cours-v2.png "RDCU retirer un cours")
 
 ![RDCU Demarrer gestion de question](../../docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png "RDCU Demarrer gestion de question")
 
 ![RDCU Ajouter une question de type vrai ou faux](../../docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png "RDCU Ajouter une question de type vrai ou faux")
 
-![RDCU Ajouter une question d'autre type](../../docs/modeles/iteration1exports/rdcu-ajouter-question-autre-type.png "RDCU Ajouter une question d'autre type")
+![RDCU Ajouter une question d'autre type](../../docs/modeles/iteration1exports/rdcu-ajouter-question-autre-type-v2.png "RDCU Ajouter une question d'autre type")
 
 
 
 ### Diagramme de classe TPLANT
 ![Diagramme de classe](../../docs/modeles/iteration1exports/diagramme-de-classe.png "Diagramme de classe")
-- Générer un diagramme de classe avec l'outil TPLANT et commenter celui-ci par rapport à votre MDD.
-- https://www.npmjs.com/package/tplant
+Il est possible de constater plusieurs différence entre notre MDD et notre diagramme de classes. La pluspart d'entre elles comme le AuthController sont causé par les accès avec le SGB. L'authentification qui doit être fait n'est pas non plus dans le mdd puisqu'il découle de la récupération de l'enseignant dans le SGB.
   
 
 ## Vérification finale
 
-- [ ] Vous avez un seul MDD
-  - [ ] Vous avez mis un verbe à chaque association
-  - [ ] Chaque association a une multiplicité
-- [ ] Vous avez un DSS par cas d'utilisation
-  - [ ] Chaque DSS a un titre
-  - [ ] Chaque opération synchrone a un retour d'opération
-  - [ ] L'utilisation d'une boucle (LOOP) est justifiée par les exigences
-- [ ] Vous avez autant de contrats que d'opérations système (pour les cas d'utilisation nécessitant des contrats)
-  - [ ] Les postconditions des contrats sont écrites au passé
-- [ ] Vous avez autant de RDCU que d'opérations système
-  - [ ] Chaque décision de conception (affectation de responsabilité) est identifiée et surtout **justifiée** (par un GRASP ou autre heuristique)
-  - [ ] Votre code source (implémentation) est cohérent avec la RDCU (ce n'est pas juste un diagramme)
-- [ ] Vous avez un seul diagramme de classes
-- [ ] Vous avez remis la version PDF de ce document dans votre répertoire
-- [ ] [Vous avez regardé cette petite présentation pour l'architecture en couche et avez appliqué ces concepts](https://log210-cfuhrman.github.io/log210-valider-architecture-couches/#/) 
+- [X] Vous avez un seul MDD
+  - [X] Vous avez mis un verbe à chaque association
+  - [X] Chaque association a une multiplicité
+- [X] Vous avez un DSS par cas d'utilisation
+  - [X] Chaque DSS a un titre
+  - [X] Chaque opération synchrone a un retour d'opération
+  - [X] L'utilisation d'une boucle (LOOP) est justifiée par les exigences
+- [X] Vous avez autant de contrats que d'opérations système (pour les cas d'utilisation nécessitant des contrats)
+  - [X] Les postconditions des contrats sont écrites au passé
+- [X] Vous avez autant de RDCU que d'opérations système
+  - [X] Chaque décision de conception (affectation de responsabilité) est identifiée et surtout **justifiée** (par un GRASP ou autre heuristique)
+  - [X] Votre code source (implémentation) est cohérent avec la RDCU (ce n'est pas juste un diagramme)
+- [X] Vous avez un seul diagramme de classes
+- [X] Vous avez remis la version PDF de ce document dans votre répertoire
+- [X] [Vous avez regardé cette petite présentation pour l'architecture en couche et avez appliqué ces concepts](https://log210-cfuhrman.github.io/log210-valider-architecture-couches/#/) 

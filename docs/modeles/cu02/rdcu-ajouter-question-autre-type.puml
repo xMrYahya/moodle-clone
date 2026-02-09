@@ -34,17 +34,15 @@ alt nom unique
   C -> LQ : add(q)
   activate LQ
   deactivate LQ
-  
   note right
     selon Expert
     (List connaît ses éléments)
   end note
   
-  C --> : questions:List<Question>
-  
+    <-- C: true
 else nom déjà utilisé
   
-  C --> : AlreadyExistsError
+   <-- C: false
   
 end
 

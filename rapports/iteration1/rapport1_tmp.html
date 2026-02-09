@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>rapport1.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<!-- Changer le numéro de l'itération plus bas pour chaque rapport -->
+<h1 id="rapport-it%C3%A9ration-num%C3%A9ro-1">Rapport Itération numéro 1</h1>
+<h2 id="identification-des-membres-de-l%C3%A9quipe">Identification des membres de l'équipe</h2>
+<h2 id="membre-1">Membre 1</h2>
+<ul>
+<li><nomComplet1>Ardy, Yahya</nomComplet1></li>
+<li><courriel1>yahya.ardy.1@ens.etsmtl.ca</courriel1></li>
+<li><codeMoodle1>AT73950</codeMoodle1></li>
+<li><githubAccount1>xMrYahya</githubAccount1></li>
+</ul>
+<h2 id="membre-2">Membre 2</h2>
+<ul>
+<li><nomComplet2>Boulianne, Alex</nomComplet2></li>
+<li><courriel2>alex.boulianne.1@ens.etsmtl.ca</courriel2></li>
+<li><codeMoodle2>AT72810</codeMoodle2></li>
+<li><githubAccount2>c4tiki</githubAccount2></li>
+</ul>
+<h2 id="membre-3">Membre 3</h2>
+<ul>
+<li><nomComplet3>Gamache, Alexandre</nomComplet3></li>
+<li><courriel3>alexandre.gamache.1@ens.etsmtl.ca</courriel3></li>
+<li><codeMoodle3>AU74150</codeMoodle3></li>
+<li><githubAccount3>AlexandreG17</githubAccount3></li>
+</ul>
+<h2 id="membre-4">Membre 4</h2>
+<ul>
+<li><nomComplet4>Hoffmann, Raphaël</nomComplet4></li>
+<li><courriel4>raphael.hoffmann.1@ens.etsmtl.ca</courriel4></li>
+<li><codeMoodle4>AU65470</codeMoodle4></li>
+<li><githubAccount4>WishPib</githubAccount4></li>
+</ul>
+<h2 id="membre-5">Membre 5</h2>
+<ul>
+<li><nomComplet5>Kandil, Kassem</nomComplet5></li>
+<li><courriel5>kassem.kandil.1@ens.etsmtl.ca</courriel5></li>
+<li><codeMoodle5>AU84220</codeMoodle5></li>
+<li><githubAccount5>kassem0303,kassem03-ets</githubAccount5></li>
+</ul>
+<h2 id="membre-6">Membre 6</h2>
+<ul>
+<li><nomComplet6>Montion, Lucas</nomComplet6></li>
+<li><courriel6>lucas.montion.1@ens.etsmtl.ca</courriel6></li>
+<li><codeMoodle6>AT98200</codeMoodle6></li>
+<li><githubAccount6>LucasMontion</githubAccount6></li>
+</ul>
+<h2 id="exigences">Exigences</h2>
+<table>
+<thead>
+<tr>
+<th>Exigence</th>
+<th>Responsable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MDD</td>
+<td>Raphael Hoffman, Alexandre Gamache</td>
+</tr>
+<tr>
+<td>DSS CU1a,b,c,CU2a</td>
+<td>Alexandre Gamache</td>
+</tr>
+<tr>
+<td>Rapport</td>
+<td>Alexandre Gamache, Alex Boulianne</td>
+</tr>
+<tr>
+<td>CU01a - Ajouter cours</td>
+<td>Kassem Kandil</td>
+</tr>
+<tr>
+<td>CU01b - Récupérer cours</td>
+<td>Kassem Kandil,   Lucas Montion (RDCU)</td>
+</tr>
+<tr>
+<td>CU01c - Supprimer cours</td>
+<td>Kassem Kandil, Alex Boulianne (RDCU)</td>
+</tr>
+<tr>
+<td>CU02a - Ajouter Question</td>
+<td>Alexandre Gamache (rdcu et CO seulement), Yahya Ardy</td>
+</tr>
+</tbody>
+</table>
+<h2 id="mod%C3%A8le-du-domaine-mdd">Modèle du domaine (MDD)</h2>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/mddv1.png" alt="Modele du domaine" title="Modèle du domaine (MDD)"></p>
+<h2 id="diagramme-de-s%C3%A9quence-syst%C3%A8me-dss">Diagramme de séquence système (DSS)</h2>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/dss-ajouter-cours.png" alt="DSS Ajouter Cours" title="DSS Ajouter Cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/dss-recuperer-cours.png" alt="DSS Recuperer Cours" title="DSS Recuperer cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/retirer-cours.png" alt="Dss retirer cours" title="Dss retirer cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/dss-ajouter-question.png" alt="Dss Ajouter question" title="Dss Ajouter question"></p>
+<h2 id="contrats">Contrats</h2>
+<h3 id="contrat-co01---d%C3%A9marrer-ajout-cours">Contrat CO01 - Démarrer Ajout Cours</h3>
+<hr>
+<p><strong>Opération:</strong>
+demarrerAjoutCours()</p>
+<p><strong>Références croisées:</strong></p>
+<p><strong>Préconditions:</strong>
+L'Enseignant doit être authentifié.
+Le service SGB est accessible.</p>
+<p><strong>PostConditions:</strong>
+L'enseignant e a été récupéré depuis le SGA la liste des groupes-cours.</p>
+<h3 id="contrat-co02---s%C3%A9lectionner-cours">Contrat CO02 - Sélectionner Cours</h3>
+<hr>
+<p><strong>Opération:</strong>
+sélectionnerGroupeCours(idGroupe : String)</p>
+<p><strong>Références croisées:</strong>
+Contrat CO01 - Démarrer Ajout Cours</p>
+<p><strong>Préconditions:</strong>
+L'Enseignant est authentifié.
+Un jeton d'authentification valide est présent dans la session.
+La liste des groupes-cours assignés à l'enseignant a été récupérée préalablement via demarrerAjoutCours()</p>
+<p><strong>PostConditions:</strong>
+Une instance c : Cours a été créée.
+c a été associée à l'Enseignant authentifié.
+Les étudiants inscrit à ce groupe-cours étaient associés a c.
+Les informations du groupe-cours(horaire, local, etc.) ont étés enregistrées dans c.</p>
+<h3 id="contrat-co03---afficher-la-liste-des-cours">Contrat CO03 - Afficher la liste des cours</h3>
+<hr>
+<p><strong>Opération:</strong>
+afficherListeCours()</p>
+<p><strong>Références croisées:</strong></p>
+<p><strong>Préconditions:</strong>
+Une instance ens d'enseignant existe.</p>
+<p><strong>PostConditions:</strong></p>
+<h3 id="contrat-co04---afficher-les-d%C3%A9tails-dun-cours">Contrat CO04 - Afficher les détails d'un cours</h3>
+<hr>
+<p><strong>Opération:</strong>
+afficherDetailsCours(idCours: String)</p>
+<p><strong>Références croisées:</strong></p>
+<p><strong>Préconditions:</strong>
+L'enseignant a eu au moins un cours qui lui est assigné.</p>
+<p><strong>PostConditions:</strong></p>
+<h3 id="contrat-co05---retirer-un-cours">Contrat CO05 - Retirer un cours</h3>
+<hr>
+<p><strong>Opération:</strong>
+retirerCours(idCours : String)</p>
+<p><strong>Références croisées:</strong>
+Contrat CO03 - Afficher la liste des cours</p>
+<p><strong>Préconditions:</strong>
+L'enseignant est authentifié.
+L'enseignant a récupéré un cours (Cu01b)</p>
+<p><strong>PostConditions:</strong>
+Le cours c a été associcé à idCours</p>
+<h3 id="contrat-co06---confirmation-de-la-suppression-dun-cours">Contrat CO06 - Confirmation de la suppression d'un cours</h3>
+<hr>
+<p><strong>Opération:</strong>
+confirmerSuppressionCours()</p>
+<p><strong>Références croisées:</strong>
+Contrat CO05 - Retirer un cours</p>
+<p><strong>Préconditions:</strong>
+L'enseignant est authentifié.
+L'enseignant a récupéré un cours (Cu01b)</p>
+<p><strong>PostConditions:</strong>
+Le cours (et seulement ce cours) a été supprimé du système SGA</p>
+<h3 id="contrat-co07---gestion-de-question">Contrat CO07 - Gestion de Question</h3>
+<hr>
+<p><strong>Opération:</strong>
+gestionQuestions()</p>
+<p><strong>Références croisées:</strong></p>
+<p><strong>Préconditions:</strong></p>
+<ul>
+<li>Le token de l'Enseignant e.token n'est pas vide</li>
+<li>Un cours c est selectioné</li>
+</ul>
+<p><strong>PostConditions:</strong></p>
+<h3 id="contrat-co08---ajouter-une-question-vraifaux">Contrat CO08 - Ajouter une question vrai/faux</h3>
+<hr>
+<p><strong>Opération:</strong>
+ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Boolean, rétroactionVrai : String, rétroactionFaux : String) : void</p>
+<p><strong>Références croisées:</strong><br>
+CU02a – Ajouter question<br>
+DSS – Ajouter une question<br>
+MDD – Question, Cours</p>
+<p><strong>Préconditions:</strong></p>
+<ul>
+<li>L’enseignant.token n'est pas vide.</li>
+<li>Un cours c  est sélectionné.</li>
+</ul>
+<p><strong>PostConditions:</strong></p>
+<ul>
+<li>Une instance <code>qvf</code> de <code>Question</code> a été créée.</li>
+<li><code>qvf.nom</code> est devenu <code>nom</code>.</li>
+<li><code>qvf.énoncé</code> est devenu <code>énoncé</code>.</li>
+<li><code>qvf.vérité</code> est devenu <code>vérité</code>.</li>
+<li><code>qvf.rétroactionValide</code> est devenu <code>rétroactionVrai</code>.</li>
+<li><code>qvf.rétroactionInvalide</code> est devenu <code>rétroactionFaux</code>.</li>
+<li><code>qvf</code> a été associée au <code>Cours</code> courant via l’association <em>contient</em>.</li>
+</ul>
+<h3 id="contrat-co09---ajouter-une-question-dautre-type">Contrat CO09 - Ajouter une question d'autre type</h3>
+<hr>
+<p><strong>Opération:</strong>
+ajouterQuestionAutreType(nom: String, énoncé: String, type: String, rétroactionValide: String, rétroactionInvalide: String, tags: String[])</p>
+<p><strong>Références croisées:</strong>
+CU02a - Ajouter question
+DSS - Ajoute une question
+MDD - Questions, Cours</p>
+<p><strong>Préconditions:</strong></p>
+<ul>
+<li>L'enseignant est authentifié</li>
+<li>Un cours courant est sélectionné.</li>
+<li>Le nom de la question n’existe pas déjà dans la banque de questions du cours courant.</li>
+</ul>
+<p><strong>Postconditions:</strong></p>
+<ul>
+<li>Une instance <code>q</code> de <code>Question</code> a été créée</li>
+<li><code>q.nom</code> est devenu <code>nom</code></li>
+<li><code>q.énoncé</code> est devenu <code>énoncé</code></li>
+<li><code>q.type</code> est devenu <code>type</code> (attribut indiquant le type de question)</li>
+<li><code>q.rétroactionValide</code> est devenu <code>rétroactionValide</code></li>
+<li><code>q.rétroactionInvalide</code> est devenu <code>rétroactionInvalide</code></li>
+<li><code>q</code> a été associée au <code>Cours</code> courant via l'association <em>contient</em></li>
+<li>Pour chaque élément <code>t</code> dans <code>tags</code>, une instance de <code>tags</code> a été créée ou récupérée et associée à <code>q</code> via l'association <em>catégorisé par</em></li>
+</ul>
+<h2 id="r%C3%A9alisation-de-cas-dutilisation-rdcu">Réalisation de cas d'utilisation (RDCU)</h2>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-demarrer-ajout-cours.png" alt="RDCU Demarrer ajout de cours" title="RDCU demarrer ajout de cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-selectionner-groupe-cours.png" alt="RDCU Selectionner Groupe cours" title="RDCU Selectionner groupe cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/afficher-liste-cours.png" alt="RDCU afficher liste de cours" title="RDCU afficher liste de cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-afficher-details-cours.png" alt="RDCU afficher details de cours" title="RDCU afficher details de cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-confirmation-retrait-v2.png" alt="RDCU confirmation de retrait de cours" title="RDCU confirmation Retrait de cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-retirer-cours-v2.png" alt="RDCU RDCU retirer un cours" title="RDCU retirer un cours"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png" alt="RDCU Demarrer gestion de question" title="RDCU Demarrer gestion de question"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-ajouter-question-vrai-faux.png" alt="RDCU Ajouter une question de type vrai ou faux" title="RDCU Ajouter une question de type vrai ou faux"></p>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/rdcu-ajouter-question-autre-type-v2.png" alt="RDCU Ajouter une question d'autre type" title="RDCU Ajouter une question d'autre type"></p>
+<h3 id="diagramme-de-classe-tplant">Diagramme de classe TPLANT</h3>
+<p><img src="file:///c:/Users/alexa/OneDrive/Documents/Ecole/2026/hiver/log210/labo1/laboratoire-1-log210-h26-equipe-207/docs/modeles/iteration1exports/diagramme-de-classe.png" alt="Diagramme de classe" title="Diagramme de classe">
+Il est possible de constater plusieurs différence entre notre MDD et notre diagramme de classes. La pluspart d'entre elles comme le AuthController sont causé par les accès avec le SGB. L'authentification qui doit être fait n'est pas non plus dans le mdd puisqu'il découle de la récupération de l'enseignant dans le SGB.</p>
+<h2 id="v%C3%A9rification-finale">Vérification finale</h2>
+<ul>
+<li><input type="checkbox" id="checkbox0" checked="true"><label for="checkbox0">Vous avez un seul MDD</label>
+<ul>
+<li><input type="checkbox" id="checkbox1" checked="true"><label for="checkbox1">Vous avez mis un verbe à chaque association</label></li>
+<li><input type="checkbox" id="checkbox2" checked="true"><label for="checkbox2">Chaque association a une multiplicité</label></li>
+</ul>
+</li>
+<li><input type="checkbox" id="checkbox3" checked="true"><label for="checkbox3">Vous avez un DSS par cas d'utilisation</label>
+<ul>
+<li><input type="checkbox" id="checkbox4" checked="true"><label for="checkbox4">Chaque DSS a un titre</label></li>
+<li><input type="checkbox" id="checkbox5" checked="true"><label for="checkbox5">Chaque opération synchrone a un retour d'opération</label></li>
+<li><input type="checkbox" id="checkbox6" checked="true"><label for="checkbox6">L'utilisation d'une boucle (LOOP) est justifiée par les exigences</label></li>
+</ul>
+</li>
+<li><input type="checkbox" id="checkbox7" checked="true"><label for="checkbox7">Vous avez autant de contrats que d'opérations système (pour les cas d'utilisation nécessitant des contrats)</label>
+<ul>
+<li><input type="checkbox" id="checkbox8" checked="true"><label for="checkbox8">Les postconditions des contrats sont écrites au passé</label></li>
+</ul>
+</li>
+<li><input type="checkbox" id="checkbox9" checked="true"><label for="checkbox9">Vous avez autant de RDCU que d'opérations système</label>
+<ul>
+<li><input type="checkbox" id="checkbox10" checked="true"><label for="checkbox10">Chaque décision de conception (affectation de responsabilité) est identifiée et surtout </label><strong>justifiée</strong> (par un GRASP ou autre heuristique)</li>
+<li><input type="checkbox" id="checkbox11" checked="true"><label for="checkbox11">Votre code source (implémentation) est cohérent avec la RDCU (ce n'est pas juste un diagramme)</label></li>
+</ul>
+</li>
+<li><input type="checkbox" id="checkbox12" checked="true"><label for="checkbox12">Vous avez un seul diagramme de classes</label></li>
+<li><input type="checkbox" id="checkbox13" checked="true"><label for="checkbox13">Vous avez remis la version PDF de ce document dans votre répertoire</label></li>
+<li><input type="checkbox" id="checkbox14" checked="true"><label for="checkbox14"></label><a href="https://log210-cfuhrman.github.io/log210-valider-architecture-couches/#/">Vous avez regardé cette petite présentation pour l'architecture en couche et avez appliqué ces concepts</a></li>
+</ul>
+
+</body>
+</html>

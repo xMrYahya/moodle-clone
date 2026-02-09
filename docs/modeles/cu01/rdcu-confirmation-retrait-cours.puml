@@ -1,0 +1,26 @@
+@startuml
+hide footbox
+title RDCU –  Confirmation de retrait d'un cours
+
+participant Enseignant as Ens
+participant controlleurCours as ctrl
+participant catalogueCours as cours
+
+activate Ens
+ -> Ens : confirmerSuppressionCours()
+
+
+Ens -> ctrl : suppressionCours(idCours : String)
+activate  ctrl
+
+ctrl -> cours : suppressionCours(idCours : String)
+activate cours
+cours --> ctrl : coursSupprimer()
+deactivate cours
+
+ctrl --> Ens : messageSuppressionConfirmer()
+
+Ens -> ctrl : getListeCours(teacher_id:string): Cours[]
+ctrl -->> Ens : listeCours : cours[]
+
+@enduml
