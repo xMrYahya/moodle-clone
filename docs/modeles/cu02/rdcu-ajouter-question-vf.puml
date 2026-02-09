@@ -1,25 +1,33 @@
 @startuml
 title RDCU pour Ajouter une question Vrai ou Faux
-participant ":Enseignant" as e
-participant "c:CoursSGA" as c
-participant "b:Question[]" as b
-participant "q:Question" as q
 
--->e : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
-activate e
-    e->c : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
-    activate c
-      c->b : ajouterQuestionVraiFaux(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[]) : boolean
-        activate b
-            alt Nom de question unique 
-                b-> q **: <<create>> Question(nom : String, enonce : String,\n verite : bool, retroactionVrai : String,\n retroactionFaux : String, tags : String[])
-                activate q
-                deactivate q
-                b-->> c : true
-            else Nom de question déjà utilisé
-                b-->> c : false
-            end alt
-        deactivate b
-    deactivate c
-deactivate e
+actor ":Enseignant" as e
+participant "qc:QuestionsController" as QC
+participant "qs:QuestionsStore" as QS
+participant "q:QuestionVraiFaux" as Q
+
+e -> QC : ajouterQuestionVraiFaux(nom : String, enonce : String,\n reponse : bool, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
+activate QC
+
+QC -> QS : questionNameExists(nom)
+activate QS
+QS --> QC : nomExiste:boolean
+deactivate QS
+
+alt Nom de question unique
+    create Q
+    QC -> Q : <<create>> QuestionVraiFaux(nom, enonce, reponse,\n retroactionValide, retroactionInvalide, tags)
+    activate Q
+    deactivate Q
+
+    QC -> QS : addQuestion(q)
+    activate QS
+    deactivate QS
+
+    QC --> e : confirmationAjout(listeQuestions)
+else Nom de question deja utilise
+    QC --> e : signalerErreurNomExistant()
+end
+
+deactivate QC
 @enduml
