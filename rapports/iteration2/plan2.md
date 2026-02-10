@@ -4,21 +4,22 @@
 
 | Étape jalon          | Date       |
 | :------------------- | :--------- |
-| Début de l'itération et remise du plan d'itération | 2026/01/30 |
-| Création du projet sur GitHub Project et configuration de l'environnement de développement | 2026/01/31 |
-| Livraison interne du MDD | 2026/02/02 |
-| Livraison interne des artéfacts pour le CU01 | 2026/02/03 |
-| Revue par les pairs des artéfacts pour le CU01 | 2026/02/06 |
-| Tests complet d'intégration du code système | 2026/02/10 |
-| Vérification de la cohérence documentation/code | 2026/02/11 |
-| Remise du rapport d'itération | 2026/02/12 |
-| Démonstration technique du projet | 2026/02/13 |
-| Fin de l'itération et remise du plan d'itération avec évaluations | 2026/02/13 |
+| Début de l'itération 2 et remise du plan d'itération 2 | 2026/02/09 |
+| Livraison interne du MDD | 2026/02/12 |
+| Livraison interne des artéfacts pour le CU02b, c, d | 2026/02/16 |
+| Revue par les pairs des artéfacts pour le CU05a, b, c, d | 2026/02/19 |
+| Tests complet d'intégration du code système | 2026/02/23 |
+| Vérification de la cohérence documentation/code | 2026/02/26 |
+| Remise du rapport d'itération | 2026/03/05 |
+| Démonstration technique du projet | 2026/03/09 |
+| Fin de l'itération et remise du plan d'itération avec évaluations | 2026/03/09 |
 
 ## Objectifs clés
 
 - Convertir le code pour utiliser la même langue partout 
--
+- Réduire les décalages entre les diagrammes et le code final 
+- Présenter une démonstration technique de CU02b, c et d avec leurs tests (3,75 points).
+- Présenter une démonstration technique de CU05a, b, c et d avec leurs tests (4,5 points).
 
 
 ## Affectations d'éléments de travail
@@ -31,28 +32,23 @@ Les éléments de travail suivants seront abordés dans cette itération:
 | Mise a jour du MDD | 1 | 1 | QUI |
 | CU02b,c  | 1 | 2 | QUI |  |
 | CU05a,b,c,d| 1 | 2 | QuI | |
-| S4 | 2| 1 | QUI | |
 
 ## Problèmes
 
-> Afficher tous les problèmes à résoudre lors de l'itération. Mettre à jour le statut lorsque de nouvelles questions sont présentées au cours des réunions.
-> Si vous n'avez pas (eu) de problème, écrivez-le avec "Sans objet". Sinon, c'est comme si vous n'aviez pas fait la section.
-
 | Problème                                                                                             | Notes |
 | ---------------------------------------------------------------------------------------------------- | ----- |
-| L'Équipe ne comprend pas bien les "router handlers" dans Express                                     |       |
-| ~~Jacques-Éric n'a pas pu installer VSCode sur sa machine~~                                   |       |
-| Jacques-Éric a écrasé le code de plusieurs coéquipiers. | Jacques-Éric va suivre un tutoriel sur git pour mieux comprendre les conflits et pour utiliser les branches. |
-| Hélène part pour un match de Volleyball lors de la 3e semaine et ne sera pas disponible pour la démonstration technique et la réunion d'équipe. | Pierre va prendre des notes pour Hélène. Hélène va contribuer davantage pour la prochaine itération.     |
-| Guy a livré du code invalide et a créé des diagrammes problématiques avec ChatGPT sans valider les résultats.  |  L'équipe considère son travail comme n'étant pas utilisable, ce qui correspond à une contribution insuffisante. Une discussion d'équipe a eu lieu afin de résoudre la situation, conformément à l'étape #1 de la procédure pour la gestion des contributions insuffisantes d'un coéquipier.     |
+| Lucas nous a dit sur discord qu'il a fait une commotion cérébrale durant la semaine. Il est aller voir un médecin qui l'a mis en arrêt de travail pour une semaine. | Si il peut se remmettre assez vite pour réintégrer l'équipe, il en fera un peu plus pour les itérations 2 et 3. |
+| Lorsque nous faisions les diagrammes pour l'itération 1, nous avions un peu de difficulté à bien comprendre le projet. C'est seulement lorsque nous sommes arrivés à faire le code que nous avons réussis à comprendre ce qui fonctionnait ou ne fonctionnait pas dans notre conception. |   |
+| Lors de l'implémentation du CU01c, nous avons oublier d'ajouter le message de confirmation, qui permet de signaler l'utilisateur que le cours a bien été supprimer. | Kassem a dit qu'il ferait les corrections pour celui-ci |
 
 ## Critères d'évaluation
 
 > Une brève description de la façon d'évaluer si les objectifs (définis plus haut) de haut niveau ont été atteints.
 > Vos critères d'évaluation doivent être objectifs (aucun membre de l'équipe ne peut avoir une opinion divergente) et quantifiables (sauf pour ceux évalués par l'auxiliaire d'enseignement). En voici des exemples:
 
-- Un minimum de 97% des cas de test passent avec succès.
-- Démonstration avec succès des fonctionnalités CU06 et CU07 pas à pas avec l'auxiliaire d'enseignement.
+- Une majorité des membres de l'équipe a approuvé chaque diagramme.
+- Un minimum de 90% des cas de test passent avec succès.
+- Corriger les erreurs mentionnés lors de la correction de l'itération 1.
 
 
 ## Évaluation
