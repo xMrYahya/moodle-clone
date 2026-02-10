@@ -1,6 +1,4 @@
-# Plan d'itération 1 (exemple)
-
-> Note: Texte en bloc comme ceci indique des directives aux auteurs. Vous devez supprimer ces directives des plans soumis.
+# Plan d'itération 2
 
 ## Étapes jalons
 
@@ -29,6 +27,8 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 | Nom / Description                | Priorité | [Taille estimée (points)](#commentEstimer "Comment estimer?") | Assigné à (nom) | Documents de référence |
 | -------------------------------- | -------: | --------------------------: | --------------- | ---------------------- |
+| Ajout des DSS des nouveaux CU | 1 | 1 |
+| Mise a jour du MDD | 1 | 1 | QUI |
 | CU02b,c  | 1 | 2 | QUI |  |
 | CU05a,b,c,d| 1 | 2 | QuI | |
 | S4 | 2| 1 | QUI | |
