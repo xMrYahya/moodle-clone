@@ -112,6 +112,31 @@ describe("HomeController.index", () => {
     }));
   });
 
+  test("addCourse!=1 with teacher -> createdGroups contains only teacher courses", async () => {
+    jest.resetModules();
+    const store = require("../../src/core/coursStore");
+    const getStoredSpy = jest.spyOn(store, "getStoredForTeacher").mockResolvedValueOnce([
+      { group_id: "g-10", teacher_id: "7" },
+      { group_id: "g-11", teacher_id: "7" },
+    ] as any);
+
+    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const req: any = {
+      session: { user: { id: 7, first_name: "T", last_name: "L" } },
+      query: { addCourse: "0" },
+    };
+    const res = makeRes();
+
+    await HomeController.index(req, res);
+
+    expect(getStoredSpy).toHaveBeenCalledWith("7");
+    const renderArg = (res.render.mock.calls[0][1] as any);
+    expect(renderArg.createdGroups).toEqual([
+      { group_id: "g-10", teacher_id: "7" },
+      { group_id: "g-11", teacher_id: "7" },
+    ]);
+  });
+
   test("confirmRemove string is passed through", async () => {
     jest.resetModules();
     const HomeController = require("../../src/controllers/HomeController").HomeController;

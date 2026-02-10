@@ -77,16 +77,18 @@ describe("coursStore", () => {
     expect(tA[0].group_id).toBe("gA");
   });
 
-  test("getStoredForTeacher returns all courses for the same teacher", async () => {
+  test("add second course and it is assigned to the teacher", async () => {
     const store = require("../../src/core/coursStore");
     const a = { group_id: "g1", day: "", hours: "", activity: "", mode: "", local: "", teacher_id: "t1" } as any;
     const b = { group_id: "g2", day: "", hours: "", activity: "", mode: "", local: "", teacher_id: "t1" } as any;
-    const c = { group_id: "g3", day: "", hours: "", activity: "", mode: "", local: "", teacher_id: "t2" } as any;
+    const other = { group_id: "g3", day: "", hours: "", activity: "", mode: "", local: "", teacher_id: "t2" } as any;
+
     await store.addStored(a);
     await store.addStored(b);
-    await store.addStored(c);
+    await store.addStored(other);
 
     const t1 = await store.getStoredForTeacher("t1");
+    expect(t1).toHaveLength(2);
     expect(t1.map((x: any) => x.group_id).sort()).toEqual(["g1", "g2"]);
   });
 

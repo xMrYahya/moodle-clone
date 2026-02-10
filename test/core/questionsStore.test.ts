@@ -84,6 +84,78 @@ describe("QuestionsStore - CU02a", () => {
       expect(allData[0].questions[1].nom).toBe("Q2");
     });
 
+    test("CU02a-t2b : Associer la question au cours de l'enseignant", async () => {
+      const groupId = "LOG210-A01";
+      const question: QuestionVraiFaux = {
+        nom: "Q-COURSE",
+        énoncé: "Associer question au bon cours",
+        reponse: true,
+        retroaction: "OK",
+        retroactionValide: "OK",
+        retroactionInvalide: "Non",
+        tags: [],
+        type: "VraiFaux",
+      };
+
+      await store.addQuestion(groupId, question);
+
+      const allData = await store.getAllQuestions();
+      const entry = allData.find((e: any) => e.group_id === groupId);
+      expect(entry).toBeTruthy();
+      expect(entry.questions.map((q: any) => q.nom)).toContain("Q-COURSE");
+    });
+
+    test("CU02a-t2c : La question n'est pas associée à un autre cours", async () => {
+      const question: QuestionVraiFaux = {
+        nom: "Q-ONLY",
+        énoncé: "Ne pas associer au mauvais cours",
+        reponse: true,
+        retroaction: "OK",
+        retroactionValide: "OK",
+        retroactionInvalide: "Non",
+        tags: [],
+        type: "VraiFaux",
+      };
+
+      await store.addQuestion("COURSE-A", question);
+
+      const courseA = await store.getQuestionsForCours("COURSE-A");
+      const courseB = await store.getQuestionsForCours("COURSE-B");
+
+      expect(courseA.map((q: any) => q.nom)).toContain("Q-ONLY");
+      expect(courseB.map((q: any) => q.nom)).not.toContain("Q-ONLY");
+    });
+
+    test("CU02a-t2d : Ajouter une deuxième question associée au même cours", async () => {
+      const groupId = "LOG210-A02";
+      const q1: QuestionVraiFaux = {
+        nom: "Q1",
+        énoncé: "Q1",
+        reponse: true,
+        retroaction: "OK",
+        retroactionValide: "OK",
+        retroactionInvalide: "Non",
+        tags: [],
+        type: "VraiFaux",
+      };
+      const q2: QuestionVraiFaux = {
+        nom: "Q2",
+        énoncé: "Q2",
+        reponse: false,
+        retroaction: "OK",
+        retroactionValide: "OK",
+        retroactionInvalide: "Non",
+        tags: [],
+        type: "VraiFaux",
+      };
+
+      await store.addQuestion(groupId, q1);
+      await store.addQuestion(groupId, q2);
+
+      const questions = await store.getQuestionsForCours(groupId);
+      expect(questions.map((q: any) => q.nom)).toEqual(["Q1", "Q2"]);
+    });
+
     test("CU02a-t3 : Rejeter les doublons de nom (insensible à la casse)", async () => {
       const groupId = "LOG210-A01";
       const question: QuestionVraiFaux = {
