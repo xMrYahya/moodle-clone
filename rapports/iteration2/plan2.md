@@ -28,10 +28,10 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 | Nom / Description                | Priorité | [Taille estimée (points)](#commentEstimer "Comment estimer?") | Assigné à (nom) | Documents de référence |
 | -------------------------------- | -------: | --------------------------: | --------------- | ---------------------- |
-| Ajout des DSS des nouveaux CU | 1 | 1 |
-| Mise a jour du MDD | 1 | 1 | QUI |
-| CU02b,c  | 1 | 2 | QUI |  |
-| CU05a,b,c,d| 1 | 2 | QuI | |
+| Ajout des DSS et contrats d'operation des nouveaux CU | 1 | 1 | Alexandre Gamache |Exigences pour le lab|
+| Mise a jour du MDD | 1 | 1 | Alexandre Gamache |  |
+| CU02b,c  | 1 | 2 | Yahya Ardy, Alex Boulianne | Exigences pour le lab |
+| CU05a,b,c,d| 1 | 2 | Kassem Kandil, raphael hoffmann| Exigences pour le lab |
 
 ## Problèmes
 
