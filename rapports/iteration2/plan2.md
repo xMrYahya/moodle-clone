@@ -4,13 +4,13 @@
 
 | Étape jalon          | Date       |
 | :------------------- | :--------- |
-| Début de l'itération 2 et remise du plan d'itération 2 | 2026/02/09 |
-| Livraison interne du MDD | 2026/02/12 |
-| Livraison interne des artéfacts pour le CU02b, c, d | 2026/02/16 |
-| Revue par les pairs des artéfacts pour le CU05a, b, c, d | 2026/02/19 |
-| Tests complet d'intégration du code système | 2026/02/23 |
-| Vérification de la cohérence documentation/code | 2026/02/26 |
-| Remise du rapport d'itération | 2026/03/05 |
+| Début de l'itération 2 et remise du plan d'itération 2 | 2026/02/16 |
+| Livraison interne du MDD | 2026/02/19 |
+| Livraison interne des artéfacts pour le CU02b, c, d | 2026/02/23 |
+| Revue par les pairs des artéfacts pour le CU05a, b, c, d | 2026/02/26 |
+| Tests complet d'intégration du code système | 2026/03/02 |
+| Vérification de la cohérence documentation/code | 2026/03/06 |
+| Remise du rapport d'itération | 2026/03/08 |
 | Démonstration technique du projet | 2026/03/09 |
 | Fin de l'itération et remise du plan d'itération avec évaluations | 2026/03/09 |
 
@@ -121,7 +121,6 @@ Nous avons décidé de ne pas utiliser GitHub insigts puisque l'ajout du templat
 
 ### Retrait d'un membre de l'équipe pour contribution non significative
 
-- C'est ici que vous mettez le nom de la personne ainsi que les raisons du retrait. Cette section doit nécessairement inclure une liste d'objectifs que cette personne doit respecter pour pouvoir s'assurer de faire partie de l'itération suivante. 
-
+N/A
 
 ---
