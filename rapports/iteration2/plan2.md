@@ -30,8 +30,8 @@ Les éléments de travail suivants seront abordés dans cette itération:
 | -------------------------------- | -------: | --------------------------: | --------------- | ---------------------- |
 | Ajout des DSS et contrats d'operation des nouveaux CU | 1 | 1 | Alexandre Gamache |Exigences pour le lab|
 | Mise a jour du MDD | 1 | 1 | Alexandre Gamache |  |
-| CU02b,c  | 1 | 2 | Yahya Ardy, Alex Boulianne | Exigences pour le lab |
-| CU05a,b,c,d| 1 | 2 | Kassem Kandil, raphael hoffmann| Exigences pour le lab |
+| CU02b,c code, tests et RDCUs | 1 | 2 | Yahya Ardy, Alex Boulianne | Exigences pour le lab |
+| CU05a,b,c,d code, tests et RDCUs| 1 | 2 | Kassem Kandil, raphael hoffmann| Exigences pour le lab |
 
 ## Problèmes
 
@@ -42,9 +42,6 @@ Les éléments de travail suivants seront abordés dans cette itération:
 | Lors de l'implémentation du CU01c, nous avons oublier d'ajouter le message de confirmation, qui permet de signaler l'utilisateur que le cours a bien été supprimer. | Kassem a dit qu'il ferait les corrections pour celui-ci |
 
 ## Critères d'évaluation
-
-> Une brève description de la façon d'évaluer si les objectifs (définis plus haut) de haut niveau ont été atteints.
-> Vos critères d'évaluation doivent être objectifs (aucun membre de l'équipe ne peut avoir une opinion divergente) et quantifiables (sauf pour ceux évalués par l'auxiliaire d'enseignement). En voici des exemples:
 
 - Une majorité des membres de l'équipe a approuvé chaque diagramme.
 - Un minimum de 90% des cas de test passent avec succès.
