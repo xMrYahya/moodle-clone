@@ -53,74 +53,75 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 ## Évaluation
 
-<!-- GitHub ne supporte pas les tables sans en-tête: https://stackoverflow.com/a/17543474/1168342 -->
 | Résumé | |
 | ------------------------------------- | ------------------------------------------------------------------------ |
-| Cible d'évaluation                    | Itération <!-- *Cela pourrait être toute l'itération ou simplement un composant spécifique* -->                            |
-| Date d'évaluation  |   2026/02/13 |
-| Participants       | **Coéquipiers** : Jérémie, Jacques-Éric, Pierre (Hélène avait une absence justifiée),<br> **Auxiliaire d'enseignement** : Jonathan Mayhem |
-| État du projet     | 🟢 <!-- 🔴🟠🟢 *Rouge, Orange, ou Vert.* --> |
+| Cible d'évaluation                    | Itération 1       |
+| Date d'évaluation  |   2026/02/09 |
+| Participants       | **Coéquipiers** : Alex Boulianne, Alexandre Gamache, Kassem Kandil,Raphael Hoffmann (Lucas Montion et Yahya Ardy avaient des absences justifiées),<br> **Auxiliaire d'enseignement** : Thierry Fokou Toukam |
+| État du projet     | 🟢  |
 
 ### Questions d'évaluation
-
 1. Est-ce qu'il y a un décalage de représentation?
-  - Est-ce que tous les noms de classe ont un rapport avec le domaine?
+    - Les noms des classes ne correspondent pas exactement avec le mdd
+    - Les noms des fonctions dans les RDCU ne correspondent pas exactement avec ceux du code
 2. Est-ce que l'architecture en couche est respectée?
-   - Est-ce que les contrôleurs GRASP sont bien identifiés?
-   - Est-ce que les paramètres des opérations système sont tous de type primitif ou sont des objets de paramètres de type primitif?
-   - Est-ce que vous avez un fichier de route par contrôleur?
+   - Chaque controlleur contiens controlleur dans son nom
+   - Toute les operations systême utilisent des types primitifs
+   - Nous avons un fichier de route par controlleur
 3. Évaluer votre conception par rapport aux GRASP "forte cohésion" et "faible couplage"
    - Avez-vous des classes qui sont couplées avec "beaucoup" d'autres classes?
-   - Avez-vous des classes qui ont beaucoup de responsabilités (d'opérations)?
-     - Faite surtout attention aux responsabilités que vous avez données à vos contrôleurs.
+   - Certaines classes tels que coursControlleur doivent être grandement couplé. Réduire leurs coouplage serait possible mais complexe
+   - Chaque controlleur accomplis seulement les tâches nécessaire
 4. Y a-t-il des problèmes de [Code smell](https://refactoring.guru/fr/refactoring/smells) dans notre projet?
    1. Mysterious name relié au décalage des représentations ou pas
-      1. Identifier le renommage (réusinage) éventuel de classe et/ou méthodes
+      - Les noms des classes devront être renomées pour être en francais
    2. Large class (cohésion)
-      1. Proposer d'appliquer le réusinage Extract class / GRAPS fabrication pure 
+      - Quelques classe sont plus grandes qu'elles devraient être telles que questionTypes pourraient être subdivisé en plusieurs classes
    3. Trop de paramètres (4+)
-      1. Proposer d'appliquer le réusinage Objet de paramètre
-   > Ajouter d'autres questions si nécessaire
+      - Aucune fonction utilise trop de paramêtres
    
 ### Évaluation par rapport aux objectifs
-
-- Résoudre les problèmes de la dernière itération soulevés par l'auxiliaire d'enseignement.
-  - La rétroaction de l'auxiliaire d'enseignement a été positive. Bon travail l'équipe!
-- Présenter une démonstration technique.
-  - Le CU06 a été convaincant pour l'auxiliaire d'enseignement, mais il a trouvé que les tests pour le CU07 n'étaient pas assez étoffés. On doit corriger ça à la prochaine itération si on veut que le CU07 compte pour l'implémentation finale.
+- Organiser l'espace de travail avec GitHub Project.
+   - Nous avons organisé l'espace de travail, mais nous avons décidé de ne pas utiliser GitHub Project.
+- Adapter le squelette du projet à nos exigences.
+   - Nous avons effacé les classes inutiles du projet et nous avons covertis les classes nécessaires.
+- Présenter une démonstration technique de CU01 avec tests (2,5 points).
+   - Nous avons présenté les tests et le fonctionnement du CU01 durant la démo
+- Présenter une démonstration technique de CU02a avec tests (5,75 points).
+   - Nous avons présenté les tests et le fonctionnement du CU02a durant la démo
 
 ### Éléments de travail: prévus vs réalisés
 
-Tous les éléments ont été complétés, mais il faut étoffer les tests du CU07:
-
-- CU07 - test et implémentation assignés à Hélène
+- Tous les éléments ont été complétés, mais il faut réduire le décalage entre le code et les diagrammes
+- Tout les tests ont passés 
+- CU01ABC et CU02a sont complétés
 
 ### Évaluation par rapport aux résultats selon les critères d'évaluation
 
-La solution a répondu à tous les critères, mais attention: il faut rajouter des cas de tests.
+Les démos pour tout les cas d'utilisations ont réussi, mais il manque un message de confirmation à l'enseignant lorsqu'il efface un cours.
 
 ## Autres préoccupations et écarts
 
-Nous avons discuté avec plusieurs professeurs pour comprendre le flux de travail de construction des devoirs à faire en ligne (CU06).
+Nous avons vérifié le fonctionnement du language GIFT pour le CU02
 
 ## Évaluation du travail d'équipe
 
-> Évaluez la contribution de chaque membre de l'équipe au projet durant l'itération. Pour vous aider, utilisez `GitHub Insights`. Toutefois, tenez aussi compte des éléments qui ne peuvent être évalués par l'outil (apprentissage, connaissances préalables, participation, communication, etc.)
 
-Selon les statistiques générées par `GitHub Insights` Pierre et Jérémie font 90 % de la programmation et les deux autres membres doivent contribuer plus. 
+- Chaque membre de l'équipe a fait un ou deux RDCU .
+- Alexandre et Raphael on fait le MDD.
+- Alexandre a fait les DSS pour les CU.
+- Le code pour le CU01 a été fait par Kassem.
+- Le code pour le CU02a a été fait par Yahya
+- Les test ont été créé par Kassem
+- Le rapport a été fait par Alex et Alexandre
+- Chaque membre de l'équipe a apporté des modifications aux RDCU au moment du rapport
+- Raphael a ajouté le diagramme de classes
 
-Nous devons trouver un autre moyen de faire les commits (peut-être avec des branches et PR), car il y avait trop de merges difficiles de la documentation.
+Lucas Montion souffre d'une commotion cérébrale et a été forcé de réduire la contribution effectué
+Nous avons décidé de ne pas utiliser GitHub insights puisque l'ajout du template du projet est compté et modifie les résultats
 
 ### Retrait d'un membre de l'équipe pour contribution non significative
 
-- C'est ici que vous mettez le nom de la personne ainsi que les raisons du retrait. Cette section doit nécessairement inclure une liste d'objectifs que cette personne doit respecter pour pouvoir s'assurer de faire partie de l'itération suivante. 
-
+N/A
 
 ---
-
-<a name="commentPlanifier">Comment planifier une itération selon le
-    processus unifié :</a>
-    <https://etsmtl365-my.sharepoint.com/:w:/g/personal/christopher_fuhrman_etsmtl_ca/EWVA3MlzFHdElIMlduUvg6oBSAlrgHO7hjM2J93D1LGPSg?e=kCbXch>
-
-<a name="commentEstimer">Comment estimer la taille :</a>
-    <https://etsmtl365-my.sharepoint.com/:w:/g/personal/christopher_fuhrman_etsmtl_ca/EaEe2fDK94RAkfWthKX1pr4B7KBgbD9BW4UMrzwtQzOrkg?e=XMf4IK>
