@@ -83,7 +83,7 @@ hide stereotype
   etudiant "*" -- "*" cours : associé-à >
   infocours "1" -- "1" cours : décrit >
   infocours "1" -- "1" horaire : contient >
-  cours "1" -- "1" question :contient >
+  cours "1" -- "*" question :contient >
   cours "*" -- "1" ens : est associé-à >
   question "*" -- "*" tags : appartient-à >
   qcm "1" -- "*" rcm : contient >
