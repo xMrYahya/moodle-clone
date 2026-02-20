@@ -1,5 +1,5 @@
 @startuml
-title Ajouter un cours
+title CU01a - Ajouter un cours
 actor ":Enseignant" as e
 participant ":Systeme" as s
 

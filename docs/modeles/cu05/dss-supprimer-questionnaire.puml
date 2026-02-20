@@ -1,0 +1,15 @@
+@startuml
+title CU05d - Supprimer un questionnaire
+actor ":Enseignant" as e
+participant ":Systeme" as s
+e->s : gererQuestionnaires()
+s-->>e : Liste des questionnaires associes au cours
+e->s : supprimerQuestionnaire(nom : String)
+alt Questionnaire donc aucun étudiant a réalisé
+s-->>e : Détails du questionnaire (nom, description, actif ou non,\n étudiants qui on répondu et leurs notes)\n demande de confirmation de suppression
+e->s : confirmerSuppression()
+s-->>e : Message confirmant la suppression du questionnaire
+else Questionnaire réalisé par au moins un étudiant 
+s-->>e : Message indiquant la raison de l'impossibilité de supprimer le questionnaire.
+end alt
+@enduml

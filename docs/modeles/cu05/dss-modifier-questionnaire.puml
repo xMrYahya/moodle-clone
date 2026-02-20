@@ -1,0 +1,26 @@
+@startuml
+title CU05c - Modifier un questionnaire
+actor ":Enseignant" as e
+participant ":Systeme" as s
+ref over e,s
+DSS ajouter un questionnaire
+end ref
+'Je n'ai pas mis selection ajouter puisque selectionnerQuestionnaire mene au meme menu
+e->s : modifierQuestionnaire(nom : String,description:String,actif:bool)
+alt L'enseignant associe de nouvelles questions
+s-->>e : Liste de tags de Questions
+e->s : selectionnerTag(nom : String)
+loop tant que l'enseignant n'a pas terminé l'ajout de questions.
+s-->>e : Questions correspondant au tag et nombre de questionnaires\n auxquels ces questions ont déjà été ajoutées.
+'important de mettre a jout le nombre de quetionnaires auquel les questions ont déjé été ajoutées apres un ajout
+e->s : ajouterQuestion(nomQuestions : String[])
+'Pas de fonction du coté du système
+end loop
+else L'enseignant dissocie des questions
+e->s : dissocierQuestion(nomQuestions : String[])
+else L'enseignant modifie l'ordre des questions
+e->s : modifierOrdreQuestions(nom: String, nouvellePosition : int)
+end alt
+e->s : sauvegarderQuestionnaire()
+s-->>e : Confirmation de la sauvegarde des modifications
+@enduml

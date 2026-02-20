@@ -1,5 +1,5 @@
 @startuml
-title Ajouter une question
+title CU02a -Ajouter une question
 actor ":Enseignant" as e
 participant ":Systeme" as s
 ' Ajout des Pre conditions ici si nécessaire

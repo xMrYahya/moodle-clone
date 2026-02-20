@@ -1,5 +1,5 @@
 @startuml
-title Recuperer un cours
+title CU01b - Recuperer un cours
 actor ":Enseignant" as e
 participant ":Systeme" as s
 

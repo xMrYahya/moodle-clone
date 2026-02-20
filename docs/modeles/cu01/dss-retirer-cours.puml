@@ -1,5 +1,5 @@
 @startuml
-title Retirer un cours
+title CU01c - Retirer un cours
 actor ":Enseignant" as e
 participant ":Systeme" as s
 

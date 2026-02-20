@@ -1,0 +1,11 @@
+@startuml
+title CU05b - Afficher un questionnaire
+actor ":Enseignant" as e
+participant ":Systeme" as s
+e->s : gererQuestionnaires()
+s-->>e : Liste des questionnaires associes au cours
+loop tant que l'enseignant n'a pas terminé de consulter les questionnaires.
+e->s : selectionnerQuestionnaire(nom : String)
+s-->>e : Détails du questionnaire (nom, description, actif ou non,\n étudiants qui on répondu et leurs notes)
+end loop
+@enduml
