@@ -79,7 +79,15 @@ hide stereotype
     jeudi : String
     vendredi : String
   }
-  
+  class "Questionnaire" as questionnaire {
+    nom : String
+    description : String
+    actif : boolean
+  }
+  class "PositionQuestion" as position {
+    ordre : int
+  }
+
   etudiant "*" -- "*" cours : associé-à >
   infocours "1" -- "1" cours : décrit >
   infocours "1" -- "1" horaire : contient >
@@ -88,4 +96,15 @@ hide stereotype
   question "*" -- "*" tags : appartient-à >
   qcm "1" -- "*" rcm : contient >
   qmc "1" -- "*" pdc : contient >
+  cours "1" -- "*" questionnaire : contient >
+  questionnaire "*" -- "*" question : contient >
+  (questionnaire,question) .. position
+
+
+  'Selon le CU08 
+  'class "ReponseQuestionnaire" as reponseQuestionnaire {
+
+  '}
+  'etudiant "*" -- "*" questionnaire : répond-à >
+  '(etudiant,questionnaire) .. reponseQuestionnaire
 @enduml
