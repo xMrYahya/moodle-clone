@@ -56,28 +56,22 @@ hide stereotype
   class "Enseignant" as ens {
     token : String
   }
-  class "cours" as cours {
-    sigle : String
-    titre : String
+  class "Cours" as cours {
+    idGroupe : String
+    jour : String
+    heure : String
+    activite : String
+    mode : String
+    local : String
+    idEnseignant : String
+    idCours : String
+    titreCours : String
   }
   class "Etudiant" as etudiant {
     prenom : String
     nom : String
     courriel : String
     codePermanent : String
-  }
-  class "InformationCours" as infocours {
-    identifiant : String
-    jour : String
-    local : String
-    enPresence : boolean
-  }
-  class "horaire" as horaire {
-    lundi : String
-    mardi : String
-    mercredi : String
-    jeudi : String
-    vendredi : String
   }
   class "Questionnaire" as questionnaire {
     nom : String
@@ -89,8 +83,6 @@ hide stereotype
   }
 
   etudiant "*" -- "*" cours : associé-à >
-  infocours "1" -- "1" cours : décrit >
-  infocours "1" -- "1" horaire : contient >
   cours "1" -- "*" question :contient >
   cours "*" -- "1" ens : est associé-à >
   question "*" -- "*" tags : appartient-à >
