@@ -1,0 +1,21 @@
+@startuml
+title CU05b - RDCU Selectionner un questionnaire
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+
+-> controller : selectionnerQuestionnaire(nom:String):Questionnaire
+note right: GRASP: Controller
+activate controller
+
+controller -> questionnaireModele : recupererQuestionnaireParNom(nom:String):Questionnaire
+note right: GRASP: Expert
+activate questionnaireModele
+
+questionnaireModele --> controller : detailsQuestionnaire:Questionnaire
+deactivate questionnaireModele
+
+<-- controller : detailsQuestionnaire:Questionnaire
+deactivate controller
+
+@enduml
