@@ -1,0 +1,94 @@
+@startuml
+title CU05a - RDCU Ajouter un questionnaire
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+participant "q:Questionnaire" as questionnaire
+participant "questions:Question[]" as tab
+
+-> controller : gererQuestionnaires():Questionnaire[]
+note right: GRASP: Controller
+activate controller
+controller -> questionnaireModele : obtenirQuestionnairesAssocies(groupeId:String):Questionnaire[]
+note right: GRASP: Expert
+activate questionnaireModele
+questionnaireModele -> questionnaireModele ++: obtenirTousQuestionnaires()
+note right: GRASP: Expert
+deactivate questionnaireModele
+questionnaireModele --> controller : questionnairesAssociesJSON:Questionnaire[]
+deactivate questionnaireModele
+<-- controller : JSONQuestionnairesAssocies : Questionnaire[]
+deactivate controller
+
+-> controller : ajouterQuestionnaire(nom:String, description:String, actif:boolean):String
+note right: GRASP: Controller
+activate controller
+controller -> questionnaireModele : creerQuestionnaire(groupeId:String, nom:String, description:String, actif:boolean):Questionnaire
+note right: GRASP: Expert
+activate questionnaireModele
+create questionnaire
+questionnaireModele -> questionnaire : q = new Questionnaire(nom:String, description:String, actif:boolean)
+note right: GRASP: Creator
+activate questionnaire
+questionnaire --> questionnaireModele : q:Questionnaire
+deactivate questionnaire
+questionnaireModele -> questionnaireModele ++: ajouterQuestionnaire(q:Questionnaire)
+note right: GRASP: Expert
+deactivate questionnaireModele
+questionnaireModele --> controller : q:Questionnaire
+deactivate questionnaireModele
+'peut etre changer la classe qui recoit obtenirListeTagsDesQuestions() pour ne pas que le modele de questionnaire soit oblig� de connaitre les tags
+controller -> questionnaireModele : obtenirListeTagsDesQuestions(groupeId:String)
+note right: GRASP: Expert
+activate questionnaireModele
+questionnaireModele --> controller : tags:String[]
+deactivate questionnaireModele
+<-- controller : confirmerAjoutEtAfficherTagsJSON:String
+deactivate controller
+
+-> controller : selectionnerTag(nomTag:String):Questions[]
+note right: GRASP: Controller
+activate controller
+'peut etre changer la classe qui recoit obtenirQuestionsParTag() pour ne pas que le modele de questionnaire soit oblig� de connaitre les tags
+controller -> questionnaireModele : obtenirQuestionsParTag(groupeId:String, nomTag:String):Questions[]
+note right: GRASP: Expert
+activate questionnaireModele
+questionnaireModele --> controller : questions:Questions[]
+deactivate questionnaireModele
+<-- controller : questionsDuTag:Questions[]
+deactivate controller
+
+loop tant que l'utilisateur n'a pas termine l'ajout de questions
+
+  loop tant que l'utilisateur veut ajouter des questions
+    -> controller : ajouterQuestion(nomQuestion:String)
+    note right: GRASP: Controller
+    activate controller
+    controller -> questionnaireModele ++: ajouterQuestion(nomQuestion:String)
+    note right: GRASP: Expert
+    questionnaireModele -> questionnaireModele ++: question = obtenirQuestionParNom(nomQuestion:String):Question
+    note right: GRASP: Expert
+    deactivate questionnaireModele
+    questionnaireModele -> tab ++: push(question:Question)
+    note right: GRASP: Expert
+    deactivate tab
+    deactivate questionnaireModele
+    deactivate controller
+  end
+
+  -> controller : sauvegarderQuestionnaire():boolean
+  note right: GRASP: Controller
+  activate controller
+  controller -> questionnaireModele ++: sauvegarderQuestionnaire():boolean
+  note right: GRASP: Expert
+  questionnaireModele -> questionnaire ++: ajouterQuestions(questions:Question[])
+  note right: GRASP: Expert
+  deactivate questionnaire
+  note bottom: effacer le contenu de questions apres la sauvegarde
+  questionnaireModele --> controller : sauvegardeConfirmee:boolean
+  deactivate questionnaireModele
+  <-- controller : confirmerSauvegarde : boolean
+  deactivate controller
+end
+
+@enduml

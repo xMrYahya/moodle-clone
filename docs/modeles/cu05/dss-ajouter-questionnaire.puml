@@ -9,7 +9,7 @@ s-->>e : Confirmation de l'ajout et liste de tags de Questions
 e->s : selectionnerTag(nom : String)
 loop tant que l'enseignant n'a pas terminé l'ajout de questions.
 s-->>e : Questions correspondant au tag et nombre de questionnaires\n auxquels ces questions ont déjà été ajoutées.
-'important de mettre a jout le nombre de quetionnaires auquel les questions ont déjé été ajoutées apres un ajout
+'important de mettre a jour le nombre de questionnaires auquel les questions ont déjé été ajoutées apres un ajout
 e->s : ajouterQuestion(nomQuestions : String[])
 'Pas de fonction du coté du système
 e->s : sauvegarderQuestionnaire()
