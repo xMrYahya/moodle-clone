@@ -1,0 +1,53 @@
+@startuml
+hide footbox
+title RDCU – Sélectionner une question
+
+actor ":Enseignant" as e
+participant "ui:UIQuestionsCours" as UI
+participant "qc:QuestionsController" as QC
+participant "qs:QuestionsStore" as QS
+participant "q:Question" as Q
+
+activate e
+
+e -> UI : selectionnerQuestion(nom : String)
+activate UI
+
+UI -> QC : selectionnerQuestion(groupId : String, nom : String)
+activate QC
+
+QC -> QS : chercherInfoQuestion(groupId : String, nom : String)
+activate QS
+QS --> QC : question : Question
+deactivate QS
+
+activate Q
+QC -> Q : getType()
+Q --> QC : type
+
+QC -> Q : getNom()
+Q --> QC : nom
+
+QC -> Q : getEnonce()
+Q --> QC : enonce
+
+QC -> Q : getVerite()
+Q --> QC : verite
+
+QC -> Q : getRetroactionBonne()
+Q --> QC : retroBonne
+
+QC -> Q : getRetroactionMauvaise()
+Q --> QC : retroMauvaise
+
+QC -> Q : getTags()
+Q --> QC : tags : List<String>
+deactivate Q
+
+QC --> UI : afficherInfoQuestion(type, nom, enonce, verite,\nretroBonne, retroMauvaise, tags)
+deactivate QC
+
+UI --> e : affichageInfoQuestion()
+deactivate UI
+
+@enduml
