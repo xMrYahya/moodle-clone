@@ -1,0 +1,22 @@
+@startuml
+title CU05a - RDCU Gerer les questionnaires
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+
+-> controller : gererQuestionnaires():Questionnaire[]
+note right: GRASP: Controller
+activate controller
+controller -> questionnaireModele : obtenirQuestionnairesAssocies(groupeId:String):Questionnaire[]
+note right: GRASP: Expert
+activate questionnaireModele
+questionnaireModele -> questionnaireModele ++: obtenirTousQuestionnaires()
+note right: GRASP: Expert
+deactivate questionnaireModele
+questionnaireModele --> controller : questionnairesAssociesJSON:Questionnaire[]
+deactivate questionnaireModele
+<-- controller : QuestionnairesAssociesJSON : Questionnaire[]
+deactivate controller
+
+
+@enduml

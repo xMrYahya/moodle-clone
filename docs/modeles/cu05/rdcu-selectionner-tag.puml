@@ -1,0 +1,19 @@
+@startuml
+title CU05a - RDCU Selectionner un tag
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+
+-> controller : selectionnerTag(nomTag:String):Questions[]
+note right: GRASP: Controller
+activate controller
+'peut etre changer la classe qui recoit obtenirQuestionsParTag() pour ne pas que le modele de questionnaire soit oblig� de connaitre les tags
+controller -> questionnaireModele : obtenirQuestionsParTag(groupeId:String, nomTag:String):Questions[]
+note right: GRASP: Expert
+activate questionnaireModele
+questionnaireModele --> controller : questions:Questions[]
+deactivate questionnaireModele
+<-- controller : questionsDuTag:Questions[]
+deactivate controller
+
+@enduml

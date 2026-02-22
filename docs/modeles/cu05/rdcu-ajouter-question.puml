@@ -1,0 +1,22 @@
+@startuml
+title CU05a - RDCU Ajouter une question
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+participant "questions:Question[]" as tab
+
+-> controller : ajouterQuestion(nomQuestion:String)
+    note right: GRASP: Controller
+    activate controller
+    controller -> questionnaireModele ++: ajouterQuestion(nomQuestion:String)
+    note right: GRASP: Expert
+    questionnaireModele -> questionnaireModele ++: question = obtenirQuestionParNom(nomQuestion:String):Question
+    note right: GRASP: Expert
+    deactivate questionnaireModele
+    questionnaireModele -> tab ++: push(question:Question)
+    note right: GRASP: Expert
+    deactivate tab
+    deactivate questionnaireModele
+    deactivate controller
+
+@enduml
