@@ -33,5 +33,5 @@ else Nom de question deja utilise
 end
 
 deactivate QC
-activate e
+deactivate e
 @enduml

@@ -1,0 +1,44 @@
+@startuml
+hide footbox
+title RDCU – Modifier une question
+
+actor ":Enseignant" as e
+participant "ui:UIQuestionsCours" as UI
+participant "qc:QuestionsController" as QC
+participant "qs:QuestionsStore" as QS
+participant "q:Question" as Q
+
+
+e -> UI : modifierQuestion(nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
+activate UI
+
+UI -> QC : modifierQuestion(groupId, nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
+activate QC
+
+
+
+alt Nom de question unique
+    QC -> Q : modifierQuestion(nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
+    activate Q
+    Q --> QC : confirmationModificationQuestion()
+    deactivate Q
+
+    QC -> QS : updateQuestion(Q)
+    activate QS
+    QS --> QC : confirmationModificationQuestionStore()
+    deactivate QS
+
+    QC --> UI : afficherConfirmationModification(Q)
+
+    UI --> e : questionModifiee()
+
+
+else Nom de question deja utilise
+    QC --> UI : signalerErreurNomExistant()
+    deactivate QC
+
+    UI --> e : erreurNomNonUnique()
+    deactivate UI
+end
+
+@enduml

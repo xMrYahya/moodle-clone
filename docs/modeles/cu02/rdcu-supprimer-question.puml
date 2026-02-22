@@ -1,0 +1,46 @@
+@startuml
+hide footbox
+title RDCU – Supprimer une question (Demande)
+
+actor ":Enseignant" as e
+participant "ui:UIQuestionsCours" as UI
+participant "qc:QuestionsController" as QC
+participant "qs:QuestionsStore" as QS
+
+e -> UI : supprimerQuestion(nom : String)
+activate UI
+
+UI -> QC : supprimerQuestion(groupId : String, nom : String)
+activate QC
+
+QC -> QS : questionUtiliseeDansQuestionnaire(groupId : String, nom : String)
+activate QS
+QS --> QC : utilisee : boolean
+deactivate QS
+
+alt Question non utilisee dans un questionnaire
+  QC -> QS : chercherInfoQuestion(groupId : String, nom : String)
+  activate QS
+  QS --> QC : question
+  deactivate QS
+
+  QC --> UI : afficherInfoQuestionASupprimer(question)
+  QC --> UI : demanderConfirmationSuppression()
+
+  UI --> e : demandeConfirmationSuppression()
+
+else Question utilisee dans au moins un questionnaire
+  QC -> QS : listerQuestionnairesUtilisantQuestion(groupId : String, nom : String)
+  activate QS
+  QS --> QC : questionnaires : List<Questionnaire>
+  deactivate QS
+
+  QC --> UI : afficherQuestionnairesUtilisantQuestion(questionnaires)
+  QC --> UI : desactiverSuppression()
+  deactivate QC
+
+  UI --> e : suppressionImpossible()
+  deactivate UI
+end
+
+@enduml

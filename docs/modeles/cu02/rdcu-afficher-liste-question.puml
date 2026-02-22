@@ -1,0 +1,27 @@
+@startuml
+hide footbox
+title RDCU – Afficher la liste des questions
+
+actor ":Enseignant" as e
+participant "ui:UIQuestionsCours" as UI
+participant "qc:QuestionsController" as QC
+participant "qs:QuestionsStore" as QS
+
+e -> UI : consulterQuestionsCours(groupId : String)
+activate UI
+
+UI -> QC : consulterQuestionsCours(groupId : String)
+activate QC
+
+QC -> QS : chercherListeQuestions(groupId : String)
+activate QS
+QS --> QC : questions : List<Question>
+deactivate QS
+
+QC --> UI : afficherListeQuestions(questions)
+deactivate QC
+
+UI --> e : listeQuestionsAffichee()
+deactivate UI
+
+@enduml

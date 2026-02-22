@@ -1,0 +1,32 @@
+@startuml
+hide footbox
+title RDCU – Supprimer une question (Confirmation)
+
+actor ":Enseignant" as e
+participant "ui:UIQuestionsCours" as UI
+participant "qc:QuestionsController" as QC
+participant "qs:QuestionsStore" as QS
+
+e -> UI : confirmerSuppression()
+activate UI
+
+UI -> QC : confirmerSuppression(groupId : String, nom : String)
+activate QC
+
+QC -> QS : supprimerQuestion(groupId : String, nom : String)
+activate QS
+deactivate QS
+
+QC -> QS : chercherListeQuestions(groupId : String)
+activate QS
+QS --> QC : questions : List<Question>
+deactivate QS
+
+QC --> UI : afficherListeQuestions(questions)
+QC --> UI : afficherConfirmationSuppression()
+deactivate QC
+
+UI --> e : suppressionConfirmee()
+deactivate UI
+
+@enduml

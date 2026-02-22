@@ -1,4 +1,5 @@
 @startuml
+hide footbox
 title RDCU pour Ajouter une question Vrai ou Faux
 
 actor ":Enseignant" as e
