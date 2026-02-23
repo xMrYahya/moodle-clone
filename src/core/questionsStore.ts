@@ -59,7 +59,7 @@ export async function questionNameExists(groupId: string, nom: string): Promise<
   return questions.some(q => String(q.nom).toLowerCase() === String(nom).toLowerCase());
 }
 
-export async function addQuestion(groupId: string, question: AnyQuestion): Promise<void> {
+export async function addQuestion(groupId: string, question: AnyQuestion | Question): Promise<void> {
   const questionsStockees = await lireQuestionsStockage();
   const nouveauModele: Question = question instanceof Question ? question : deserialiserQuestionDepuisJson(question);
 

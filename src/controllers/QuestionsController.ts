@@ -3,11 +3,181 @@ import {
   addQuestion, 
   questionNameExists 
 } from "../core/questionsStore";
-import { AnyQuestion, QuestionVraiFaux, QuestionChoixMultiple } from "../types/questionTypes";
+import {
+  PairDeCorrespondance,
+  Question,
+  QuestionChoixMultipleModele,
+  QuestionEssaiModele,
+  QuestionMiseEnCorrespondanceModele,
+  QuestionNumeriqueModele,
+  QuestionReponseCourteModele,
+  QuestionVraiFauxModele,
+  ReponseChoixMultiple,
+} from "../types/questionTypes";
 import { AlreadyExistsError } from "../core/errors/alreadyExistsError";
 import { InvalidParameterError } from "../core/errors/invalidParameterError";
+import { convertirQuestionModeleEnDonnees } from "../core/questionsFactory";
 
 export class QuestionsController {
+  private static lireTags(tags: unknown): string[] {
+    if (Array.isArray(tags)) {
+      return tags.map(String).map((t) => t.trim()).filter((t) => t.length > 0);
+    }
+
+    if (tags) {
+      return String(tags).split(",").map((t) => t.trim()).filter((t) => t.length > 0);
+    }
+
+    return [];
+  }
+
+  private static lireReponsesChoixMultiple(reponses: unknown): ReponseChoixMultiple[] {
+    if (Array.isArray(reponses)) {
+      return reponses
+        .map((item: any) => ({
+          text: String(item?.text ?? "").trim(),
+          estBonneReponse: item?.estBonneReponse === true,
+          retroaction: String(item?.retroaction ?? "").trim(),
+        }))
+        .filter((item) => item.text.length > 0);
+    }
+
+    const texte = String(reponses ?? "").trim();
+    if (!texte) {
+      return [];
+    }
+
+    return texte
+      .split("|")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+      .map((item, index) => ({
+        text: item,
+        estBonneReponse: index === 0,
+        retroaction: "",
+      }));
+  }
+
+  private static lirePairesCorrespondance(paires: unknown): PairDeCorrespondance[] {
+    if (Array.isArray(paires)) {
+      return paires
+        .map((item: any) => ({
+          question: String(item?.question ?? "").trim(),
+          reponse: String(item?.reponse ?? "").trim(),
+        }))
+        .filter((item) => item.question.length > 0 || item.reponse.length > 0);
+    }
+
+    const texte = String(paires ?? "").trim();
+    if (!texte) {
+      return [];
+    }
+
+    return texte
+      .split("|")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+      .map((item) => {
+        const separateur = item.indexOf(":");
+        if (separateur === -1) {
+          return { question: item, reponse: "" };
+        }
+
+        return {
+          question: item.slice(0, separateur).trim(),
+          reponse: item.slice(separateur + 1).trim(),
+        };
+      });
+  }
+
+  private static creerQuestionAutreType(
+    type: string,
+    nom: string,
+    énoncé: string,
+    retroactionValide: string,
+    retroactionInvalide: string,
+    tags: string[],
+    autresDonnees: Record<string, unknown>
+  ): Question {
+    if (type === "ChoixMultiple") {
+      const reponses = this.lireReponsesChoixMultiple(autresDonnees.reponses);
+      if (reponses.length === 0) {
+        throw new InvalidParameterError("Champs manquants: reponses");
+      }
+
+      return new QuestionChoixMultipleModele(
+        nom,
+        énoncé,
+        retroactionValide,
+        retroactionInvalide,
+        tags,
+        autresDonnees.seulementUnChoix === true || autresDonnees.seulementUnChoix === "true",
+        reponses
+      );
+    }
+
+    if (type === "MiseEnCorrespondance") {
+      const paires = this.lirePairesCorrespondance(autresDonnees.paires);
+      if (paires.length === 0) {
+        throw new InvalidParameterError("Champs manquants: paires");
+      }
+
+      return new QuestionMiseEnCorrespondanceModele(
+        nom,
+        énoncé,
+        retroactionValide,
+        retroactionInvalide,
+        tags,
+        paires
+      );
+    }
+
+    if (type === "ReponseCourte") {
+      const reponseAttendue = String(autresDonnees.reponse ?? "").trim();
+      if (!reponseAttendue) {
+        throw new InvalidParameterError("Champs manquants: reponse");
+      }
+
+      return new QuestionReponseCourteModele(
+        nom,
+        énoncé,
+        retroactionValide,
+        retroactionInvalide,
+        tags,
+        reponseAttendue,
+        retroactionValide
+      );
+    }
+
+    if (type === "Numerique") {
+      const valeur = Number.parseFloat(String(autresDonnees.reponse ?? "").trim());
+      if (!Number.isFinite(valeur)) {
+        throw new InvalidParameterError("Champs manquants: reponse");
+      }
+
+      return new QuestionNumeriqueModele(
+        nom,
+        énoncé,
+        retroactionValide,
+        retroactionInvalide,
+        tags,
+        valeur,
+        retroactionValide
+      );
+    }
+
+    if (type === "Essai") {
+      return new QuestionEssaiModele(
+        nom,
+        énoncé,
+        retroactionValide,
+        retroactionInvalide,
+        tags
+      );
+    }
+
+    throw new InvalidParameterError(`Type de question non supporté: ${type}`);
+  }
   
   static async ajouterQuestionVraiFaux(req: any, res: Response): Promise<void> {
     try {
@@ -34,23 +204,22 @@ export class QuestionsController {
 
       const reponseBoolean = reponse === "true" || reponse === true;
 
-      const newQuestion: QuestionVraiFaux = {
-        nom: String(nom).trim(),
-        énoncé: String(énoncé).trim(),
-        reponse: reponseBoolean,
-        retroaction: String(retroactionValide || "").trim(),
-        retroactionValide: String(retroactionValide || "").trim(),
-        retroactionInvalide: String(retroactionInvalide || "").trim(),
-        tags: Array.isArray(tags) ? tags.map(String) : (tags ? String(tags).split(",").map(t => t.trim()).filter(t => t) : []),
-        type: "VraiFaux",
-      };
+      const nouvelleQuestion = new QuestionVraiFauxModele(
+        String(nom).trim(),
+        String(énoncé).trim(),
+        String(retroactionValide || "").trim(),
+        String(retroactionInvalide || "").trim(),
+        this.lireTags(tags),
+        reponseBoolean,
+        String(retroactionValide || "").trim()
+      );
 
-      await addQuestion(String(groupId), newQuestion);
+      await addQuestion(String(groupId), nouvelleQuestion);
 
       res.status(201).json({
         success: true,
         message: "Question ajoutée avec succès",
-        question: newQuestion,
+        question: convertirQuestionModeleEnDonnees(nouvelleQuestion),
       });
       return;
     } catch (e: any) {
@@ -88,29 +257,23 @@ export class QuestionsController {
         throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
       }
 
-      let parsedTags: string[] = [];
-      if (Array.isArray(tags)) {
-        parsedTags = tags.map(String).filter(t => t.trim());
-      } else if (tags) {
-        parsedTags = String(tags).split(",").map(t => t.trim()).filter(t => t.length > 0);
-      }
+      const typeQuestion = String(type).trim();
+      const nouvelleQuestion = this.creerQuestionAutreType(
+        typeQuestion,
+        String(nom).trim(),
+        String(énoncé).trim(),
+        String(retroactionValide || "").trim(),
+        String(retroactionInvalide || "").trim(),
+        this.lireTags(tags),
+        otherData
+      );
 
-      const newQuestion: AnyQuestion = {
-        nom: String(nom).trim(),
-        énoncé: String(énoncé).trim(),
-        type: String(type).trim() as any,
-        retroactionValide: String(retroactionValide || "").trim(),
-        retroactionInvalide: String(retroactionInvalide || "").trim(),
-        tags: parsedTags,
-        ...otherData,
-      } as AnyQuestion;
-
-      await addQuestion(String(groupId), newQuestion);
+      await addQuestion(String(groupId), nouvelleQuestion);
 
       res.status(201).json({
         success: true,
         message: "Question ajoutée avec succès",
-        question: newQuestion,
+        question: convertirQuestionModeleEnDonnees(nouvelleQuestion),
       });
       return;
     } catch (e: any) {
