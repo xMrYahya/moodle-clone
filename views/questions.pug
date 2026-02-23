@@ -44,7 +44,7 @@ html
                     .card-body
                       h5.card-title.mb-1 #{q.nom}
                       p.card-text.text-muted.mb-2
-                        small Type: #{q.type}
+                        small Type: #{q.typeAffichage}
                       p.card-text.mb-2
                         em #{q.énoncé}
           else
@@ -165,8 +165,7 @@ html
             #form-screen-choixmultiple(style="display: none;")
               button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-choix-multiple")
-                input(type="hidden" name="type" value="ChoixMultiple")
+              form(method="post" action=`/questions/${groupId}/ajouter-choix-multiple` id="form-choix-multiple")
                 h6.mb-3 Question Choix Multiple
 
                 .form-group
@@ -205,8 +204,7 @@ html
             #form-screen-numerique(style="display: none;")
               button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-numerique")
-                input(type="hidden" name="type" value="Numerique")
+              form(method="post" action=`/questions/${groupId}/ajouter-numerique` id="form-numerique")
                 h6.mb-3 Question Numérique
 
                 .form-group
@@ -239,8 +237,7 @@ html
             #form-screen-reponsecourte(style="display: none;")
               button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-reponse-courte")
-                input(type="hidden" name="type" value="ReponseCourte")
+              form(method="post" action=`/questions/${groupId}/ajouter-reponse-courte` id="form-reponse-courte")
                 h6.mb-3 Question Réponse Courte
 
                 .form-group
@@ -273,8 +270,7 @@ html
             #form-screen-miseencorrespondance(style="display: none;")
               button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-mise-correspondance")
-                input(type="hidden" name="type" value="MiseEnCorrespondance")
+              form(method="post" action=`/questions/${groupId}/ajouter-mise-en-correspondance` id="form-mise-correspondance")
                 h6.mb-3 Question Mise en Correspondance
 
                 .form-group
@@ -309,8 +305,7 @@ html
             #form-screen-essai(style="display: none;")
               button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-autre-type` id="form-essai")
-                input(type="hidden" name="type" value="Essai")
+              form(method="post" action=`/questions/${groupId}/ajouter-essai` id="form-essai")
                 h6.mb-3 Question Essai
 
                 .form-group
@@ -485,19 +480,19 @@ html
       if (fVf) fVf.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponse']));
 
       const fCm = document.getElementById('form-choix-multiple');
-      if (fCm) fCm.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponses']));
+      if (fCm) fCm.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponses']));
 
       const fNum = document.getElementById('form-numerique');
-      if (fNum) fNum.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']));
+      if (fNum) fNum.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponse']));
 
       const fRc = document.getElementById('form-reponse-courte');
-      if (fRc) fRc.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'reponse']));
+      if (fRc) fRc.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponse']));
 
       const fMec = document.getElementById('form-mise-correspondance');
-      if (fMec) fMec.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type', 'paires']));
+      if (fMec) fMec.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'paires']));
 
       const fEss = document.getElementById('form-essai');
-      if (fEss) fEss.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'type']));
+      if (fEss) fEss.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé']));
 
       // ---- Format affichage (minimal) : Jeu->Jeudi, P/D -> Présentiel/Distance ----
       // On modifie juste le texte déjà rendu, sans toucher au backend.

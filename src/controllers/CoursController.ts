@@ -7,6 +7,35 @@ const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
 const accesSGA = new SgbClient(sgbBaseUrl);
 
 export class CoursController {
+  private static obtenirTypeQuestionPourAffichage(question: any): string {
+    if (question && (question.reponses !== undefined || question.seulementUnChoix !== undefined)) {
+      return "ChoixMultiple";
+    }
+
+    if (question && question.paires !== undefined) {
+      return "MiseEnCorrespondance";
+    }
+
+    if (question && question.reponseAttendue !== undefined) {
+      return typeof question.reponseAttendue === "number" ? "Numerique" : "ReponseCourte";
+    }
+
+    if (question && question.reponse !== undefined) {
+      if (typeof question.reponse === "boolean") {
+        return "VraiFaux";
+      }
+
+      const texteReponse = String(question.reponse).trim().toLowerCase();
+      if (texteReponse === "true" || texteReponse === "false") {
+        return "VraiFaux";
+      }
+
+      return Number.isFinite(Number.parseFloat(texteReponse)) ? "Numerique" : "ReponseCourte";
+    }
+
+    return "Essai";
+  }
+
   static async selectionnerGroupeCours(req: any, res: Response): Promise<void> {
     try {
       const teacher = req.session.user;
@@ -107,7 +136,11 @@ export class CoursController {
         return;
       }
 
-      const questions = await getQuestionsForCours(idCours);
+      const questionsBrutes = await getQuestionsForCours(idCours);
+      const questions = questionsBrutes.map((question: any) => ({
+        ...question,
+        typeAffichage: CoursController.obtenirTypeQuestionPourAffichage(question),
+      }));
       const showAddQuestionModal = req.query.addQuestion === "1";
       const displayName = `${teacher.first_name} ${teacher.last_name}`;
 
