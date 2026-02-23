@@ -1,19 +1,19 @@
 @startuml
-title CU05a - RDCU Ajouter une question
+title CU05c - RDCU Dissocier une question du questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
 participant "questionnaireTemp:Questionnaire" as temp
 
--> controller : ajouterQuestion(nomQuestion:String)
+-> controller : dissocierQuestion(nomQuestion:String)
     note right: GRASP: Controller
     activate controller
-    controller -> questionnaireModele ++: ajouterQuestion(nomQuestion:String)
+    controller -> questionnaireModele ++: dissocierQuestion(nomQuestion:String)
     note right: GRASP: Expert
     questionnaireModele -> questionnaireModele ++: question = obtenirQuestionParNom(nomQuestion:String):Question
     note right: GRASP: Expert
     deactivate questionnaireModele
-    questionnaireModele -> temp ++: ajouterQuestion(question:Question)
+    questionnaireModele -> temp ++: retirerQuestion(question:Question)
     note right: GRASP: Expert
     deactivate temp
     deactivate questionnaireModele

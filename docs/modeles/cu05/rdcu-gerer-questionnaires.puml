@@ -15,8 +15,7 @@ note right: GRASP: Expert
 deactivate questionnaireModele
 questionnaireModele --> controller : questionnairesAssociesJSON:Questionnaire[]
 deactivate questionnaireModele
-<-- controller : QuestionnairesAssociesJSON : Questionnaire[]
+<-- controller : questionnairesAssociesJSON : Questionnaire[]
 deactivate controller
-
 
 @enduml

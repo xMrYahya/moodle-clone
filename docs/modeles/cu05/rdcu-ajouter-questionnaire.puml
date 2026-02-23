@@ -18,12 +18,15 @@ activate questionnaire
 questionnaire --> questionnaireModele : q:Questionnaire
 deactivate questionnaire
 questionnaireModele -> questionnaireModele ++: ajouterQuestionnaire(q:Questionnaire)
-note right: GRASP: Expert
+note right
+GRASP: Expert
+(ajouter le questionnaire dans le data.json pour questionnaires)
+end note
 deactivate questionnaireModele
 questionnaireModele --> controller : q:Questionnaire
 deactivate questionnaireModele
-'peut etre changer la classe qui recoit obtenirListeTagsDesQuestions() pour ne pas que le modele de questionnaire soit oblig� de connaitre les tags
-controller -> questionnaireModele : obtenirListeTagsDesQuestions(groupeId:String)
+'peut etre changer la classe qui recoit obtenirListeTagsDesQuestions() pour ne pas que le modele de questionnaire soit oblige de connaitre les tags
+controller -> questionnaireModele : obtenirListeTagsDesQuestions(groupeId:String):String[]
 note right: GRASP: Expert
 activate questionnaireModele
 questionnaireModele --> controller : tags:String[]

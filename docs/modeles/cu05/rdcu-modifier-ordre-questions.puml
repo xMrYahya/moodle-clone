@@ -1,0 +1,18 @@
+@startuml
+title CU05c - RDCU Modifier l'ordre d'une question
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+participant "questionnaireTemp:Questionnaire" as temp
+
+-> controller : modifierOrdreQuestion(nomQuestion: String, nouvellePosition : int)
+note right: GRASP: Controller
+activate controller
+controller -> questionnaireModele ++: modifierOrdreQuestion(nomQuestion: String, nouvellePosition : int)
+note right: GRASP: Expert
+questionnaireModele -> temp ++: modifierOrdreQuestion(nomQuestion: String, nouvellePosition : int)
+note right: GRASP: Expert
+deactivate questionnaireModele
+deactivate controller
+
+@enduml

@@ -1,0 +1,14 @@
+@startuml
+title CU05c - RDCU Obtenir les tags des questions
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+
+-> controller ++: obtenirTags():String[]
+note right :GRASP: Controller
+controller -> questionnaireModele ++: obtenirListeTagsDesQuestions(groupeId:String):String[]
+note right :GRASP: Expert
+questionnaireModele --> controller --: tags:String[]
+<-- controller --: tags:String[]
+
+@enduml

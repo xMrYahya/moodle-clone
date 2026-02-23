@@ -1,0 +1,31 @@
+@startuml
+title CU05c - RDCU Modifier un questionnaire
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+participant "q:Questionnaire" as questionnaire
+participant "questionnaireTemp:Questionnaire" as temp
+
+-> controller ++:modifierQuestionnaire(nom:String, description:String, actif:boolean):boolean
+note right: GRASP: Controller
+controller -> questionnaireModele ++:modifierQuestionnaire(nom:String, description:String, actif:boolean):boolean
+note right: GRASP: Expert
+questionnaireModele ->temp ++:setNom(nom:String)
+note right: GRASP: Expert
+deactivate temp
+questionnaireModele ->temp ++:setDescription(description:String)
+note right: GRASP: Expert
+deactivate temp
+questionnaireModele ->temp ++:setActif(actif:boolean)
+note right: GRASP: Expert
+deactivate temp
+questionnaireModele -> questionnaireModele ++: sauvegarderQuestionnaire():boolean
+note right: GRASP: Expert
+questionnaireModele -> questionnaire ++: mettreAJourAvec(questionnaireTemp:Questionnaire)
+note right: GRASP: Expert
+deactivate questionnaire
+deactivate questionnaireModele
+questionnaireModele --> controller --: confirmerSauvegarde:boolean
+<-- controller --: confirmerSauvegarde:boolean
+
+@enduml

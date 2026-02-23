@@ -7,7 +7,7 @@ participant ":QuestionnaireModele" as questionnaireModele
 -> controller : selectionnerTag(nomTag:String):Questions[]
 note right: GRASP: Controller
 activate controller
-'peut etre changer la classe qui recoit obtenirQuestionsParTag() pour ne pas que le modele de questionnaire soit oblig� de connaitre les tags
+'peut etre changer la classe qui recoit obtenirQuestionsParTag() pour ne pas que le modele de questionnaire soit oblige de connaitre les tags
 controller -> questionnaireModele : obtenirQuestionsParTag(groupeId:String, nomTag:String):Questions[]
 note right: GRASP: Expert
 activate questionnaireModele

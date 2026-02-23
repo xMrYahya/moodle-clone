@@ -4,17 +4,21 @@ title CU05a - RDCU Sauvegarder un questionnaire
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
 participant "q:Questionnaire" as questionnaire
-participant "questions:Question[]" as tab
+participant "questionnaireTemp:Questionnaire"
 
 -> controller : sauvegarderQuestionnaire():boolean
 note right: GRASP: Controller
 activate controller
 controller -> questionnaireModele ++: sauvegarderQuestionnaire():boolean
 note right: GRASP: Expert
-questionnaireModele -> questionnaire ++: ajouterQuestions(questions:Question[])
+questionnaireModele -> questionnaire ++: mettreAJourAvec(questionnaireTemp:Questionnaire)
 note right: GRASP: Expert
 deactivate questionnaire
-note bottom: effacer le contenu de questions apres la sauvegarde -->
+note bottom 
+effacer le contenu de questionnaireTemp apres la sauvegarde.
+Si jamais un champ est vide/null pour le questionnaireTemp,
+alors on ne update pas ce champ specifique du questionnaire q -->
+end note
 questionnaireModele --> controller : confirmerSauvegarde:boolean
 deactivate questionnaireModele
 <-- controller : confirmerSauvegarde : boolean
