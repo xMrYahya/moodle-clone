@@ -5,7 +5,7 @@ participant ":Systeme" as s
 e->s : consulterQuestionsCours(groupId : String)
 s-->>e : Liste des questions associees au cours
 'Noter qu'il faudrait 2 boutons 1 pour details, un pour modifier
-e->s : modifierQuestion(nom : String)
+e->s : selectionnerModifierQuestion(nom : String)
 s-->>e : Détails de la question (Type, Nom,\nÉnoncé, Vérité, \nRétroaction pour la bonne réponse, \nRétroaction pour la mauvaise réponse, tags)
 e->s : modifierQuestion(nom : String, enonce : String, type : String, \nretroactionValide : String, retroactionInvalide : String, tags : String[])
 alt Nom de question unique
