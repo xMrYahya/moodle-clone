@@ -2,13 +2,11 @@
 hide footbox
 title RDCU pour Ajouter une question Vrai ou Faux
 
-actor ":Enseignant" as e
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 participant "q:QuestionVraiFaux" as Q
 
-activate e
-e -> QC : ajouterQuestionVraiFaux(nom : String, enonce : String,\n reponse : bool, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
+-> QC : ajouterQuestionVraiFaux(nom : String, enonce : String,\n reponse : bool, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
 activate QC
 
 QC -> QS : questionNameExists(nom)
@@ -26,11 +24,10 @@ alt Nom de question unique
     activate QS
     deactivate QS
 
-    QC --> e : confirmationAjout(listeQuestions)
+    <-- QC : confirmationAjout(listeQuestions):String
 else Nom de question deja utilise
-    QC --> e : signalerErreurNomExistant()
+    <-- QC : signalerErreurNomExistant():String
 end
 
 deactivate QC
-deactivate e
 @enduml

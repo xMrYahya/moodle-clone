@@ -2,13 +2,11 @@
 hide footbox
 title RDCU - ajouterQuestionAutreType
 
-actor ":Enseignant" as e
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 participant "q:Question" as Q
 
-e -> QC : ajouterQuestionAutreType(nom : String, enonce : String, type : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
-activate e
+-> QC : ajouterQuestionAutreType(nom : String, enonce : String, type : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
 
 activate QC
 
@@ -27,11 +25,11 @@ alt Nom de question unique
   activate QS
   deactivate QS
 
-  QC --> e : confirmationAjout(listeQuestions)
+  <-- QC : confirmationAjout(listeQuestions):String
 else Nom de question deja utilise
-  QC --> e : signalerErreurNomExistant()
+  <-- QC : signalerErreurNomExistant():String
 end
 
 deactivate QC
-deactivate e
+
 @enduml

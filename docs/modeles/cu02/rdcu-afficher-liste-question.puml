@@ -2,12 +2,12 @@
 hide footbox
 title RDCU – Afficher la liste des questions
 
-actor ":Enseignant" as e
+
 participant "ui:UIQuestionsCours" as UI
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 
-e -> UI : consulterQuestionsCours(groupId : String)
+-> UI : consulterQuestionsCours(groupId : String)
 activate UI
 
 UI -> QC : consulterQuestionsCours(groupId : String)
@@ -21,7 +21,7 @@ deactivate QS
 QC --> UI : afficherListeQuestions(questions)
 deactivate QC
 
-UI --> e : listeQuestionsAffichee()
+<-- UI : listeQuestionsAffichee():String
 deactivate UI
 
 @enduml
