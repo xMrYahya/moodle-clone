@@ -142,7 +142,7 @@ describe("AuthController (100% coverage)", () => {
   test("postSignin: erreur avec message => 401 + message", async () => {
     const { AuthController, loginTeacherMock } = loadControllerWithMockedSgbClient();
 
-    loginTeacherMock.mockRejectedValue(new Error("Bad credentials"));
+    loginTeacherMock.mockRejectedValue(new Error("Identifiants invalides"));
 
     const req: any = {
       body: { email: "a@a.com", password: "wrong" },
@@ -153,13 +153,13 @@ describe("AuthController (100% coverage)", () => {
     await AuthController.postSignin(req, res);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ ok: false, message: "Bad credentials" });
+    expect(res.json).toHaveBeenCalledWith({ ok: false, message: "Identifiants invalides" });
   });
 
-  test("postSignin: erreur sans message => 401 + 'Login failed'", async () => {
+  test("postSignin: erreur sans message => 401 + 'Echec de connexion'", async () => {
     const { AuthController, loginTeacherMock } = loadControllerWithMockedSgbClient();
 
-    // e?.message undefined => fallback "Login failed"
+    // e?.message undefined => fallback "Echec de connexion"
     loginTeacherMock.mockRejectedValue({});
 
     const req: any = {
@@ -171,10 +171,10 @@ describe("AuthController (100% coverage)", () => {
     await AuthController.postSignin(req, res);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ ok: false, message: "Login failed" });
+    expect(res.json).toHaveBeenCalledWith({ ok: false, message: "Echec de connexion" });
   });
 
-  test("postSignin: erreur undefined => 401 + 'Login failed'", async () => {
+  test("postSignin: erreur undefined => 401 + 'Echec de connexion'", async () => {
     const { AuthController, loginTeacherMock } = loadControllerWithMockedSgbClient();
 
     loginTeacherMock.mockRejectedValue(undefined);
@@ -188,7 +188,7 @@ describe("AuthController (100% coverage)", () => {
     await AuthController.postSignin(req, res);
 
     expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ ok: false, message: "Login failed" });
+    expect(res.json).toHaveBeenCalledWith({ ok: false, message: "Echec de connexion" });
   });
 
   test("signout: destroy session => redirect /", () => {

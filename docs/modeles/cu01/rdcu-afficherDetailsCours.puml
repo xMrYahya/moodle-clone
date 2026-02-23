@@ -6,10 +6,10 @@ skinparam sequenceMessageAlign center
 participant ":Enseignant"  as enseignant
 participant "sga:accesSGA" as sga
 
- -> enseignant : afficherDetailsCours(idCours: String) : cours
+ -> enseignant : afficherDetailsCours(idGroupe: String) : cours
 note right: controlleur
 activate enseignant
-enseignant -> sga : getEtudiants() : Étudiant[]
+enseignant -> sga : getEtudiantsParGroupe(idGroupe: String) : Étudiant[]
 sga -->> enseignant : ListeEtudiants : Étudiant[]
 
 deactivate enseignant

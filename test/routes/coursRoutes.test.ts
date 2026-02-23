@@ -4,9 +4,11 @@ import { jest } from "@jest/globals";
 
 jest.mock("../../src/controllers/CoursController", () => ({
   CoursController: {
-    creer: jest.fn((req: any, res: any) => res.status(200).send("creer-ok")),
-    supprimer: jest.fn((req: any, res: any) => res.status(200).send("supprimer-ok")),
-    afficherQuestions: jest.fn((req: any, res: any) => res.status(200).send("questions-ok")),
+    selectionnerGroupeCours: jest.fn((req: any, res: any) => res.status(200).send("selection-reussie-fr")),
+    retirerCours: jest.fn((req: any, res: any) => res.status(200).send("retrait-reussi-fr")),
+    confirmerSuppressionCours: jest.fn((req: any, res: any) => res.status(200).send("confirmation-reussie-fr")),
+    suppressionCours: jest.fn((req: any, res: any) => res.status(200).send("suppression-reussie-fr")),
+    afficherDetailsCours: jest.fn((req: any, res: any) => res.status(200).send("details-reussis-fr")),
   },
 }));
 
@@ -41,81 +43,103 @@ describe("coursRoutes", () => {
     jest.clearAllMocks();
   });
 
-  test("POST /cours/creer without auth redirects to /signin", async () => {
+  test("POST /cours/selectionner-groupe-cours sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
-    const res = await request(app).post("/cours/creer").send({});
+    const res = await request(app).post("/cours/selectionner-groupe-cours").send({});
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("/signin");
-    expect(CoursController.creer).not.toHaveBeenCalled();
+    expect(CoursController.selectionnerGroupeCours).not.toHaveBeenCalled();
   });
 
-  test("POST /cours/supprimer without auth redirects to /signin", async () => {
+  test("POST /cours/suppression-cours sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
-    const res = await request(app).post("/cours/supprimer").send({});
+    const res = await request(app).post("/cours/suppression-cours").send({});
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("/signin");
-    expect(CoursController.supprimer).not.toHaveBeenCalled();
+    expect(CoursController.suppressionCours).not.toHaveBeenCalled();
   });
 
-  test("POST /cours/creer with no session redirects to /signin", async () => {
+  test("GET /cours/retirer-cours sans auth redirige vers /signin", async () => {
+    const app = makeApp();
+
+    const res = await request(app).get("/cours/retirer-cours?groupId=g-1");
+
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe("/signin");
+    expect(CoursController.retirerCours).not.toHaveBeenCalled();
+  });
+
+  test("POST /cours/selectionner-groupe-cours sans session redirige vers /signin", async () => {
     const app = makeAppNoSession();
 
-    const res = await request(app).post("/cours/creer").send({});
+    const res = await request(app).post("/cours/selectionner-groupe-cours").send({});
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("/signin");
-    expect(CoursController.creer).not.toHaveBeenCalled();
+    expect(CoursController.selectionnerGroupeCours).not.toHaveBeenCalled();
   });
 
-  test("POST /cours/creer with auth calls controller", async () => {
+  test("POST /cours/selectionner-groupe-cours avec auth appelle le controleur", async () => {
     const app = makeApp();
 
     const res = await request(app)
-      .post("/cours/creer")
+      .post("/cours/selectionner-groupe-cours")
       .set("x-test-auth", "1")
       .send({});
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("creer-ok");
-    expect(CoursController.creer).toHaveBeenCalledTimes(1);
+    expect(res.text).toBe("selection-reussie-fr");
+    expect(CoursController.selectionnerGroupeCours).toHaveBeenCalledTimes(1);
   });
 
-  test("GET /cours/:groupId/questions without auth redirects to /signin", async () => {
+  test("GET /cours/:groupId/details-cours sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
-    const res = await request(app).get("/cours/g-1/questions");
+    const res = await request(app).get("/cours/g-1/details-cours");
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("/signin");
-    expect(CoursController.afficherQuestions).not.toHaveBeenCalled();
+    expect(CoursController.afficherDetailsCours).not.toHaveBeenCalled();
   });
 
-  test("GET /cours/:groupId/questions with auth calls controller", async () => {
+  test("GET /cours/:groupId/details-cours avec auth appelle le controleur", async () => {
     const app = makeApp();
 
     const res = await request(app)
-      .get("/cours/g-1/questions")
+      .get("/cours/g-1/details-cours")
       .set("x-test-auth", "1");
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("questions-ok");
-    expect(CoursController.afficherQuestions).toHaveBeenCalledTimes(1);
+    expect(res.text).toBe("details-reussis-fr");
+    expect(CoursController.afficherDetailsCours).toHaveBeenCalledTimes(1);
   });
 
-  test("POST /cours/supprimer with auth calls controller", async () => {
+  test("POST /cours/suppression-cours avec auth appelle le controleur", async () => {
     const app = makeApp();
 
     const res = await request(app)
-      .post("/cours/supprimer")
+      .post("/cours/suppression-cours")
       .set("x-test-auth", "1")
       .send({});
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("supprimer-ok");
-    expect(CoursController.supprimer).toHaveBeenCalledTimes(1);
+    expect(res.text).toBe("suppression-reussie-fr");
+    expect(CoursController.suppressionCours).toHaveBeenCalledTimes(1);
+  });
+
+  test("GET /cours/retirer-cours avec auth appelle le controleur", async () => {
+    const app = makeApp();
+
+    const res = await request(app)
+      .get("/cours/retirer-cours?groupId=g-1")
+      .set("x-test-auth", "1");
+
+    expect(res.status).toBe(200);
+    expect(res.text).toBe("retrait-reussi-fr");
+    expect(CoursController.retirerCours).toHaveBeenCalledTimes(1);
   });
 });

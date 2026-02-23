@@ -24,3 +24,15 @@ export type CourseDto = {
   id: string;
   titre: string;
 };
+
+export type Cours = {
+  idGroupe: string;
+  jour: string;
+  heure: string;
+  activite: string;
+  mode: string;
+  local: string;
+  idEnseignant: string;
+  idCours: string;
+  titreCours: string;
+};

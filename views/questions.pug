@@ -20,7 +20,7 @@ html
             .mt-2
               // un peu plus gros qu'avant
               .text-muted.fs-5
-                | Horaire: #{cours.day} · #{cours.hours}
+                | Horaire: #{cours.jour} · #{cours.heure}
                 |  · Mode: #{cours.mode}
                 |  · Local: #{cours.local}
 
@@ -34,7 +34,7 @@ html
           .d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
             h4.mb-0 Questions
             .d-flex.align-items-center.gap-2
-              a.btn.btn-primary(href=`/cours/${groupId}/questions?addQuestion=1` id="btn-add-question") Ajouter une question
+              a.btn.btn-primary(href=`/cours/${groupId}/details-cours?addQuestion=1` id="btn-add-question") Ajouter une question
 
           if questions && questions.length
             .row.mt-3
@@ -88,7 +88,7 @@ html
         .modal-card
           .modal-header
             h5.mb-0#modal-title Choisir le type de question
-            a.close(href=`/cours/${groupId}/questions` aria-label="Fermer") ×
+            a.close(href=`/cours/${groupId}/details-cours` aria-label="Fermer") ×
 
           .modal-body
             // === ÉCRAN DE SÉLECTION DU TYPE ===
@@ -339,7 +339,7 @@ html
                 button.btn.btn-primary.w-100(type="submit") Ajouter cette question
 
           .modal-footer
-            a.btn.btn-secondary(href=`/cours/${groupId}/questions`) Fermer
+            a.btn.btn-secondary(href=`/cours/${groupId}/details-cours`) Fermer
 
     style.
       .question-type-card:hover {
@@ -475,7 +475,7 @@ html
           const result = await response.json();
 
           // cache-buster pour éviter le 304
-          window.location.href = `/cours/${groupId}/questions?ts=${Date.now()}`;
+          window.location.href = `/cours/${groupId}/details-cours?ts=${Date.now()}`;
         } catch (err) {
           alert('Erreur: ' + err.message);
         }

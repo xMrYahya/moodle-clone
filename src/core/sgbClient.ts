@@ -29,6 +29,18 @@ export type StudentInfo = {
   email: string;
 };
 
+export type GroupeCoursSGA = {
+  idGroupe: string;
+  jour: string;
+  heure: string;
+  activite: string;
+  mode: string;
+  local: string;
+  idEnseignant: string;
+  idCours: string;
+  titreCours: string;
+};
+
 export class SgbClient {
   constructor(private readonly baseUrl: string) { }
 
@@ -41,13 +53,13 @@ export class SgbClient {
 
     if (!resp.ok) {
       const text = await resp.text().catch(() => "");
-      throw new Error(`SGB login failed (${resp.status}): ${text}`);
+      throw new Error(`Echec connexion SGB (${resp.status}): ${text}`);
     }
 
     const data = (await resp.json()) as SgbTeacherLoginResponse;
 
     if (!data.token) {
-      throw new Error("SGB login response missing token");
+      throw new Error("Reponse connexion SGB sans jeton");
     }
 
     return data;
@@ -62,7 +74,7 @@ export class SgbClient {
     });
 
     if (!res.ok) {
-      throw new Error("Unable to fetch schedules");
+      throw new Error("Impossible de recuperer les horaires");
     }
 
     return res.json();
@@ -76,7 +88,7 @@ export class SgbClient {
       },
     });
 
-    if (!res.ok) throw new Error("Unable to fetch courses");
+    if (!res.ok) throw new Error("Impossible de recuperer les cours");
     return res.json();
   }
 
@@ -84,7 +96,7 @@ export class SgbClient {
     const res = await fetch(`${this.baseUrl}/api/v3/student/groupstudent`, {
       headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
     });
-    if (!res.ok) throw new Error("Unable to fetch group-student links");
+    if (!res.ok) throw new Error("Impossible de recuperer les associations groupe-etudiant");
     return (await res.json()) as GroupStudentResponse;
   }
 
@@ -92,11 +104,11 @@ export class SgbClient {
     const res = await fetch(`${this.baseUrl}/api/v3/student/all`, {
       headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
     });
-    if (!res.ok) throw new Error("Unable to fetch students");
+    if (!res.ok) throw new Error("Impossible de recuperer les etudiants");
     return (await res.json()) as AllStudentsResponse;
   }
 
-  async getStudentsForGroup(token: string, groupId: string): Promise<StudentInfo[]> {
+  async getEtudiantsParGroupe(token: string, groupId: string): Promise<StudentInfo[]> {
 
     const [linksResp, studentsResp] = await Promise.all([
       this.getGroupStudentLinks(token),
@@ -129,5 +141,73 @@ export class SgbClient {
 
     result.sort((a, b) => (a.last_name + a.first_name).localeCompare(b.last_name + b.first_name));
     return result;
+  }
+
+  async getStudentsForGroup(token: string, groupId: string): Promise<StudentInfo[]> {
+    return this.getEtudiantsParGroupe(token, groupId);
+  }
+
+  private async construireGroupesCours(token: string, teacherId?: string): Promise<GroupeCoursSGA[]> {
+    const [scheduleResult, coursesResult] = await Promise.all([
+      this.getSchedules(token) as Promise<{ data: { group_id: string; day: string; hours: string; activity: string; mode: string; local: string; teacher_id: string }[] }>,
+      this.getCourses(token),
+    ]);
+    const schedules = (scheduleResult.data ?? []).filter((s) =>
+      teacherId === undefined ? true : String(s.teacher_id) === String(teacherId)
+    );
+
+    const coursesById = new Map<string, { id: string; titre: string }>();
+    for (const c of coursesResult.data ?? []) {
+      coursesById.set(String(c.id), c);
+    }
+
+    const groupes = new Map<string, GroupeCoursSGA>();
+
+    for (const s of schedules) {
+      const groupId = String(s.group_id);
+      if (groupes.has(groupId)) continue;
+
+      const parts = groupId.split("-");
+      const code = parts.length >= 2 ? parts[1] : null;
+      const direct = code ? coursesById.get(code) : undefined;
+      const fallback =
+        !direct && code
+          ? (coursesResult.data ?? []).find((c) => String(c.titre).includes(code))
+          : undefined;
+      const course = direct ?? fallback;
+
+      groupes.set(groupId, {
+        idGroupe: groupId,
+        jour: String(s.day),
+        heure: String(s.hours),
+        idCours: course ? String(course.id) : (code ?? ""),
+        titreCours: course ? String(course.titre) : (code ?? groupId),
+        activite: String(s.activity),
+        mode: String(s.mode),
+        local: String(s.local),
+        idEnseignant: String(s.teacher_id),
+      });
+    }
+
+    return Array.from(groupes.values());
+  }
+
+  async getCours(teacherId: string, token: string): Promise<GroupeCoursSGA[]> {
+    return this.construireGroupesCours(token, teacherId);
+  }
+
+  async getCoursParGroupe(
+    groupId: string,
+    token: string,
+    teacherId?: string
+  ): Promise<GroupeCoursSGA | undefined> {
+    const groupes = teacherId
+      ? await this.construireGroupesCours(token, teacherId)
+      : await this.construireGroupesCours(token);
+    return groupes.find((g) => String(g.idGroupe) === String(groupId));
+  }
+
+  async getListeCours(teacherId: string, token: string): Promise<GroupeCoursSGA[]> {
+    return this.getCours(teacherId, token);
   }
 }

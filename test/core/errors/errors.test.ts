@@ -2,25 +2,25 @@ import { AlreadyExistsError } from "../../../src/core/errors/alreadyExistsError"
 import { InvalidParameterError } from "../../../src/core/errors/invalidParameterError";
 import { NotFoundError } from "../../../src/core/errors/notFoundError";
 
-describe("error classes", () => {
-  test("AlreadyExistsError sets code 400 and message", () => {
-    const err = new AlreadyExistsError("exists");
+describe("classes derreur", () => {
+  test("AlreadyExistsError definit code 400 et message", () => {
+    const err = new AlreadyExistsError("existe");
     expect(err).toBeInstanceOf(Error);
     expect(err.code).toBe(400);
-    expect(err.message).toBe("exists");
+    expect(err.message).toBe("existe");
   });
 
-  test("InvalidParameterError sets code 400 and message", () => {
-    const err = new InvalidParameterError("invalid");
+  test("InvalidParameterError definit code 400 et message", () => {
+    const err = new InvalidParameterError("invalide");
     expect(err).toBeInstanceOf(Error);
     expect(err.code).toBe(400);
-    expect(err.message).toBe("invalid");
+    expect(err.message).toBe("invalide");
   });
 
-  test("NotFoundError sets code 404 and message", () => {
-    const err = new NotFoundError("missing");
+  test("NotFoundError definit code 404 et message", () => {
+    const err = new NotFoundError("introuvable");
     expect(err).toBeInstanceOf(Error);
     expect(err.code).toBe(404);
-    expect(err.message).toBe("missing");
+    expect(err.message).toBe("introuvable");
   });
 });

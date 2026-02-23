@@ -25,9 +25,9 @@ describe("SgbClient", () => {
     const email = "teacher@example.com";
     const password = "password123";
 
-    it("should successfully login and return response with token", async () => {
+    it("devrait se connecter et retourner une reponse avec jeton", async () => {
       const mockResponse: SgbTeacherLoginResponse = {
-        message: "Success",
+        message: "Succes",
         token: "token123",
         user: {
           first_name: "John",
@@ -51,9 +51,9 @@ describe("SgbClient", () => {
       );
     });
 
-    it("should include email and password as query parameters", async () => {
+    it("devrait inclure email et mot de passe en parametres", async () => {
       const mockResponse: SgbTeacherLoginResponse = {
-        message: "Success",
+        message: "Succes",
         token: "token123",
         user: { first_name: "Jane", last_name: "Smith", id: "user456" },
       };
@@ -70,19 +70,19 @@ describe("SgbClient", () => {
       expect(callUrl).toContain(`password=${encodeURIComponent(password)}`);
     });
 
-    it("should throw error if response is not ok", async () => {
+    it("devrait lancer une erreur si la reponse nest pas OK", async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
-        text: jest.fn().mockResolvedValueOnce("Unauthorized"),
+        text: jest.fn().mockResolvedValueOnce("Non autorise"),
       } as any);
 
       await expect(client.loginTeacher(email, password)).rejects.toThrow(
-        "SGB login failed (401): Unauthorized"
+        "Echec connexion SGB (401): Non autorise"
       );
     });
 
-    it("should throw error if response text fails", async () => {
+    it("devrait lancer une erreur si la lecture du texte echoue", async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
@@ -90,21 +90,21 @@ describe("SgbClient", () => {
       } as any);
 
       await expect(client.loginTeacher(email, password)).rejects.toThrow(
-        "SGB login failed (500): "
+        "Echec connexion SGB (500): "
       );
     });
 
-    it("should throw error if response is missing token", async () => {
+    it("devrait lancer une erreur si le jeton est absent", async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: jest.fn().mockResolvedValueOnce({
-          message: "Success",
+          message: "Succes",
           user: { first_name: "John", last_name: "Doe", id: "user123" },
         }),
       } as any);
 
       await expect(client.loginTeacher(email, password)).rejects.toThrow(
-        "SGB login response missing token"
+        "Reponse connexion SGB sans jeton"
       );
     });
   });
@@ -112,7 +112,7 @@ describe("SgbClient", () => {
   describe("getSchedules", () => {
     const token = "token123";
 
-    it("should successfully fetch schedules", async () => {
+    it("devrait recuperer les horaires", async () => {
       const mockSchedules = {
         data: [
           { id: "1", name: "Schedule 1" },
@@ -140,13 +140,13 @@ describe("SgbClient", () => {
       );
     });
 
-    it("should throw error if response is not ok", async () => {
+    it("devrait lancer une erreur si la reponse nest pas OK", async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: false,
       } as any);
 
       await expect(client.getSchedules(token)).rejects.toThrow(
-        "Unable to fetch schedules"
+        "Impossible de recuperer les horaires"
       );
     });
   });
@@ -154,7 +154,7 @@ describe("SgbClient", () => {
   describe("getCourses", () => {
     const token = "token123";
 
-    it("should successfully fetch courses", async () => {
+    it("devrait recuperer les cours", async () => {
       const mockCourses = {
         data: [
           { id: "course1", titre: "Math 101" },
@@ -182,13 +182,13 @@ describe("SgbClient", () => {
       );
     });
 
-    it("should throw error if response is not ok", async () => {
+    it("devrait lancer une erreur si la reponse nest pas OK", async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: false,
       } as any);
 
       await expect(client.getCourses(token)).rejects.toThrow(
-        "Unable to fetch courses"
+        "Impossible de recuperer les cours"
       );
     });
   });
@@ -196,7 +196,7 @@ describe("SgbClient", () => {
   describe("getGroupStudentLinks", () => {
     const token = "token123";
 
-    it("should successfully fetch group-student links", async () => {
+    it("devrait recuperer les liens groupe-etudiant", async () => {
       const mockLinks = { data: [{ group_id: "1", student_id: "s1" }] };
 
       mockedFetch.mockResolvedValueOnce({
@@ -213,11 +213,11 @@ describe("SgbClient", () => {
       );
     });
 
-    it("should throw error if response is not ok", async () => {
+    it("devrait lancer une erreur si la reponse nest pas OK", async () => {
       mockedFetch.mockResolvedValueOnce({ ok: false } as any);
 
       await expect(client.getGroupStudentLinks(token)).rejects.toThrow(
-        "Unable to fetch group-student links"
+        "Impossible de recuperer les associations groupe-etudiant"
       );
     });
   });
@@ -225,7 +225,7 @@ describe("SgbClient", () => {
   describe("getAllStudents", () => {
     const token = "token123";
 
-    it("should successfully fetch all students", async () => {
+    it("devrait recuperer tous les etudiants", async () => {
       const mockStudents = {
         data: [{ first_name: "A", last_name: "B", id: "a@b.com" }],
       };
@@ -244,11 +244,11 @@ describe("SgbClient", () => {
       );
     });
 
-    it("should throw error if response is not ok", async () => {
+    it("devrait lancer une erreur si la reponse nest pas OK", async () => {
       mockedFetch.mockResolvedValueOnce({ ok: false } as any);
 
       await expect(client.getAllStudents(token)).rejects.toThrow(
-        "Unable to fetch students"
+        "Impossible de recuperer les etudiants"
       );
     });
   });
@@ -256,7 +256,7 @@ describe("SgbClient", () => {
   describe("getStudentsForGroup", () => {
     const token = "token123";
 
-    it("should return students for a group, skipping missing students and sorting by name", async () => {
+    it("devrait retourner les etudiants du groupe en ignorant les absents et en triant par nom", async () => {
       const links = {
         data: [
           { group_id: "10", student_id: "s1" },
@@ -290,7 +290,7 @@ describe("SgbClient", () => {
       ]);
     });
 
-    it("should return empty array when responses have no data", async () => {
+    it("devrait retourner un tableau vide si les reponses nont pas de data", async () => {
       mockedFetch
         .mockResolvedValueOnce({
           ok: true,

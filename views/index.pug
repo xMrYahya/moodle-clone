@@ -18,16 +18,16 @@ html
       if createdGroups && createdGroups.length
         .row.mt-3
           each g in createdGroups
-            a.col-12.col-md-6.col-lg-4.mb-3(href=`/cours/${g.group_id}/questions` style="text-decoration: none; color: inherit;")
+            a.col-12.col-md-6.col-lg-4.mb-3(href=`/cours/${g.idGroupe}/details-cours` style="text-decoration: none; color: inherit;")
               .card.h-100
                 .card-body
-                  h5.card-title.mb-1 #{g.course_id} · #{g.course_titre || g.activity}
-                  p.card-text.text-muted.mb-3 #{g.group_id}
+                  h5.card-title.mb-1 #{g.idCours} · #{g.titreCours || g.activite}
+                  p.card-text.text-muted.mb-3 #{g.idGroupe}
 
                   .d-flex.gap-2
                     button.btn.btn-sm.btn-outline-danger(
                       type="button"
-                      onclick=`event.preventDefault(); window.location.href='/index?confirmRemove=${encodeURIComponent(g.group_id)}'`
+                      onclick=`event.preventDefault(); window.location.href='/cours/retirer-cours?idCours=${encodeURIComponent(g.idGroupe)}'`
                     ) Retirer
       else
         p.text-muted.mt-3 Aucun cours pour l’instant.
@@ -50,14 +50,14 @@ html
                 each g in groups
                   li.list-group-item.d-flex.justify-content-between.align-items-center
                     div
-                      strong #{g.course_id} · #{g.course_titre || g.activity}
+                      strong #{g.idCours} · #{g.titreCours || g.activite}
                       br
-                      small.text-muted #{g.group_id}
+                      small.text-muted #{g.idGroupe}
 
-                    form(method="post" action="/cours/creer" class="m-0")
-                      input(type="hidden" name="groupId" value=g.group_id)
-                      input(type="hidden" name="courseId" value=g.course_id)
-                      input(type="hidden" name="courseTitre" value=g.course_titre)
+                    form(method="post" action="/cours/selectionner-groupe-cours" class="m-0")
+                      input(type="hidden" name="groupId" value=g.idGroupe)
+                      input(type="hidden" name="courseId" value=g.idCours)
+                      input(type="hidden" name="courseTitre" value=g.titreCours)
                       button.btn.btn-sm.btn-outline-primary(type="submit") Créer
 
           .modal-footer
@@ -79,6 +79,6 @@ html
 
           .modal-footer
             a.btn.btn-secondary(href="/index") Annuler
-            form(method="post" action="/cours/supprimer" class="m-0")
-              input(type="hidden" name="groupId" value=confirmRemoveGroupId)
+            form(method="post" action="/cours/suppression-cours" class="m-0")
+              input(type="hidden" name="idCours" value=confirmRemoveGroupId)
               button.btn.btn-danger(type="submit") Oui, retirer

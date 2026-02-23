@@ -6,7 +6,7 @@ debug('ts-express:server');
 
 const port = Number.parseInt(process.env.PORT || '3000');
 if (Number.isNaN(port)) {
-  console.error('PORT must be a number');
+  console.error('PORT doit etre un nombre');
   process.exit(1);
 }
 
@@ -18,13 +18,13 @@ server.on('listening', onListening);
 
 function onError(error: NodeJS.ErrnoException) {
   if (error.syscall !== 'listen') throw error;
-  let bind = (typeof port === 'string') ? 'Pipe ' + port : 'Port ' + port;
+  let bind = (typeof port === 'string') ? 'Canal ' + port : 'Port ' + port;
   switch (error.code) {
     case 'EACCES':
-      console.error(`${bind} requires elevated privileges`);
+      console.error(`${bind} requiert des privileges eleves`);
       process.exit(1);
     case 'EADDRINUSE':
-      console.error(`${bind} is already in use`);
+      console.error(`${bind} est deja utilise`);
       process.exit(1);
     default:
       throw error;
@@ -33,7 +33,7 @@ function onError(error: NodeJS.ErrnoException) {
 
 function onListening(): void {
   let addr = server.address();
-  let bind = (typeof addr === 'string') ? `pipe ${addr}` :
+  let bind = (typeof addr === 'string') ? `canal ${addr}` :
     (addr ? `port ${addr.port}` : ``);
-  debug(`Listening on ${bind}`);
+  debug(`Ecoute sur ${bind}`);
 }
