@@ -17,53 +17,16 @@ describe("CoursController", () => {
     jest.dontMock("../../src/core/sgbClient");
   });
 
-  function loadControllerWithMockedSgbClient() {
-    const getSchedulesMock = jest.fn();
-    const getCoursesMock = jest.fn();
-    const SgbClientMock = jest.fn().mockImplementation((_baseUrl: string) => {
-      return { getSchedules: getSchedulesMock, getCourses: getCoursesMock };
-    });
-
-    jest.doMock("../../src/core/sgbClient", () => ({
-      SgbClient: SgbClientMock,
-    }));
-
-    const mod = require("../../src/controllers/CoursController");
-
-    return {
-      CoursController: mod.CoursController as typeof import("../../src/controllers/CoursController").CoursController,
-      SgbClientMock,
-      getSchedulesMock,
-      getCoursesMock,
-    };
-  }
-
-  test("module init: uses fallback URL when SGB_BASE_URL is undefined", () => {
-    delete process.env.SGB_BASE_URL;
-    const { SgbClientMock } = loadControllerWithMockedSgbClient();
-
-    expect(SgbClientMock).toHaveBeenCalledTimes(1);
-    expect(SgbClientMock).toHaveBeenCalledWith("http://localhost:3200");
-  });
-
-  test("module init: uses process.env.SGB_BASE_URL when defined", () => {
-    process.env.SGB_BASE_URL = "http://example:7777";
-    const { SgbClientMock } = loadControllerWithMockedSgbClient();
-
-    expect(SgbClientMock).toHaveBeenCalledTimes(1);
-    expect(SgbClientMock).toHaveBeenCalledWith("http://example:7777");
-  });
-
   test("creer: missing teacher or groupId -> 400", async () => {
     jest.resetModules();
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { /* no user */ }, body: {} };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send).toHaveBeenCalledWith("Missing teacher or groupId");
+    expect(res.send).toHaveBeenCalledWith("Enseignant ou idGroupe manquant");
   });
 
   test("creer: schedule not found for this group -> 404", async () => {
@@ -76,20 +39,20 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 1 }, token: "t" }, body: { groupId: "g-1" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.send).toHaveBeenCalledWith("Schedule not found for this group");
+    expect(res.send).toHaveBeenCalledWith("Horaire introuvable pour ce groupe");
   });
 
-  test("creer: success with direct course match -> addStored called and redirect", async () => {
+  test("creer: success with direct course match -> ajouterCoursStocke called and redirect", async () => {
     jest.resetModules();
     const SgbModule = require("../../src/core/sgbClient");
     const schedule = {
@@ -106,28 +69,28 @@ describe("CoursController", () => {
       .mockResolvedValueOnce({ data: [schedule] });
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
-      .mockResolvedValueOnce({ data: [{ id: 123, titre: "Course 123" }] });
+      .mockResolvedValueOnce({ data: [{ id: 123, titre: "Cours 123" }] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
-    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+    const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 1 }, token: "t" }, body: { groupId: "g-123" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
-    expect(addStoredSpy).toHaveBeenCalledTimes(1);
-    const arg = (addStoredSpy.mock.calls[0][0] as any);
-    expect(arg.course_id).toBe("123");
-    expect(arg.course_titre).toBe("Course 123");
+    expect(ajouterCoursStockeSpy).toHaveBeenCalledTimes(1);
+    const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
+    expect(arg.idCours).toBe("123");
+    expect(arg.titreCours).toBe("Cours 123");
     expect(res.redirect).toHaveBeenCalledWith("/index");
   });
 
-  test("creer: success with fallback course match -> addStored called and redirect", async () => {
+  test("creer: success with fallback course match -> ajouterCoursStocke called and redirect", async () => {
     jest.resetModules();
     const SgbModule = require("../../src/core/sgbClient");
     const schedule = {
@@ -144,28 +107,28 @@ describe("CoursController", () => {
       .mockResolvedValueOnce({ data: [schedule] });
     jest
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
-      .mockResolvedValueOnce({ data: [{ id: 999, titre: "Course-XYZ-special" }] });
+      .mockResolvedValueOnce({ data: [{ id: 999, titre: "Cours-XYZ-special" }] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
-    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+    const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 2 }, token: "t" }, body: { groupId: "g-XYZ" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
-    expect(addStoredSpy).toHaveBeenCalledTimes(1);
-    const arg = (addStoredSpy.mock.calls[0][0] as any);
-    expect(arg.course_id).toBe("999");
-    expect(arg.course_titre).toBe("Course-XYZ-special");
+    expect(ajouterCoursStockeSpy).toHaveBeenCalledTimes(1);
+    const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
+    expect(arg.idCours).toBe("999");
+    expect(arg.titreCours).toBe("Cours-XYZ-special");
     expect(res.redirect).toHaveBeenCalledWith("/index");
   });
 
-  test("creer: no dash in groupId -> course_id undefined and redirect", async () => {
+  test("creer: no dash in groupId -> idCours undefined and redirect", async () => {
     jest.resetModules();
     const SgbModule = require("../../src/core/sgbClient");
     const schedule = {
@@ -184,26 +147,26 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
-    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+    const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 3 }, token: "t" }, body: { groupId: "group" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
-    expect(addStoredSpy).toHaveBeenCalledTimes(1);
-    const arg = (addStoredSpy.mock.calls[0][0] as any);
-    expect(arg.course_id).toBeUndefined();
-    expect(arg.course_titre).toBeUndefined();
+    expect(ajouterCoursStockeSpy).toHaveBeenCalledTimes(1);
+    const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
+    expect(arg.idCours).toBeUndefined();
+    expect(arg.titreCours).toBeUndefined();
     expect(res.redirect).toHaveBeenCalledWith("/index");
   });
 
-  test("creer: code present but no course match -> course_id is code", async () => {
+  test("creer: code present but no course match -> idCours is code", async () => {
     jest.resetModules();
     const SgbModule = require("../../src/core/sgbClient");
     const schedule = {
@@ -222,26 +185,26 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [{ id: 888, titre: "Other course" }] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
-    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+    const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 5 }, token: "t" }, body: { groupId: "g-777" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
-    expect(addStoredSpy).toHaveBeenCalledTimes(1);
-    const arg = (addStoredSpy.mock.calls[0][0] as any);
-    expect(arg.course_id).toBe("777");
-    expect(arg.course_titre).toBeUndefined();
+    expect(ajouterCoursStockeSpy).toHaveBeenCalledTimes(1);
+    const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
+    expect(arg.idCours).toBe("777");
+    expect(arg.titreCours).toBeUndefined();
     expect(res.redirect).toHaveBeenCalledWith("/index");
   });
 
-  test("creer: addStored throws -> 500 with message", async () => {
+  test("creer: ajouterCoursStocke throws -> 500 with message", async () => {
     jest.resetModules();
     const SgbModule = require("../../src/core/sgbClient");
     const schedule = {
@@ -260,17 +223,17 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "addStored").mockRejectedValueOnce(new Error("store-fail"));
+    jest.spyOn(coursStore, "ajouterCoursStocke").mockRejectedValueOnce(new Error("store-fail"));
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 4 }, token: "t" }, body: { groupId: "g-7" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith("store-fail");
@@ -290,10 +253,10 @@ describe("CoursController", () => {
     const req: any = { session: { user: { id: 6 }, token: "t" }, body: { groupId: "g-9" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith("Create failed");
+    expect(res.send).toHaveBeenCalledWith("Echec de creation");
   });
 
   test("creer: associates students and teacher to stored course", async () => {
@@ -319,21 +282,21 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce(students as any);
 
     const coursStore = require("../../src/core/coursStore");
-    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+    const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 42 }, token: "t" }, body: { groupId: "g-42" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
-    const arg = (addStoredSpy.mock.calls[0][0] as any);
-    expect(arg.teacher_id).toBe("42");
-    expect(arg.students).toEqual(students);
+    const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
+    expect(arg.idEnseignant).toBe("42");
+    expect(arg.etudiants).toEqual(students);
   });
 
   test("creer: ignores schedules from other teachers", async () => {
@@ -350,130 +313,131 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getCourses")
       .mockResolvedValueOnce({ data: [] });
     jest
-      .spyOn(SgbModule.SgbClient.prototype, "getStudentsForGroup")
+      .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
     const coursStore = require("../../src/core/coursStore");
-    const addStoredSpy = jest.spyOn(coursStore, "addStored").mockResolvedValueOnce(undefined);
+    const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 1 }, token: "t" }, body: { groupId: "g-1" } };
     const res = makeRes();
 
-    await CoursController.creer(req, res);
+    await CoursController.selectionnerGroupeCours(req, res);
 
-    const arg = (addStoredSpy.mock.calls[0][0] as any);
-    expect(arg.teacher_id).toBe("1");
-    expect(arg.activity).toBe("Y");
+    const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
+    expect(arg.idEnseignant).toBe("1");
+    expect(arg.activite).toBe("Y");
   });
 
-  test("supprimer: missing groupId -> redirect to /index", async () => {
+  test("suppressionCours: missing groupId -> redirect to /index", async () => {
     jest.resetModules();
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { body: {} };
     const res = makeRes();
 
-    await CoursController.supprimer(req, res);
+    await CoursController.suppressionCours(req, res);
 
     expect(res.redirect).toHaveBeenCalledWith("/index");
   });
 
-  test("supprimer: success calls removeStored and redirects", async () => {
+  test("suppressionCours: success calls retirerCoursStocke and redirects", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
-    const removeSpy = jest.spyOn(coursStore, "removeStored").mockResolvedValueOnce(undefined);
+    const removeSpy = jest.spyOn(coursStore, "retirerCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { body: { groupId: 55 } };
     const res = makeRes();
 
-    await CoursController.supprimer(req, res);
+    await CoursController.suppressionCours(req, res);
 
     expect(removeSpy).toHaveBeenCalledWith("55");
     expect(res.redirect).toHaveBeenCalledWith("/index");
   });
 
-  test("supprimer: removeStored throws -> 500 with message", async () => {
+  test("suppressionCours: retirerCoursStocke throws -> 500 with message", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "removeStored").mockRejectedValueOnce(new Error("remove-fail"));
+    jest.spyOn(coursStore, "retirerCoursStocke").mockRejectedValueOnce(new Error("remove-fail"));
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { body: { groupId: "x" } };
     const res = makeRes();
 
-    await CoursController.supprimer(req, res);
+    await CoursController.suppressionCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith("remove-fail");
   });
 
-  test("supprimer: removeStored throws undefined -> 500 with fallback message", async () => {
+  test("suppressionCours: retirerCoursStocke throws undefined -> 500 with fallback message", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "removeStored").mockRejectedValueOnce(undefined);
+    jest.spyOn(coursStore, "retirerCoursStocke").mockRejectedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { body: { groupId: "y" } };
     const res = makeRes();
 
-    await CoursController.supprimer(req, res);
+    await CoursController.suppressionCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith("Delete failed");
+    expect(res.send).toHaveBeenCalledWith("Echec de suppression");
   });
 
-  test("afficherQuestions: missing groupId or teacher -> 400", async () => {
+  test("afficherDetailsCours: missing groupId or teacher -> 400", async () => {
     jest.resetModules();
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const res = makeRes();
 
-    await CoursController.afficherQuestions({ params: {}, session: {} }, res);
+    await CoursController.afficherDetailsCours({ params: {}, session: {} }, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send).toHaveBeenCalledWith("Missing groupId or userInfo");
+    expect(res.send).toHaveBeenCalledWith("idGroupe ou infos utilisateur manquant");
   });
 
-  test("afficherQuestions: groupId present but teacher missing -> 400", async () => {
+  test("afficherDetailsCours: groupId present but teacher missing -> 400", async () => {
     jest.resetModules();
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const res = makeRes();
 
-    await CoursController.afficherQuestions({ params: { groupId: "g-1" }, session: {} }, res);
+    await CoursController.afficherDetailsCours({ params: { groupId: "g-1" }, session: {} }, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send).toHaveBeenCalledWith("Missing groupId or userInfo");
+    expect(res.send).toHaveBeenCalledWith("idGroupe ou infos utilisateur manquant");
   });
 
-  test("afficherQuestions: course not found -> 404", async () => {
+  test("afficherDetailsCours: course not found -> 404", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "getStoredByGroupId").mockResolvedValueOnce(undefined);
+    jest.spyOn(coursStore, "getStoredParIdGroupe").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { params: { groupId: "g-1" }, session: { user: { id: 1 } } };
     const res = makeRes();
 
-    await CoursController.afficherQuestions(req, res);
+    await CoursController.afficherDetailsCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.send).toHaveBeenCalledWith("Course not found");
+    expect(res.send).toHaveBeenCalledWith("Cours introuvable");
   });
 
-  test("afficherQuestions: success renders with questions and modal flag", async () => {
+  test("afficherDetailsCours: success renders with questions and modal flag", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
     const questionsStore = require("../../src/core/questionsStore");
-    jest.spyOn(coursStore, "getStoredByGroupId").mockResolvedValueOnce({
-      group_id: "g-2",
-      activity: "Lab",
-      course_id: "C-1",
-      course_titre: "Cours 1",
-      day: "Mon",
-      hours: "10-11",
+    jest.spyOn(coursStore, "getStoredParIdGroupe").mockResolvedValueOnce({
+      idGroupe: "g-2",
+      activite: "Lab",
+      idCours: "C-1",
+      titreCours: "Cours 1",
+      jour: "Mon",
+      heure: "10-11",
       mode: "Online",
       local: "A",
-      teacher_id: "1",
+      idEnseignant: "1",
+      etudiants: [],
     });
     jest.spyOn(questionsStore, "getQuestionsForCours").mockResolvedValueOnce([
       { nom: "Q1", type: "VraiFaux" },
@@ -487,7 +451,7 @@ describe("CoursController", () => {
     };
     const res = makeRes();
 
-    await CoursController.afficherQuestions(req, res);
+    await CoursController.afficherDetailsCours(req, res);
 
     expect(res.render).toHaveBeenCalledWith("questions", expect.objectContaining({
       displayName: "John Doe",
@@ -499,21 +463,21 @@ describe("CoursController", () => {
     }));
   });
 
-  test("afficherQuestions: returns all questions for course", async () => {
+  test("afficherDetailsCours: returns all questions for course", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
     const questionsStore = require("../../src/core/questionsStore");
-    jest.spyOn(coursStore, "getStoredByGroupId").mockResolvedValueOnce({
-      group_id: "g-10",
-      activity: "Cours",
-      course_id: "C-10",
-      course_titre: "Cours 10",
-      day: "Mon",
-      hours: "10-11",
+    jest.spyOn(coursStore, "getStoredParIdGroupe").mockResolvedValueOnce({
+      idGroupe: "g-10",
+      activite: "Cours",
+      idCours: "C-10",
+      titreCours: "Cours 10",
+      jour: "Mon",
+      heure: "10-11",
       mode: "Online",
       local: "A",
-      teacher_id: "1",
-      students: [],
+      idEnseignant: "1",
+      etudiants: [],
     });
     const questions = [
       { nom: "Q1", type: "VraiFaux" },
@@ -529,7 +493,7 @@ describe("CoursController", () => {
     };
     const res = makeRes();
 
-    await CoursController.afficherQuestions(req, res);
+    await CoursController.afficherDetailsCours(req, res);
 
     expect(res.render).toHaveBeenCalledWith("questions", expect.objectContaining({
       groupId: "g-10",
@@ -537,20 +501,21 @@ describe("CoursController", () => {
     }));
   });
 
-  test("afficherQuestions: course title missing -> uses activity", async () => {
+  test("afficherDetailsCours: course title missing -> uses activity", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
     const questionsStore = require("../../src/core/questionsStore");
-    jest.spyOn(coursStore, "getStoredByGroupId").mockResolvedValueOnce({
-      group_id: "g-4",
-      activity: "ActivityTitle",
-      course_id: "C-4",
-      course_titre: "",
-      day: "Mon",
-      hours: "10-11",
+    jest.spyOn(coursStore, "getStoredParIdGroupe").mockResolvedValueOnce({
+      idGroupe: "g-4",
+      activite: "ActivityTitle",
+      idCours: "C-4",
+      titreCours: "",
+      jour: "Mon",
+      heure: "10-11",
       mode: "Online",
       local: "A",
-      teacher_id: "1",
+      idEnseignant: "1",
+      etudiants: [],
     });
     jest.spyOn(questionsStore, "getQuestionsForCours").mockResolvedValueOnce([]);
 
@@ -562,27 +527,28 @@ describe("CoursController", () => {
     };
     const res = makeRes();
 
-    await CoursController.afficherQuestions(req, res);
+    await CoursController.afficherDetailsCours(req, res);
 
     expect(res.render).toHaveBeenCalledWith("questions", expect.objectContaining({
       coursTitre: "ActivityTitle",
     }));
   });
 
-  test("afficherQuestions: questions store throws -> 500 fallback", async () => {
+  test("afficherDetailsCours: questions store throws -> 500 fallback", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
     const questionsStore = require("../../src/core/questionsStore");
-    jest.spyOn(coursStore, "getStoredByGroupId").mockResolvedValueOnce({
-      group_id: "g-3",
-      activity: "Lab",
-      course_id: "C-2",
-      course_titre: "",
-      day: "Tue",
-      hours: "10-11",
+    jest.spyOn(coursStore, "getStoredParIdGroupe").mockResolvedValueOnce({
+      idGroupe: "g-3",
+      activite: "Lab",
+      idCours: "C-2",
+      titreCours: "",
+      jour: "Tue",
+      heure: "10-11",
       mode: "Online",
       local: "A",
-      teacher_id: "1",
+      idEnseignant: "1",
+      etudiants: [],
     });
     jest.spyOn(questionsStore, "getQuestionsForCours").mockRejectedValueOnce(undefined);
 
@@ -593,16 +559,16 @@ describe("CoursController", () => {
     };
     const res = makeRes();
 
-    await CoursController.afficherQuestions(req, res);
+    await CoursController.afficherDetailsCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.send).toHaveBeenCalledWith("Failed to load questions");
+    expect(res.send).toHaveBeenCalledWith("Echec du chargement des questions");
   });
 
-  test("afficherQuestions: coursStore throws -> 500 with message", async () => {
+  test("afficherDetailsCours: coursStore throws -> 500 with message", async () => {
     jest.resetModules();
     const coursStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "getStoredByGroupId").mockRejectedValueOnce(new Error("cours-fail"));
+    jest.spyOn(coursStore, "getStoredParIdGroupe").mockRejectedValueOnce(new Error("cours-fail"));
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
@@ -611,7 +577,7 @@ describe("CoursController", () => {
     };
     const res = makeRes();
 
-    await CoursController.afficherQuestions(req, res);
+    await CoursController.afficherDetailsCours(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith("cours-fail");

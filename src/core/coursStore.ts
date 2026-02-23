@@ -3,23 +3,23 @@ import path from "path";
 import { StudentInfo } from "./sgbClient";
 
 export type Cours = {
-  group_id: string;
-  day: string;
-  hours: string;
-  activity: string;
+  idGroupe: string;
+  jour: string;
+  heure: string;
+  activite: string;
   mode: string;
   local: string;
-  teacher_id: string;
+  idEnseignant: string;
 
-  course_id?: string;
-  course_titre?: string;
-  students: StudentInfo[];
+  idCours?: string;
+  titreCours?: string;
+  etudiants: StudentInfo[];
 };
 
 
 const STORE_PATH = path.join(process.cwd(), "data", "cours.json");
 
-async function ensureFile() {
+async function assurerFichier() {
   await fs.mkdir(path.dirname(STORE_PATH), { recursive: true });
   try {
     await fs.access(STORE_PATH);
@@ -28,41 +28,41 @@ async function ensureFile() {
   }
 }
 
-export async function clearStoreOnStartup(): Promise<void> {
+export async function viderStoreAuDemarrage(): Promise<void> {
   await fs.mkdir(path.dirname(STORE_PATH), { recursive: true });
   await fs.writeFile(STORE_PATH, JSON.stringify({ courses: [] }, null, 2), "utf-8");
 }
 
-export async function getAllStored(): Promise<Cours[]> {
-  await ensureFile();
+export async function getCoursStockes(): Promise<Cours[]> {
+  await assurerFichier();
   const raw = await fs.readFile(STORE_PATH, "utf-8");
   const json = JSON.parse(raw);
   return Array.isArray(json.courses) ? json.courses : [];
 }
 
-export async function getStoredForTeacher(teacherId: string): Promise<Cours[]> {
-  const all = await getAllStored();
-  return all.filter(c => String(c.teacher_id) === String(teacherId));
+export async function getStoredPourProf(teacherId: string): Promise<Cours[]> {
+  const all = await getCoursStockes();
+  return all.filter(c => String(c.idEnseignant) === String(teacherId));
 }
 
-export async function getStoredByGroupId(groupId: string): Promise<Cours | undefined> {
-  const all = await getAllStored();
-  return all.find(c => c.group_id === String(groupId));
+export async function getStoredParIdGroupe(groupId: string): Promise<Cours | undefined> {
+  const all = await getCoursStockes();
+  return all.find(c => c.idGroupe === String(groupId));
 }
 
-export async function addStored(course: Cours
+export async function ajouterCoursStocke(course: Cours
 
 ): Promise<void> {
-  const all = await getAllStored();
-  const exists = all.some(c => c.group_id === course.group_id);
+  const all = await getCoursStockes();
+  const exists = all.some(c => c.idGroupe === course.idGroupe);
   if (!exists) {
     all.push(course);
     await fs.writeFile(STORE_PATH, JSON.stringify({ courses: all }, null, 2), "utf-8");
   }
 }
 
-export async function removeStored(groupId: string): Promise<void> {
-  const all = await getAllStored();
-  const next = all.filter(c => c.group_id !== groupId);
+export async function retirerCoursStocke(groupId: string): Promise<void> {
+  const all = await getCoursStockes();
+  const next = all.filter(c => c.idGroupe !== groupId);
   await fs.writeFile(STORE_PATH, JSON.stringify({ courses: next }, null, 2), "utf-8");
 }

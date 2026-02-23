@@ -7,7 +7,7 @@ const loadApp = (routerFactory: () => express.Router) => {
   jest.isolateModules(() => {
     jest.doMock("morgan", () => () => (_req: any, _res: any, next: any) => next());
     jest.doMock("../src/core/coursStore", () => ({
-      clearStoreOnStartup: jest.fn().mockResolvedValue(undefined),
+      viderStoreAuDemarrage: jest.fn().mockResolvedValue(undefined),
     }));
     jest.doMock("../src/routes/indexRoutes", () => ({
       __esModule: true,

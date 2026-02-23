@@ -4,8 +4,8 @@ import { jest } from "@jest/globals";
 
 jest.mock("../../src/controllers/QuestionsController", () => ({
   QuestionsController: {
-    ajouterQuestionVraiFaux: jest.fn((req: any, res: any) => res.status(200).send("vf-ok")),
-    ajouterQuestionAutreType: jest.fn((req: any, res: any) => res.status(200).send("autre-ok")),
+    ajouterQuestionVraiFaux: jest.fn((req: any, res: any) => res.status(200).send("vrai-faux-ok-fr")),
+    ajouterQuestionAutreType: jest.fn((req: any, res: any) => res.status(200).send("autre-type-ok-fr")),
   },
 }));
 
@@ -40,7 +40,7 @@ describe("questionsRoutes", () => {
     jest.clearAllMocks();
   });
 
-  test("POST /questions/:groupId/ajouter-vrai-faux without auth redirects to /signin", async () => {
+  test("POST /questions/:groupId/ajouter-vrai-faux sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
     const res = await request(app).post("/questions/g-1/ajouter-vrai-faux").send({});
@@ -50,7 +50,7 @@ describe("questionsRoutes", () => {
     expect(QuestionsController.ajouterQuestionVraiFaux).not.toHaveBeenCalled();
   });
 
-  test("POST /questions/:groupId/ajouter-vrai-faux with no session redirects to /signin", async () => {
+  test("POST /questions/:groupId/ajouter-vrai-faux sans session redirige vers /signin", async () => {
     const app = makeAppNoSession();
 
     const res = await request(app).post("/questions/g-1/ajouter-vrai-faux").send({});
@@ -60,7 +60,7 @@ describe("questionsRoutes", () => {
     expect(QuestionsController.ajouterQuestionVraiFaux).not.toHaveBeenCalled();
   });
 
-  test("POST /questions/:groupId/ajouter-autre-type without auth redirects to /signin", async () => {
+  test("POST /questions/:groupId/ajouter-autre-type sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
     const res = await request(app).post("/questions/g-1/ajouter-autre-type").send({});
@@ -70,7 +70,7 @@ describe("questionsRoutes", () => {
     expect(QuestionsController.ajouterQuestionAutreType).not.toHaveBeenCalled();
   });
 
-  test("POST /questions/:groupId/ajouter-vrai-faux with auth calls controller", async () => {
+  test("POST /questions/:groupId/ajouter-vrai-faux avec auth appelle le controleur", async () => {
     const app = makeApp();
 
     const res = await request(app)
@@ -79,11 +79,11 @@ describe("questionsRoutes", () => {
       .send({});
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("vf-ok");
+    expect(res.text).toBe("vrai-faux-ok-fr");
     expect(QuestionsController.ajouterQuestionVraiFaux).toHaveBeenCalledTimes(1);
   });
 
-  test("POST /questions/:groupId/ajouter-autre-type with auth calls controller", async () => {
+  test("POST /questions/:groupId/ajouter-autre-type avec auth appelle le controleur", async () => {
     const app = makeApp();
 
     const res = await request(app)
@@ -92,7 +92,7 @@ describe("questionsRoutes", () => {
       .send({});
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("autre-ok");
+    expect(res.text).toBe("autre-type-ok-fr");
     expect(QuestionsController.ajouterQuestionAutreType).toHaveBeenCalledTimes(1);
   });
 });

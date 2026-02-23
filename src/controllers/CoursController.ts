@@ -1,126 +1,130 @@
 import { Response } from "express";
 import { SgbClient } from "../core/sgbClient";
-import { addStored, removeStored, getStoredByGroupId } from "../core/coursStore";
+import { ajouterCoursStocke, retirerCoursStocke, getStoredParIdGroupe } from "../core/coursStore";
 import { getQuestionsForCours } from "../core/questionsStore";
-import { CourseDto, ScheduleDto } from "../types/sgbTypes";
 
 const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
-const sgbClient = new SgbClient(sgbBaseUrl);
+const accesSGA = new SgbClient(sgbBaseUrl);
 
 export class CoursController {
-  static async creer(req: any, res: Response): Promise<void> {
+  static async selectionnerGroupeCours(req: any, res: Response): Promise<void> {
     try {
       const teacher = req.session.user;
-      const { groupId } = req.body;
+      const idGroupe = req.body?.idGroupe ?? req.body?.groupId;
 
-      if (!teacher?.id || !groupId) {
-        res.status(400).send("Missing teacher or groupId");
+      if (!teacher?.id || !idGroupe) {
+        res.status(400).send("Enseignant ou idGroupe manquant");
         return;
       }
 
-      const [scheduleResult, coursesResult] = await Promise.all([
-        sgbClient.getSchedules(req.session.token) as Promise<{ data: ScheduleDto[] }>,
-        sgbClient.getCourses(req.session.token) as Promise<{ data: CourseDto[] }>,
-      ]);
-
-      const schedulesForGroup = scheduleResult.data.filter((s) =>
-        String(s.teacher_id) === String(teacher.id) &&
-        String(s.group_id) === String(groupId)
+      const coursSelectionne = await accesSGA.getCoursParGroupe(
+        String(idGroupe),
+        req.session.token,
+        String(teacher.id)
       );
+      const students = await accesSGA.getEtudiantsParGroupe(req.session.token, String(idGroupe));
 
-      const students = await sgbClient.getStudentsForGroup(req.session.token, String(groupId));
-
-      if (schedulesForGroup.length === 0) {
-        res.status(404).send("Schedule not found for this group");
+      if (!coursSelectionne) {
+        res.status(404).send("Horaire introuvable pour ce groupe");
         return;
       }
 
-      const s = schedulesForGroup[0];
+      const idCoursFinal = coursSelectionne.idCours ? String(coursSelectionne.idCours) : undefined;
+      const titreCoursBrut = coursSelectionne.titreCours ? String(coursSelectionne.titreCours) : "";
+      const titreCoursFinal =
+        titreCoursBrut && titreCoursBrut !== String(coursSelectionne.idGroupe) && titreCoursBrut !== String(idCoursFinal)
+          ? titreCoursBrut
+          : undefined;
 
-      const parts = String(groupId).split("-");
-      const code = parts.length >= 2 ? parts[1] : null;
-
-      const direct = code
-        ? coursesResult.data.find((c) => String(c.id) === String(code))
-        : undefined;
-
-      const fallback = !direct && code
-        ? coursesResult.data.find((c) => String(c.titre).includes(code))
-        : undefined;
-
-      const course = direct ?? fallback;
-
-      await addStored({
-        group_id: String(s.group_id),
-        day: String(s.day),
-        hours: String(s.hours),
-        activity: String(s.activity),
-        mode: String(s.mode),
-        local: String(s.local),
-        teacher_id: String(s.teacher_id),
-
-        course_id: course ? String(course.id) : (code ?? undefined),
-        course_titre: course ? String(course.titre) : undefined,
-        students,
+      await ajouterCoursStocke({
+        idGroupe: String(coursSelectionne.idGroupe),
+        jour: String(coursSelectionne.jour),
+        heure: String(coursSelectionne.heure),
+        activite: String(coursSelectionne.activite),
+        mode: String(coursSelectionne.mode),
+        local: String(coursSelectionne.local),
+        idEnseignant: String(coursSelectionne.idEnseignant),
+        idCours: idCoursFinal,
+        titreCours: titreCoursFinal,
+        etudiants: students,
       });
 
       res.redirect("/index");
       return;
     } catch (e: any) {
-      res.status(500).send(e?.message ?? "Create failed");
+      res.status(500).send(e?.message ?? "Echec de creation");
       return;
     }
   }
 
-  static async supprimer(req: any, res: Response): Promise<void> {
+  static async retirerCours(req: any, res: Response): Promise<void> {
+    const idCours = req.query?.idCours ?? req.query?.groupId;
+    if (!idCours) {
+      res.redirect("/index");
+      return;
+    }
+    res.redirect(`/cours/confirmer-suppression-cours?idCours=${encodeURIComponent(String(idCours))}`);
+  }
+
+  static async confirmerSuppressionCours(req: any, res: Response): Promise<void> {
+    const idCours = req.query?.idCours ?? req.query?.groupId;
+    if (!idCours) {
+      res.redirect("/index");
+      return;
+    }
+    res.redirect(`/index?confirmRemove=${encodeURIComponent(String(idCours))}`);
+  }
+
+  static async suppressionCours(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = req.body;
-      if (!groupId) {
+      const idCours = req.body?.idCours ?? req.body?.groupId;
+      if (!idCours) {
         res.redirect("/index");
         return;
       }
-      await removeStored(String(groupId));
+      await retirerCoursStocke(String(idCours));
       res.redirect("/index");
       return;
     } catch (e: any) {
-      res.status(500).send(e?.message ?? "Delete failed");
+      res.status(500).send(e?.message ?? "Echec de suppression");
       return;
     }
   }
 
-  static async afficherQuestions(req: any, res: Response): Promise<void> {
+  static async afficherDetailsCours(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = req.params;
+      const idCours = req.params?.idCours ?? req.params?.groupId;
       const teacher = req.session.user;
 
-      if (!groupId || !teacher?.id) {
-        res.status(400).send("Missing groupId or userInfo");
+      if (!idCours || !teacher?.id) {
+        res.status(400).send("idGroupe ou infos utilisateur manquant");
         return;
       }
 
-      const cours = await getStoredByGroupId(groupId);
+      const cours = await getStoredParIdGroupe(idCours);
       if (!cours) {
-        res.status(404).send("Course not found");
+        res.status(404).send("Cours introuvable");
         return;
       }
 
-      const questions = await getQuestionsForCours(groupId);
+      const questions = await getQuestionsForCours(idCours);
       const showAddQuestionModal = req.query.addQuestion === "1";
       const displayName = `${teacher.first_name} ${teacher.last_name}`;
 
       res.render("questions", {
         title: "Questions",
         displayName,
-        groupId,
-        coursId: cours.course_id,
-        coursTitre: cours.course_titre || cours.activity,
+        groupId: idCours,
+        idCours,
+        coursId: cours.idCours,
+        coursTitre: cours.titreCours || cours.activite,
         cours,                         
-        students: cours.students ?? [],
+        students: cours.etudiants ?? [],
         questions,
         showAddQuestionModal,
       });
     } catch (e: any) {
-      res.status(500).send(e?.message ?? "Failed to load questions");
+      res.status(500).send(e?.message ?? "Echec du chargement des questions");
     }
   }
 }

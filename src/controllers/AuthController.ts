@@ -26,7 +26,7 @@ export class AuthController {
       res.status(200).json({ ok: true });
       return;
     } catch (e: any) {
-      res.status(401).json({ ok: false, message: e?.message ?? "Login failed" });
+      res.status(401).json({ ok: false, message: e?.message ?? "Echec de connexion" });
       return;
     }
   }

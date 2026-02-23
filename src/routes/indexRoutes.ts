@@ -18,6 +18,6 @@ router.get("/signin", AuthController.getSignin);
 router.post("/signin", AuthController.postSignin);
 router.get("/signout", AuthController.signout);
 
-router.get("/index", requireAuth, HomeController.index);
+router.get("/index", requireAuth, HomeController.afficherListeCours ?? HomeController.index);
 
 export default router;

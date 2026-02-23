@@ -11,8 +11,10 @@ function requireAuth(req: any, res: any, next: any) {
   next();
 }
 
-router.post("/creer", requireAuth, CoursController.creer);
-router.post("/supprimer", requireAuth, CoursController.supprimer);
-router.get("/:groupId/questions", requireAuth, CoursController.afficherQuestions);
+router.post("/selectionner-groupe-cours", requireAuth, CoursController.selectionnerGroupeCours);
+router.get("/retirer-cours", requireAuth, CoursController.retirerCours);
+router.get("/confirmer-suppression-cours", requireAuth, CoursController.confirmerSuppressionCours);
+router.post("/suppression-cours", requireAuth, CoursController.suppressionCours);
+router.get("/:idCours/details-cours", requireAuth, CoursController.afficherDetailsCours);
 
 export default router;

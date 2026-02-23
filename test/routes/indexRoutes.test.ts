@@ -4,15 +4,15 @@ import { jest } from "@jest/globals";
 
 jest.mock("../../src/controllers/AuthController", () => ({
   AuthController: {
-    getSignin: jest.fn((req: any, res: any) => res.status(200).send("get-signin-ok")),
-    postSignin: jest.fn((req: any, res: any) => res.status(200).send("post-signin-ok")),
-    signout: jest.fn((req: any, res: any) => res.status(200).send("signout-ok")),
+    getSignin: jest.fn((req: any, res: any) => res.status(200).send("connexion-afficher-ok-fr")),
+    postSignin: jest.fn((req: any, res: any) => res.status(200).send("connexion-envoyer-ok-fr")),
+    signout: jest.fn((req: any, res: any) => res.status(200).send("deconnexion-ok-fr")),
   },
 }));
 
 jest.mock("../../src/controllers/HomeController", () => ({
   HomeController: {
-    index: jest.fn((req: any, res: any) => res.status(200).send("home-index-ok")),
+    index: jest.fn((req: any, res: any) => res.status(200).send("accueil-index-ok-fr")),
   },
 }));
 
@@ -63,7 +63,7 @@ describe("indexRoutes", () => {
     const res = await request(app).get("/signin");
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("get-signin-ok");
+    expect(res.text).toBe("connexion-afficher-ok-fr");
     expect(AuthController.getSignin).toHaveBeenCalledTimes(1);
   });
 
@@ -73,7 +73,7 @@ describe("indexRoutes", () => {
     const res = await request(app).post("/signin").send({});
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("post-signin-ok");
+    expect(res.text).toBe("connexion-envoyer-ok-fr");
     expect(AuthController.postSignin).toHaveBeenCalledTimes(1);
   });
 
@@ -83,11 +83,11 @@ describe("indexRoutes", () => {
     const res = await request(app).get("/signout");
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("signout-ok");
+    expect(res.text).toBe("deconnexion-ok-fr");
     expect(AuthController.signout).toHaveBeenCalledTimes(1);
   });
 
-  test("GET /index without auth redirects to /signin", async () => {
+  test("GET /index sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
     const res = await request(app).get("/index");
@@ -97,7 +97,7 @@ describe("indexRoutes", () => {
     expect(HomeController.index).not.toHaveBeenCalled();
   });
 
-  test("GET /index with no session redirects to /signin", async () => {
+  test("GET /index sans session redirige vers /signin", async () => {
     const app = makeAppNoSession();
 
     const res = await request(app).get("/index");
@@ -107,13 +107,13 @@ describe("indexRoutes", () => {
     expect(HomeController.index).not.toHaveBeenCalled();
   });
 
-  test("GET /index with auth calls HomeController.index", async () => {
+  test("GET /index avec auth appelle HomeController.index", async () => {
     const app = makeApp();
 
     const res = await request(app).get("/index").set("x-test-auth", "1");
 
     expect(res.status).toBe(200);
-    expect(res.text).toBe("home-index-ok");
+    expect(res.text).toBe("accueil-index-ok-fr");
     expect(HomeController.index).toHaveBeenCalledTimes(1);
   });
 });

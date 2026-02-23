@@ -7,7 +7,7 @@ import indexRoutes from "./routes/indexRoutes";
 import coursRoutes from "./routes/coursRoutes";
 import questionsRoutes from "./routes/questionsRoutes";
 
-import { clearStoreOnStartup } from "./core/coursStore";
+import { viderStoreAuDemarrage } from "./core/coursStore";
 import { clearQuestionsOnStartup } from "./core/questionsStore";
 
 class App {
@@ -16,7 +16,7 @@ class App {
   constructor() {
     this.expressApp = express();
 
-    clearStoreOnStartup().catch(console.error);
+    viderStoreAuDemarrage().catch(console.error);
     clearQuestionsOnStartup().catch(console.error);
 
     this.middleware();
