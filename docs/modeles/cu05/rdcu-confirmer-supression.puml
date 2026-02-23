@@ -1,0 +1,14 @@
+@startuml
+title CU05d - RDCU Supprimer un questionnaire
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+
+-> controller ++: confirmerSuppression():String
+note right: GRASP: Controller
+controller -> questionnaireModele ++: supprimerQuestionnaire(nom:String):boolean
+note right: GRASP: Expert
+questionnaireModele --> controller --: confirmationSuppression:boolean
+<-- controller --: confirmationSuppression:String
+
+@enduml

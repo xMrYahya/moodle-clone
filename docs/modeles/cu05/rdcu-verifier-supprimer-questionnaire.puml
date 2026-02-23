@@ -1,0 +1,33 @@
+@startuml
+title CU05d - RDCU Verifier pour supprimer un questionnaire
+
+participant ":QuestionnaireController" as controller
+participant ":QuestionnaireModele" as questionnaireModele
+participant "q:Questionnaire" as q
+
+-> controller +: verifierSupprimerQuestionnaire(nom : String):String
+note right: GRASP: Controller
+controller -> questionnaireModele ++: verifierSupprimerQuestionnaire(nom : String):boolean
+note right: GRASP: Expert
+questionnaireModele -> q ++: getNombreDeReponses(): Integer
+note right: GRASP: Expert
+q --> questionnaireModele --: nombreDeReponses: Integer
+
+alt le questionnaire n'a pas de reponses
+  questionnaireModele --> controller --:confirmation:boolean
+  controller -> questionnaireModele ++: getInformations(nom : String):String
+  note right: GRASP: Expert
+  questionnaireModele -> q ++: getInformations(): String
+  note right: GRASP: Expert
+  q --> questionnaireModele --: informationsQuestionnaire:String
+  questionnaireModele --> controller --: informationsQuestionnaire:String
+  <-- controller --:detailsQuestionnaire:String
+
+  else le questionnaire a au moins une reponse
+    activate questionnaireModele
+    questionnaireModele --> controller ++: confirmation:boolean
+    deactivate questionnaireModele
+    <-- controller --:erreur:String
+end
+
+@enduml
