@@ -2,15 +2,13 @@
 hide footbox
 title RDCU – Sélectionner une question
 
-actor ":Enseignant" as e
 participant "ui:UIQuestionsCours" as UI
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 participant "q:Question" as Q
 
-activate e
 
-e -> UI : selectionnerQuestion(nom : String)
+-> UI : selectionnerQuestion(nom : String)
 activate UI
 
 UI -> QC : selectionnerQuestion(groupId : String, nom : String)
@@ -47,7 +45,7 @@ deactivate Q
 QC --> UI : afficherInfoQuestion(type, nom, enonce, verite,\nretroBonne, retroMauvaise, tags)
 deactivate QC
 
-UI --> e : affichageInfoQuestion()
+<-- UI  : affichageInfoQuestion()
 deactivate UI
 
 @enduml
