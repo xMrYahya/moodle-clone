@@ -21,22 +21,22 @@ deactivate QS
 
 activate Q
 QC -> Q : getType()
-Q --> QC : type
+Q --> QC : type:String
 
 QC -> Q : getNom()
-Q --> QC : nom
+Q --> QC : nom:String
 
 QC -> Q : getEnonce()
-Q --> QC : enonce
+Q --> QC : enonce:String
 
 QC -> Q : getVerite()
-Q --> QC : verite
+Q --> QC : verite:String
 
 QC -> Q : getRetroactionBonne()
-Q --> QC : retroBonne
+Q --> QC : retroBonne:String
 
 QC -> Q : getRetroactionMauvaise()
-Q --> QC : retroMauvaise
+Q --> QC : retroMauvaise:String
 
 QC -> Q : getTags()
 Q --> QC : tags : List<String>

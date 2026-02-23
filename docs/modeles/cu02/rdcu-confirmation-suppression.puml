@@ -22,11 +22,11 @@ activate QS
 QS --> QC : questions : List<Question>
 deactivate QS
 
-QC --> UI : afficherListeQuestions(questions)
-QC --> UI : afficherConfirmationSuppression()
+QC --> UI : afficherListeQuestions(questions):String
+QC --> UI : afficherConfirmationSuppression():String
 deactivate QC
 
-UI --> e : suppressionConfirmee()
+UI --> e : suppressionConfirmee():String
 deactivate UI
 
 @enduml

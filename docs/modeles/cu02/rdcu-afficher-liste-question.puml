@@ -1,6 +1,6 @@
 @startuml
 hide footbox
-title RDCU – Afficher la liste des questions
+title RDCU - Afficher la liste des questions
 
 
 participant "ui:UIQuestionsCours" as UI
@@ -18,7 +18,7 @@ activate QS
 QS --> QC : questions : List<Question>
 deactivate QS
 
-QC --> UI : afficherListeQuestions(questions)
+QC --> UI : afficherListeQuestions(questions):String
 deactivate QC
 
 <-- UI : listeQuestionsAffichee():String
