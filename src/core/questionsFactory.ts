@@ -1,4 +1,5 @@
 import {
+  AnyQuestion,
   PairDeCorrespondance,
   Question,
   QuestionChoixMultipleModele,
@@ -20,6 +21,27 @@ function lireTexte(valeur: unknown): string {
   return typeof valeur === "string" ? valeur.trim() : "";
 }
 
+function lireBooleen(valeur: unknown): boolean {
+  if (typeof valeur === "boolean") {
+    return valeur;
+  }
+  if (typeof valeur === "string") {
+    return valeur.trim().toLowerCase() === "true";
+  }
+  return false;
+}
+
+function lireNombre(valeur: unknown): number | null {
+  if (typeof valeur === "number" && Number.isFinite(valeur)) {
+    return valeur;
+  }
+  if (typeof valeur === "string") {
+    const nombre = Number.parseFloat(valeur.trim());
+    return Number.isFinite(nombre) ? nombre : null;
+  }
+  return null;
+}
+
 function lireTags(valeur: unknown): string[] {
   if (!Array.isArray(valeur)) {
     return [];
@@ -39,6 +61,19 @@ function lireBase(donnees: ObjetJson) {
 }
 
 function lireReponsesChoixMultiple(valeur: unknown): ReponseChoixMultiple[] {
+  if (typeof valeur === "string") {
+    const parties = valeur
+      .split("|")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
+
+    return parties.map((texte, index) => ({
+      text: texte,
+      estBonneReponse: index === 0,
+      retroaction: "",
+    }));
+  }
+
   if (!Array.isArray(valeur)) {
     return [];
   }
@@ -53,6 +88,23 @@ function lireReponsesChoixMultiple(valeur: unknown): ReponseChoixMultiple[] {
 }
 
 function lirePairesCorrespondance(valeur: unknown): PairDeCorrespondance[] {
+  if (typeof valeur === "string") {
+    return valeur
+      .split("|")
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0)
+      .map((item) => {
+        const separateur = item.indexOf(":");
+        if (separateur === -1) {
+          return { question: item, reponse: "" };
+        }
+        return {
+          question: item.slice(0, separateur).trim(),
+          reponse: item.slice(separateur + 1).trim(),
+        };
+      });
+  }
+
   if (!Array.isArray(valeur)) {
     return [];
   }
@@ -72,19 +124,19 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
 
   const base = lireBase(donneesBrutes);
 
-  if (Array.isArray(donneesBrutes.reponses) || typeof donneesBrutes.seulementUnChoix === "boolean") {
+  if (donneesBrutes.reponses !== undefined || donneesBrutes.seulementUnChoix !== undefined) {
     return new QuestionChoixMultipleModele(
       base.nom,
       base.énoncé,
       base.retroactionValide,
       base.retroactionInvalide,
       base.tags,
-      donneesBrutes.seulementUnChoix === true,
+      lireBooleen(donneesBrutes.seulementUnChoix),
       lireReponsesChoixMultiple(donneesBrutes.reponses)
     );
   }
 
-  if (Array.isArray(donneesBrutes.paires)) {
+  if (donneesBrutes.paires !== undefined) {
     return new QuestionMiseEnCorrespondanceModele(
       base.nom,
       base.énoncé,
@@ -95,19 +147,20 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
     );
   }
 
-  if (typeof donneesBrutes.reponseAttendue === "number") {
-    return new QuestionNumeriqueModele(
-      base.nom,
-      base.énoncé,
-      base.retroactionValide,
-      base.retroactionInvalide,
-      base.tags,
-      donneesBrutes.reponseAttendue,
-      lireTexte(donneesBrutes.retroaction)
-    );
-  }
+  if (donneesBrutes.reponseAttendue !== undefined) {
+    const reponseNumerique = lireNombre(donneesBrutes.reponseAttendue);
+    if (reponseNumerique !== null) {
+      return new QuestionNumeriqueModele(
+        base.nom,
+        base.énoncé,
+        base.retroactionValide,
+        base.retroactionInvalide,
+        base.tags,
+        reponseNumerique,
+        lireTexte(donneesBrutes.retroaction)
+      );
+    }
 
-  if (typeof donneesBrutes.reponseAttendue === "string") {
     return new QuestionReponseCourteModele(
       base.nom,
       base.énoncé,
@@ -119,16 +172,69 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
     );
   }
 
-  if (typeof donneesBrutes.reponse === "boolean") {
-    return new QuestionVraiFauxModele(
-      base.nom,
-      base.énoncé,
-      base.retroactionValide,
-      base.retroactionInvalide,
-      base.tags,
-      donneesBrutes.reponse,
-      lireTexte(donneesBrutes.retroaction)
-    );
+  if (donneesBrutes.reponse !== undefined) {
+    if (typeof donneesBrutes.reponse === "boolean") {
+      return new QuestionVraiFauxModele(
+        base.nom,
+        base.énoncé,
+        base.retroactionValide,
+        base.retroactionInvalide,
+        base.tags,
+        donneesBrutes.reponse,
+        lireTexte(donneesBrutes.retroaction)
+      );
+    }
+
+    if (typeof donneesBrutes.reponse === "string") {
+      const reponseTexte = donneesBrutes.reponse.trim();
+      if (reponseTexte.toLowerCase() === "true" || reponseTexte.toLowerCase() === "false") {
+        return new QuestionVraiFauxModele(
+          base.nom,
+          base.énoncé,
+          base.retroactionValide,
+          base.retroactionInvalide,
+          base.tags,
+          reponseTexte.toLowerCase() === "true",
+          lireTexte(donneesBrutes.retroaction)
+        );
+      }
+
+      const reponseNumerique = lireNombre(reponseTexte);
+      if (reponseNumerique !== null) {
+        return new QuestionNumeriqueModele(
+          base.nom,
+          base.énoncé,
+          base.retroactionValide,
+          base.retroactionInvalide,
+          base.tags,
+          reponseNumerique,
+          lireTexte(donneesBrutes.retroaction)
+        );
+      }
+
+      return new QuestionReponseCourteModele(
+        base.nom,
+        base.énoncé,
+        base.retroactionValide,
+        base.retroactionInvalide,
+        base.tags,
+        reponseTexte,
+        lireTexte(donneesBrutes.retroaction)
+      );
+    }
+
+    const reponseNumerique = lireNombre(donneesBrutes.reponse);
+    if (reponseNumerique !== null) {
+      return new QuestionNumeriqueModele(
+        base.nom,
+        base.énoncé,
+        base.retroactionValide,
+        base.retroactionInvalide,
+        base.tags,
+        reponseNumerique,
+        lireTexte(donneesBrutes.retroaction)
+      );
+    }
   }
 
   return new QuestionEssaiModele(
@@ -138,6 +244,120 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
     base.retroactionInvalide,
     base.tags
   );
+}
+
+function serialiserBase(question: Question) {
+  return {
+    nom: question.nom,
+    énoncé: question.énoncé,
+    retroactionValide: question.retroactionValide,
+    retroactionInvalide: question.retroactionInvalide,
+    tags: question.tags,
+  };
+}
+
+export function serialiserQuestionPourStockage(question: Question): Record<string, unknown> {
+  const base = serialiserBase(question);
+
+  if (question instanceof QuestionVraiFauxModele) {
+    return {
+      ...base,
+      reponse: question.reponse,
+      retroaction: question.retroaction,
+    };
+  }
+
+  if (question instanceof QuestionChoixMultipleModele) {
+    return {
+      ...base,
+      seulementUnChoix: question.seulementUnChoix,
+      reponses: question.reponses,
+    };
+  }
+
+  if (question instanceof QuestionMiseEnCorrespondanceModele) {
+    return {
+      ...base,
+      paires: question.paires,
+    };
+  }
+
+  if (question instanceof QuestionReponseCourteModele) {
+    return {
+      ...base,
+      reponseAttendue: question.reponseAttendue,
+      retroaction: question.retroaction,
+    };
+  }
+
+  if (question instanceof QuestionNumeriqueModele) {
+    return {
+      ...base,
+      reponseAttendue: question.reponseAttendue,
+      retroaction: question.retroaction,
+    };
+  }
+
+  return base;
+}
+
+export function convertirQuestionModeleEnDonnees(question: Question): AnyQuestion {
+  const base = {
+    nom: question.nom,
+    énoncé: question.énoncé,
+    retroactionValide: question.retroactionValide,
+    retroactionInvalide: question.retroactionInvalide,
+    tags: question.tags,
+  };
+
+  if (question instanceof QuestionVraiFauxModele) {
+    return {
+      ...base,
+      type: "VraiFaux",
+      reponse: question.reponse,
+      retroaction: question.retroaction,
+    };
+  }
+
+  if (question instanceof QuestionChoixMultipleModele) {
+    return {
+      ...base,
+      type: "ChoixMultiple",
+      seulementUnChoix: question.seulementUnChoix,
+      reponses: question.reponses,
+    };
+  }
+
+  if (question instanceof QuestionMiseEnCorrespondanceModele) {
+    return {
+      ...base,
+      type: "MiseEnCorrespondance",
+      paires: question.paires,
+    };
+  }
+
+  if (question instanceof QuestionReponseCourteModele) {
+    return {
+      ...base,
+      type: "ReponseCourte",
+      reponseAttendue: question.reponseAttendue,
+      retroaction: question.retroaction,
+    };
+  }
+
+  if (question instanceof QuestionNumeriqueModele) {
+    return {
+      ...base,
+      type: "Numerique",
+      reponseAttendue: question.reponseAttendue,
+      retroaction: question.retroaction,
+    };
+  }
+
+  return {
+    ...base,
+    type: "Essai",
+  };
 }
 
 export function deserialiserQuestionsDepuisJson(donneesBrutes: unknown): Question[] {
@@ -154,4 +374,12 @@ export function deserialiserQuestionsDepuisJson(donneesBrutes: unknown): Questio
       }
     })
     .filter((question): question is Question => question !== null);
+}
+
+export function convertirQuestionsModelesEnDonnees(questions: Question[]): AnyQuestion[] {
+  return questions.map((question) => convertirQuestionModeleEnDonnees(question));
+}
+
+export function serialiserQuestionsPourStockage(questions: Question[]): Record<string, unknown>[] {
+  return questions.map((question) => serialiserQuestionPourStockage(question));
 }
