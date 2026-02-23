@@ -100,7 +100,7 @@ export class QuestionsController {
     autresDonnees: Record<string, unknown>
   ): Question {
     if (type === "ChoixMultiple") {
-      const reponses = this.lireReponsesChoixMultiple(autresDonnees.reponses);
+      const reponses = QuestionsController.lireReponsesChoixMultiple(autresDonnees.reponses);
       if (reponses.length === 0) {
         throw new InvalidParameterError("Champs manquants: reponses");
       }
@@ -117,7 +117,7 @@ export class QuestionsController {
     }
 
     if (type === "MiseEnCorrespondance") {
-      const paires = this.lirePairesCorrespondance(autresDonnees.paires);
+      const paires = QuestionsController.lirePairesCorrespondance(autresDonnees.paires);
       if (paires.length === 0) {
         throw new InvalidParameterError("Champs manquants: paires");
       }
@@ -209,7 +209,7 @@ export class QuestionsController {
         String(énoncé).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
-        this.lireTags(tags),
+        QuestionsController.lireTags(tags),
         reponseBoolean,
         String(retroactionValide || "").trim()
       );
@@ -234,11 +234,11 @@ export class QuestionsController {
     }
   }
 
-  static async ajouterQuestionAutreType(req: any, res: Response): Promise<void> {
+  private static async ajouterQuestionParType(req: any, res: Response, typeQuestion: string): Promise<void> {
     try {
       const teacher = req.session.user;
       const { groupId } = req.params;
-      const { nom, énoncé, type, retroactionValide, retroactionInvalide, tags, ...otherData } = req.body;
+      const { nom, énoncé, retroactionValide, retroactionInvalide, tags, ...otherData } = req.body;
 
       if (!teacher?.id || !groupId) {
         throw new InvalidParameterError("Enseignant ou cours manquant");
@@ -247,7 +247,6 @@ export class QuestionsController {
       const missingFields: string[] = [];
       if (!nom || String(nom).trim() === "") missingFields.push("nom");
       if (!énoncé || String(énoncé).trim() === "") missingFields.push("énoncé");
-      if (!type || String(type).trim() === "") missingFields.push("type");
 
       if (missingFields.length > 0) {
         throw new InvalidParameterError(`Champs manquants: ${missingFields.join(", ")}`);
@@ -257,14 +256,13 @@ export class QuestionsController {
         throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
       }
 
-      const typeQuestion = String(type).trim();
-      const nouvelleQuestion = this.creerQuestionAutreType(
+      const nouvelleQuestion = QuestionsController.creerQuestionAutreType(
         typeQuestion,
         String(nom).trim(),
         String(énoncé).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
-        this.lireTags(tags),
+        QuestionsController.lireTags(tags),
         otherData
       );
 
@@ -286,5 +284,25 @@ export class QuestionsController {
       }
       return;
     }
+  }
+
+  static async ajouterQuestionChoixMultiple(req: any, res: Response): Promise<void> {
+    await QuestionsController.ajouterQuestionParType(req, res, "ChoixMultiple");
+  }
+
+  static async ajouterQuestionNumerique(req: any, res: Response): Promise<void> {
+    await QuestionsController.ajouterQuestionParType(req, res, "Numerique");
+  }
+
+  static async ajouterQuestionReponseCourte(req: any, res: Response): Promise<void> {
+    await QuestionsController.ajouterQuestionParType(req, res, "ReponseCourte");
+  }
+
+  static async ajouterQuestionMiseEnCorrespondance(req: any, res: Response): Promise<void> {
+    await QuestionsController.ajouterQuestionParType(req, res, "MiseEnCorrespondance");
+  }
+
+  static async ajouterQuestionEssai(req: any, res: Response): Promise<void> {
+    await QuestionsController.ajouterQuestionParType(req, res, "Essai");
   }
 }
