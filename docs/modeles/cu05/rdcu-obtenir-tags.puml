@@ -1,5 +1,5 @@
 @startuml
-title CU05c - RDCU Obtenir les tags des questions
+title RDCU Obtenir les tags des questions
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

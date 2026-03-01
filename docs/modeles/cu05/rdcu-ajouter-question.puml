@@ -1,5 +1,5 @@
 @startuml
-title CU05a - RDCU Ajouter une question
+title RDCU Ajouter une question
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

@@ -1,5 +1,5 @@
 @startuml
-title CU05b - RDCU Selectionner un questionnaire
+title RDCU Selectionner un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

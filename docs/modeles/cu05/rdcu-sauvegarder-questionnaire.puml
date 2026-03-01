@@ -1,5 +1,5 @@
 @startuml
-title CU05a - RDCU Sauvegarder un questionnaire
+title RDCU Sauvegarder un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
