@@ -2,7 +2,7 @@ import { Response } from "express";
 import { 
   addQuestion, 
   questionNameExists 
-} from "../core/questionsStore";
+} from "../core/coursStore";
 import {
   PairDeCorrespondance,
   Question,
