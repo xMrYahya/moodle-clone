@@ -1,7 +1,13 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { StudentInfo } from "./sgbClient";
-import { AnyQuestion } from "../types/questionTypes";
+import { AnyQuestion, Question } from "../types/questionTypes";
+import {
+  convertirQuestionsModelesEnDonnees,
+  deserialiserQuestionDepuisJson,
+  deserialiserQuestionsDepuisJson,
+  serialiserQuestionsPourStockage,
+} from "./questionsFactory";
 
 export type Cours = {
   idGroupe: string;
@@ -20,6 +26,10 @@ export type Cours = {
 
 
 const STORE_PATH = path.join(process.cwd(), "data", "cours.json");
+
+type CoursStockage = Omit<Cours, "questions"> & {
+  questions?: unknown[];
+};
 
 async function assurerFichier() {
   await fs.mkdir(path.dirname(STORE_PATH), { recursive: true });
@@ -43,11 +53,15 @@ export async function getCoursStockes(): Promise<Cours[]> {
     return [];
   }
 
-  return json.courses.map((cours: any) => ({
+  return json.courses.map((cours: CoursStockage) => ({
     ...cours,
     etudiants: Array.isArray(cours?.etudiants) ? cours.etudiants : [],
-    questions: Array.isArray(cours?.questions) ? cours.questions : [],
+    questions: convertirQuestionsModelesEnDonnees(deserialiserQuestionsDepuisJson(cours?.questions)),
   }));
+}
+
+async function ecrireCoursStockes(courses: CoursStockage[]): Promise<void> {
+  await fs.writeFile(STORE_PATH, JSON.stringify({ courses }, null, 2), "utf-8");
 }
 
 export async function getStoredPourProf(teacherId: string): Promise<Cours[]> {
@@ -71,12 +85,50 @@ export async function ajouterCoursStocke(course: Cours
       etudiants: Array.isArray(course.etudiants) ? course.etudiants : [],
       questions: Array.isArray(course.questions) ? course.questions : [],
     });
-    await fs.writeFile(STORE_PATH, JSON.stringify({ courses: all }, null, 2), "utf-8");
+    await ecrireCoursStockes(all);
   }
 }
 
 export async function retirerCoursStocke(groupId: string): Promise<void> {
   const all = await getCoursStockes();
   const next = all.filter(c => c.idGroupe !== groupId);
-  await fs.writeFile(STORE_PATH, JSON.stringify({ courses: next }, null, 2), "utf-8");
+  await ecrireCoursStockes(next);
+}
+
+export async function getQuestionsForCours(groupId: string): Promise<AnyQuestion[]> {
+  const cours = await getStoredParIdGroupe(groupId);
+  return cours?.questions ?? [];
+}
+
+export async function questionNameExists(groupId: string, nom: string): Promise<boolean> {
+  const questions = await getQuestionsForCours(groupId);
+  return questions.some(q => String(q.nom).toLowerCase() === String(nom).toLowerCase());
+}
+
+export async function addQuestion(groupId: string, question: AnyQuestion | Question): Promise<void> {
+  const allCours = await getCoursStockes();
+  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
+
+  if (indexCours === -1) {
+    throw new Error(`Cours introuvable pour le groupe "${groupId}".`);
+  }
+
+  const nouveauModele: Question = question instanceof Question ? question : deserialiserQuestionDepuisJson(question);
+  const questionsModeles = deserialiserQuestionsDepuisJson(allCours[indexCours].questions);
+
+  const nomExiste = questionsModeles.some(
+    (questionCourante) => String(questionCourante.nom).toLowerCase() === String(nouveauModele.nom).toLowerCase()
+  );
+
+  if (nomExiste) {
+    throw new Error(`Une question avec le nom "${nouveauModele.nom}" existe déjà pour ce cours.`);
+  }
+
+  questionsModeles.push(nouveauModele);
+  allCours[indexCours] = {
+    ...allCours[indexCours],
+    questions: serialiserQuestionsPourStockage(questionsModeles) as AnyQuestion[],
+  };
+
+  await ecrireCoursStockes(allCours);
 }
