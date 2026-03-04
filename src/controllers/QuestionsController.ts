@@ -5,6 +5,7 @@ import {
   getQuestionsForCours,
   questionNameExists,
   questionNameExistsExcept,
+  updateQuestion,
 } from "../core/coursStore";
 import {
   PairDeCorrespondance,
@@ -115,6 +116,134 @@ export class QuestionsController {
         res.status(404).json({ error: e.message });
       } else {
         res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération de la question" });
+      }
+      return;
+    }
+  }
+
+  static async modifierQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nomOriginal = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nomOriginal) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const questionExistante = await getQuestionByName(groupId, nomOriginal);
+      if (!questionExistante) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nomOriginal}"`);
+      }
+
+      const {
+        type,
+        nom,
+        énoncé,
+        retroactionValide,
+        retroactionInvalide,
+        tags,
+        ...otherData
+      } = req.body;
+
+      const typeFinal = QuestionsController.lireTexte(type || questionExistante.type);
+      const nomFinal = QuestionsController.lireTexte(nom || questionExistante.nom);
+      const enonceFinal = QuestionsController.lireTexte(énoncé || questionExistante.énoncé);
+
+      QuestionsController.validerChampsObligatoires(
+        {
+          type: typeFinal,
+          nom: nomFinal,
+          énoncé: enonceFinal,
+        },
+        ["type", "nom", "énoncé"]
+      );
+
+      await QuestionsController.validerNomQuestionUnique(groupId, nomFinal, nomOriginal);
+
+      const retroactionValideFinale = QuestionsController.lireTexte(
+        retroactionValide ?? questionExistante.retroactionValide
+      );
+      const retroactionInvalideFinale = QuestionsController.lireTexte(
+        retroactionInvalide ?? questionExistante.retroactionInvalide
+      );
+      const tagsFinaux =
+        tags !== undefined
+          ? QuestionsController.lireTags(tags)
+          : Array.isArray(questionExistante.tags)
+            ? questionExistante.tags
+            : [];
+
+      if (typeFinal === "VraiFaux") {
+        const reponse =
+          otherData.reponse !== undefined ? otherData.reponse : (questionExistante as any).reponse;
+
+        if (reponse === undefined || QuestionsController.lireTexte(reponse) === "") {
+          throw new InvalidParameterError("Champs manquants: reponse");
+        }
+
+        const questionMiseAJour = new QuestionVraiFauxModele(
+          nomFinal,
+          enonceFinal,
+          retroactionValideFinale,
+          retroactionInvalideFinale,
+          tagsFinaux,
+          reponse === "true" || reponse === true,
+          retroactionValideFinale
+        );
+
+        await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+
+        res.status(200).json({
+          success: true,
+          message: "Question modifiée avec succès",
+          question: convertirQuestionModeleEnDonnees(questionMiseAJour),
+        });
+        return;
+      }
+
+      const donneesComplementaires = {
+        ...otherData,
+        seulementUnChoix:
+          otherData.seulementUnChoix !== undefined
+            ? otherData.seulementUnChoix
+            : (questionExistante as any).seulementUnChoix,
+        reponses: otherData.reponses !== undefined ? otherData.reponses : (questionExistante as any).reponses,
+        paires: otherData.paires !== undefined ? otherData.paires : (questionExistante as any).paires,
+        reponse:
+          otherData.reponse !== undefined
+            ? otherData.reponse
+            : otherData.reponseAttendue !== undefined
+              ? otherData.reponseAttendue
+              : (questionExistante as any).reponseAttendue,
+      };
+
+      const questionMiseAJour = QuestionsController.creerQuestionAutreType(
+        typeFinal,
+        nomFinal,
+        enonceFinal,
+        retroactionValideFinale,
+        retroactionInvalideFinale,
+        tagsFinaux,
+        donneesComplementaires
+      );
+
+      await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+
+      res.status(200).json({
+        success: true,
+        message: "Question modifiée avec succès",
+        question: convertirQuestionModeleEnDonnees(questionMiseAJour),
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof AlreadyExistsError) {
+        res.status(409).json({ error: e.message });
+      } else if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la modification de la question" });
       }
       return;
     }
