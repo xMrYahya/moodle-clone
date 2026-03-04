@@ -1,7 +1,8 @@
 import { Response } from "express";
 import { 
   addQuestion, 
-  questionNameExists 
+  questionNameExists,
+  questionNameExistsExcept,
 } from "../core/coursStore";
 import {
   PairDeCorrespondance,
@@ -19,6 +20,52 @@ import { InvalidParameterError } from "../core/errors/invalidParameterError";
 import { convertirQuestionModeleEnDonnees } from "../core/questionsFactory";
 
 export class QuestionsController {
+  private static lireTexte(valeur: unknown): string {
+    return String(valeur ?? "").trim();
+  }
+
+  private static lireContexteRequete(req: any): { teacherId: string; groupId: string } {
+    const teacherId = QuestionsController.lireTexte(req?.session?.user?.id);
+    const groupId = QuestionsController.lireTexte(req?.params?.groupId);
+
+    if (!teacherId || !groupId) {
+      throw new InvalidParameterError("Enseignant ou cours manquant");
+    }
+
+    return { teacherId, groupId };
+  }
+
+  private static validerChampsObligatoires(
+    donnees: Record<string, unknown>,
+    champsObligatoires: string[]
+  ): void {
+    const champsManquants = champsObligatoires.filter((champ) => {
+      const valeur = donnees[champ];
+      return valeur === undefined || valeur === null || QuestionsController.lireTexte(valeur) === "";
+    });
+
+    if (champsManquants.length > 0) {
+      throw new InvalidParameterError(`Champs manquants: ${champsManquants.join(", ")}`);
+    }
+  }
+
+  private static async validerNomQuestionUnique(
+    groupId: string,
+    nom: string,
+    nomAExclure?: string
+  ): Promise<void> {
+    const nomNettoye = QuestionsController.lireTexte(nom);
+    const nomExcluNettoye = QuestionsController.lireTexte(nomAExclure);
+
+    const existe = nomExcluNettoye
+      ? await questionNameExistsExcept(groupId, nomNettoye, nomExcluNettoye)
+      : await questionNameExists(groupId, nomNettoye);
+
+    if (existe) {
+      throw new AlreadyExistsError(`Une question avec le nom "${nomNettoye}" existe déjà`);
+    }
+  }
+
   private static lireTags(tags: unknown): string[] {
     if (Array.isArray(tags)) {
       return tags.map(String).map((t) => t.trim()).filter((t) => t.length > 0);
@@ -181,26 +228,11 @@ export class QuestionsController {
   
   static async ajouterQuestionVraiFaux(req: any, res: Response): Promise<void> {
     try {
-      const teacher = req.session.user;
-      const { groupId } = req.params;
+      const { groupId } = QuestionsController.lireContexteRequete(req);
       const { nom, énoncé, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
 
-      if (!teacher?.id || !groupId) {
-        throw new InvalidParameterError("Enseignant ou cours manquant");
-      }
-
-      const missingFields: string[] = [];
-      if (!nom || String(nom).trim() === "") missingFields.push("nom");
-      if (!énoncé || String(énoncé).trim() === "") missingFields.push("énoncé");
-      if (reponse === undefined || reponse === "") missingFields.push("reponse");
-
-      if (missingFields.length > 0) {
-        throw new InvalidParameterError(`Champs manquants: ${missingFields.join(", ")}`);
-      }
-
-      if (await questionNameExists(groupId, nom)) {
-        throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
-      }
+      QuestionsController.validerChampsObligatoires({ nom, énoncé, reponse }, ["nom", "énoncé", "reponse"]);
+      await QuestionsController.validerNomQuestionUnique(groupId, String(nom));
 
       const reponseBoolean = reponse === "true" || reponse === true;
 
@@ -236,25 +268,11 @@ export class QuestionsController {
 
   private static async ajouterQuestionParType(req: any, res: Response, typeQuestion: string): Promise<void> {
     try {
-      const teacher = req.session.user;
-      const { groupId } = req.params;
+      const { groupId } = QuestionsController.lireContexteRequete(req);
       const { nom, énoncé, retroactionValide, retroactionInvalide, tags, ...otherData } = req.body;
 
-      if (!teacher?.id || !groupId) {
-        throw new InvalidParameterError("Enseignant ou cours manquant");
-      }
-
-      const missingFields: string[] = [];
-      if (!nom || String(nom).trim() === "") missingFields.push("nom");
-      if (!énoncé || String(énoncé).trim() === "") missingFields.push("énoncé");
-
-      if (missingFields.length > 0) {
-        throw new InvalidParameterError(`Champs manquants: ${missingFields.join(", ")}`);
-      }
-
-      if (await questionNameExists(groupId, nom)) {
-        throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
-      }
+      QuestionsController.validerChampsObligatoires({ nom, énoncé }, ["nom", "énoncé"]);
+      await QuestionsController.validerNomQuestionUnique(groupId, String(nom));
 
       const nouvelleQuestion = QuestionsController.creerQuestionAutreType(
         typeQuestion,
