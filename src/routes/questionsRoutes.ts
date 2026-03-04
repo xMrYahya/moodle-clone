@@ -17,6 +17,12 @@ router.post("/:groupId/:nom/modifier", requireAuth, QuestionsController.modifier
 router.get("/:groupId/:nom/supprimer", requireAuth, QuestionsController.supprimerQuestion);
 router.post("/:groupId/:nom/confirmer-suppression", requireAuth, QuestionsController.confirmerSuppressionQuestion);
 
+router.get("/:groupId/questions", requireAuth, QuestionsController.consulterQuestionsCours);
+router.get("/:groupId/questions/:nom", requireAuth, QuestionsController.selectionnerQuestion);
+router.post("/:groupId/questions/:nom/modifier", requireAuth, QuestionsController.modifierQuestion);
+router.get("/:groupId/questions/:nom/suppression", requireAuth, QuestionsController.supprimerQuestion);
+router.post("/:groupId/questions/:nom/suppression", requireAuth, QuestionsController.confirmerSuppressionQuestion);
+
 router.post("/:groupId/ajouter-vrai-faux", requireAuth, QuestionsController.ajouterQuestionVraiFaux);
 
   router.post("/:groupId/ajouter-choix-multiple", requireAuth, QuestionsController.ajouterQuestionChoixMultiple);
