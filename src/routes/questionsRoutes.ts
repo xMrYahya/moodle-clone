@@ -14,6 +14,8 @@ function requireAuth(req: any, res: any, next: any) {
 router.get("/:groupId", requireAuth, QuestionsController.consulterQuestionsCours);
 router.get("/:groupId/:nom", requireAuth, QuestionsController.selectionnerQuestion);
 router.post("/:groupId/:nom/modifier", requireAuth, QuestionsController.modifierQuestion);
+router.get("/:groupId/:nom/supprimer", requireAuth, QuestionsController.supprimerQuestion);
+router.post("/:groupId/:nom/confirmer-suppression", requireAuth, QuestionsController.confirmerSuppressionQuestion);
 
 router.post("/:groupId/ajouter-vrai-faux", requireAuth, QuestionsController.ajouterQuestionVraiFaux);
 

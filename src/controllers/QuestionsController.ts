@@ -5,6 +5,7 @@ import {
   getQuestionsForCours,
   questionNameExists,
   questionNameExistsExcept,
+  removeQuestion,
   updateQuestion,
 } from "../core/coursStore";
 import {
@@ -244,6 +245,73 @@ export class QuestionsController {
         res.status(404).json({ error: e.message });
       } else {
         res.status(500).json({ error: e?.message ?? "Erreur lors de la modification de la question" });
+      }
+      return;
+    }
+  }
+
+  static async supprimerQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nom = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nom) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const question = await getQuestionByName(groupId, nom);
+      if (!question) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Confirmation de suppression requise",
+        question,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la préparation de suppression" });
+      }
+      return;
+    }
+  }
+
+  static async confirmerSuppressionQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nom = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nom) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const question = await getQuestionByName(groupId, nom);
+      if (!question) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
+      }
+
+      await removeQuestion(groupId, nom);
+      const questions = await getQuestionsForCours(groupId);
+
+      res.status(200).json({
+        success: true,
+        message: "Question supprimée avec succès",
+        questions,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la suppression de la question" });
       }
       return;
     }
