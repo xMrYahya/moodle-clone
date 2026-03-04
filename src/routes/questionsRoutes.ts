@@ -11,6 +11,9 @@ function requireAuth(req: any, res: any, next: any) {
   next();
 }
 
+router.get("/:groupId", requireAuth, QuestionsController.consulterQuestionsCours);
+router.get("/:groupId/:nom", requireAuth, QuestionsController.selectionnerQuestion);
+
 router.post("/:groupId/ajouter-vrai-faux", requireAuth, QuestionsController.ajouterQuestionVraiFaux);
 
   router.post("/:groupId/ajouter-choix-multiple", requireAuth, QuestionsController.ajouterQuestionChoixMultiple);

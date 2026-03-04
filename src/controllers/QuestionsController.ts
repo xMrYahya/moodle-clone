@@ -1,6 +1,8 @@
 import { Response } from "express";
 import { 
   addQuestion, 
+  getQuestionByName,
+  getQuestionsForCours,
   questionNameExists,
   questionNameExistsExcept,
 } from "../core/coursStore";
@@ -17,6 +19,7 @@ import {
 } from "../types/questionTypes";
 import { AlreadyExistsError } from "../core/errors/alreadyExistsError";
 import { InvalidParameterError } from "../core/errors/invalidParameterError";
+import { NotFoundError } from "../core/errors/notFoundError";
 import { convertirQuestionModeleEnDonnees } from "../core/questionsFactory";
 
 export class QuestionsController {
@@ -63,6 +66,57 @@ export class QuestionsController {
 
     if (existe) {
       throw new AlreadyExistsError(`Une question avec le nom "${nomNettoye}" existe déjà`);
+    }
+  }
+
+  static async consulterQuestionsCours(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const questions = await getQuestionsForCours(groupId);
+
+      res.status(200).json({
+        success: true,
+        questions,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération des questions" });
+      }
+      return;
+    }
+  }
+
+  static async selectionnerQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nom = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nom) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const question = await getQuestionByName(groupId, nom);
+      if (!question) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
+      }
+
+      res.status(200).json({
+        success: true,
+        question,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération de la question" });
+      }
+      return;
     }
   }
 
