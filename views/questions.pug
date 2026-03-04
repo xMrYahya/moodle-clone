@@ -356,7 +356,7 @@ html
             dd.col-sm-8#details-nom -
             dt.col-sm-4 Énoncé
             dd.col-sm-8#details-enonce -
-            dt.col-sm-4 Réponse/Valeur
+            dt.col-sm-4#details-reponse-label Réponse/Valeur
             dd.col-sm-8#details-reponse -
             dt.col-sm-4 Rétroaction valide
             dd.col-sm-8#details-retro-valide -
@@ -643,12 +643,14 @@ html
 
       function extraireValeurReponse(question) {
         if (!question) return '-';
-        if (question.type === 'VraiFaux') return String(question.reponse);
+        if (question.type === 'VraiFaux') return question.reponse === true ? 'vrai' : 'faux';
         if (question.type === 'Numerique') return String(question.reponseAttendue ?? '-');
         if (question.type === 'ReponseCourte') return String(question.reponseAttendue ?? '-');
         if (question.type === 'ChoixMultiple') {
-          const reponses = Array.isArray(question.reponses) ? question.reponses.map(r => r.text) : [];
-          return reponses.length ? reponses.join(' | ') : '-';
+          const bonnesReponses = Array.isArray(question.reponses)
+            ? question.reponses.filter(r => r && r.estBonneReponse === true).map(r => r.text)
+            : [];
+          return bonnesReponses.length ? bonnesReponses.join(' | ') : '-';
         }
         if (question.type === 'MiseEnCorrespondance') {
           const paires = Array.isArray(question.paires)
@@ -659,10 +661,29 @@ html
         return '-';
       }
 
+      function libelleReponse(question) {
+        if (!question) return 'Réponse/Valeur';
+
+        if (question.type === 'ChoixMultiple') {
+          const nbBonnesReponses = Array.isArray(question.reponses)
+            ? question.reponses.filter(r => r && r.estBonneReponse === true).length
+            : 0;
+          return nbBonnesReponses > 1 ? 'Bonnes réponses' : 'Bonne réponse';
+        }
+
+        if (question.type === 'MiseEnCorrespondance') return 'Paires de correspondance';
+        if (question.type === 'Numerique') return 'Réponse numérique';
+        if (question.type === 'ReponseCourte') return 'Réponse attendue';
+        if (question.type === 'VraiFaux') return 'Réponse';
+
+        return 'Réponse/Valeur';
+      }
+
       function afficherDetailsQuestion(question) {
         document.getElementById('details-type').textContent = question?.type || '-';
         document.getElementById('details-nom').textContent = question?.nom || '-';
         document.getElementById('details-enonce').textContent = question?.['énoncé'] || '-';
+        document.getElementById('details-reponse-label').textContent = libelleReponse(question);
         document.getElementById('details-reponse').textContent = extraireValeurReponse(question);
         document.getElementById('details-retro-valide').textContent = question?.retroactionValide || '-';
         document.getElementById('details-retro-invalide').textContent = question?.retroactionInvalide || '-';
