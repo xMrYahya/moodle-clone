@@ -76,6 +76,7 @@ export class CoursController {
         idCours: idCoursFinal,
         titreCours: titreCoursFinal,
         etudiants: students,
+        questions: [],
       });
 
       res.redirect("/index");

@@ -1,6 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { StudentInfo } from "./sgbClient";
+import { AnyQuestion } from "../types/questionTypes";
 
 export type Cours = {
   idGroupe: string;
@@ -14,6 +15,7 @@ export type Cours = {
   idCours?: string;
   titreCours?: string;
   etudiants: StudentInfo[];
+  questions: AnyQuestion[];
 };
 
 
@@ -37,7 +39,15 @@ export async function getCoursStockes(): Promise<Cours[]> {
   await assurerFichier();
   const raw = await fs.readFile(STORE_PATH, "utf-8");
   const json = JSON.parse(raw);
-  return Array.isArray(json.courses) ? json.courses : [];
+  if (!Array.isArray(json.courses)) {
+    return [];
+  }
+
+  return json.courses.map((cours: any) => ({
+    ...cours,
+    etudiants: Array.isArray(cours?.etudiants) ? cours.etudiants : [],
+    questions: Array.isArray(cours?.questions) ? cours.questions : [],
+  }));
 }
 
 export async function getStoredPourProf(teacherId: string): Promise<Cours[]> {
@@ -56,7 +66,11 @@ export async function ajouterCoursStocke(course: Cours
   const all = await getCoursStockes();
   const exists = all.some(c => c.idGroupe === course.idGroupe);
   if (!exists) {
-    all.push(course);
+    all.push({
+      ...course,
+      etudiants: Array.isArray(course.etudiants) ? course.etudiants : [],
+      questions: Array.isArray(course.questions) ? course.questions : [],
+    });
     await fs.writeFile(STORE_PATH, JSON.stringify({ courses: all }, null, 2), "utf-8");
   }
 }
