@@ -8,7 +8,6 @@ import coursRoutes from "./routes/coursRoutes";
 import questionsRoutes from "./routes/questionsRoutes";
 
 import { viderStoreAuDemarrage } from "./core/coursStore";
-import { clearQuestionsOnStartup } from "./core/questionsStore";
 
 class App {
   public expressApp: express.Application;
@@ -17,7 +16,6 @@ class App {
     this.expressApp = express();
 
     viderStoreAuDemarrage().catch(console.error);
-    clearQuestionsOnStartup().catch(console.error);
 
     this.middleware();
     

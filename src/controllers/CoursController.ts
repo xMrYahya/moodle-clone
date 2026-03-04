@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { SgbClient } from "../core/sgbClient";
 import { ajouterCoursStocke, retirerCoursStocke, getStoredParIdGroupe } from "../core/coursStore";
-import { getQuestionsForCours } from "../core/questionsStore";
+import { getQuestionsForCours } from "../core/coursStore";
 
 const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
 const accesSGA = new SgbClient(sgbBaseUrl);
