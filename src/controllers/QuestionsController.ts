@@ -25,8 +25,49 @@ import { NotFoundError } from "../core/errors/notFoundError";
 import { convertirQuestionModeleEnDonnees } from "../core/questionsFactory";
 
 export class QuestionsController {
+  private static lireValeurSimple(valeur: unknown): unknown {
+    if (!Array.isArray(valeur)) {
+      return valeur;
+    }
+
+    const valeurNonVide = valeur.find((element) => QuestionsController.lireTexte(element) !== "");
+    return valeurNonVide ?? valeur[0];
+  }
+
   private static lireTexte(valeur: unknown): string {
-    return String(valeur ?? "").trim();
+    return String(QuestionsController.lireValeurSimple(valeur) ?? "").trim();
+  }
+
+  private static lireBooleen(valeur: unknown): boolean | null {
+    const valeurSimple = QuestionsController.lireValeurSimple(valeur);
+
+    if (typeof valeurSimple === "boolean") {
+      return valeurSimple;
+    }
+
+    const texte = String(valeurSimple ?? "").trim().toLowerCase();
+    if (texte === "true") {
+      return true;
+    }
+    if (texte === "false") {
+      return false;
+    }
+
+    return null;
+  }
+
+  private static lireNombre(valeur: unknown): number | null {
+    const texte = QuestionsController.lireTexte(valeur);
+    if (!texte) {
+      return null;
+    }
+
+    const nombre = Number.parseFloat(texte);
+    if (!Number.isFinite(nombre)) {
+      return null;
+    }
+
+    return nombre;
   }
 
   private static lireContexteRequete(req: any): { teacherId: string; groupId: string } {
@@ -146,9 +187,9 @@ export class QuestionsController {
         ...otherData
       } = req.body;
 
-      const typeFinal = QuestionsController.lireTexte(type || questionExistante.type);
-      const nomFinal = QuestionsController.lireTexte(nom || questionExistante.nom);
-      const enonceFinal = QuestionsController.lireTexte(énoncé || questionExistante.énoncé);
+      const typeFinal = QuestionsController.lireTexte(type ?? questionExistante.type);
+      const nomFinal = QuestionsController.lireTexte(nom ?? questionExistante.nom);
+      const enonceFinal = QuestionsController.lireTexte(énoncé ?? questionExistante.énoncé);
 
       QuestionsController.validerChampsObligatoires(
         {
@@ -175,10 +216,15 @@ export class QuestionsController {
             : [];
 
       if (typeFinal === "VraiFaux") {
-        const reponse =
-          otherData.reponse !== undefined ? otherData.reponse : (questionExistante as any).reponse;
+        const reponseSource =
+          otherData.reponse !== undefined
+            ? otherData.reponse
+            : otherData.reponseVf !== undefined
+              ? otherData.reponseVf
+              : (questionExistante as any).reponse;
 
-        if (reponse === undefined || QuestionsController.lireTexte(reponse) === "") {
+        const reponseBoolean = QuestionsController.lireBooleen(reponseSource);
+        if (reponseBoolean === null) {
           throw new InvalidParameterError("Champs manquants: reponse");
         }
 
@@ -188,7 +234,7 @@ export class QuestionsController {
           retroactionValideFinale,
           retroactionInvalideFinale,
           tagsFinaux,
-          reponse === "true" || reponse === true,
+          reponseBoolean,
           retroactionValideFinale
         );
 
@@ -207,16 +253,64 @@ export class QuestionsController {
         seulementUnChoix:
           otherData.seulementUnChoix !== undefined
             ? otherData.seulementUnChoix
+            : otherData.seulementUnChoixCm !== undefined
+              ? otherData.seulementUnChoixCm
             : (questionExistante as any).seulementUnChoix,
-        reponses: otherData.reponses !== undefined ? otherData.reponses : (questionExistante as any).reponses,
-        paires: otherData.paires !== undefined ? otherData.paires : (questionExistante as any).paires,
+        reponses:
+          otherData.reponses !== undefined
+            ? otherData.reponses
+            : otherData.reponsesCm !== undefined
+              ? otherData.reponsesCm
+              : (questionExistante as any).reponses,
+        paires:
+          otherData.paires !== undefined
+            ? otherData.paires
+            : otherData.pairesMec !== undefined
+              ? otherData.pairesMec
+              : (questionExistante as any).paires,
         reponse:
           otherData.reponse !== undefined
             ? otherData.reponse
+            : otherData.reponseLibre !== undefined
+              ? otherData.reponseLibre
             : otherData.reponseAttendue !== undefined
               ? otherData.reponseAttendue
               : (questionExistante as any).reponseAttendue,
       };
+
+      if (typeFinal === "ReponseCourte") {
+        const reponseTexte = QuestionsController.lireTexte(donneesComplementaires.reponse);
+        if (!reponseTexte) {
+          throw new InvalidParameterError("Champs manquants: reponse");
+        }
+      }
+
+      if (typeFinal === "Numerique") {
+        const valeurNumerique = QuestionsController.lireNombre(donneesComplementaires.reponse);
+        if (valeurNumerique === null) {
+          throw new InvalidParameterError("Valeur invalide: reponse numérique attendue");
+        }
+      }
+
+      if (typeFinal === "ChoixMultiple") {
+        const reponsesTexte = QuestionsController.lireTexte(donneesComplementaires.reponses);
+        const reponsesListe = Array.isArray(donneesComplementaires.reponses)
+          ? donneesComplementaires.reponses
+          : [];
+        if (!reponsesTexte && reponsesListe.length === 0) {
+          throw new InvalidParameterError("Champs manquants: reponses");
+        }
+      }
+
+      if (typeFinal === "MiseEnCorrespondance") {
+        const pairesTexte = QuestionsController.lireTexte(donneesComplementaires.paires);
+        const pairesListe = Array.isArray(donneesComplementaires.paires)
+          ? donneesComplementaires.paires
+          : [];
+        if (!pairesTexte && pairesListe.length === 0) {
+          throw new InvalidParameterError("Champs manquants: paires");
+        }
+      }
 
       const questionMiseAJour = QuestionsController.creerQuestionAutreType(
         typeFinal,

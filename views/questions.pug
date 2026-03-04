@@ -410,28 +410,28 @@ html
             #edit-field-vf(style="display: none;")
               .form-group
                 label(for="edit-reponse-vf") Réponse correcte
-                select.form-control#edit-reponse-vf(name="reponse")
+                select.form-control#edit-reponse-vf(name="reponseVf")
                   option(value="true") Vrai
                   option(value="false") Faux
 
             #edit-field-cm(style="display: none;")
               .form-group
                 .form-check.mb-2
-                  input.form-check-input#edit-seulement-un-choix(type="checkbox" name="seulementUnChoix" value="true")
+                  input.form-check-input#edit-seulement-un-choix(type="checkbox" name="seulementUnChoixCm" value="true")
                   label.form-check-label(for="edit-seulement-un-choix") Un seul choix correct
               .form-group
                 label(for="edit-reponses-cm") Réponses (format: choix1|choix2|choix3)
-                input.form-control#edit-reponses-cm(type="text" name="reponses")
+                input.form-control#edit-reponses-cm(type="text" name="reponsesCm")
 
             #edit-field-mec(style="display: none;")
               .form-group
                 label(for="edit-paires-mec") Paires (format: question:réponse|question:réponse)
-                input.form-control#edit-paires-mec(type="text" name="paires")
+                input.form-control#edit-paires-mec(type="text" name="pairesMec")
 
             #edit-field-reponse(style="display: none;")
               .form-group
                 label(for="edit-reponse") Réponse attendue
-                input.form-control#edit-reponse(type="text" name="reponse")
+                input.form-control#edit-reponse(type="text" name="reponseLibre")
 
             .d-flex.justify-content-end.gap-2
               button.btn.btn-secondary.js-close-edit(type="button") Annuler
@@ -680,10 +680,96 @@ html
           if (el) el.style.display = 'none';
         });
 
-        if (typeQuestion === 'VraiFaux' && vf) vf.style.display = 'block';
-        if (typeQuestion === 'ChoixMultiple' && cm) cm.style.display = 'block';
-        if (typeQuestion === 'MiseEnCorrespondance' && mec) mec.style.display = 'block';
-        if ((typeQuestion === 'ReponseCourte' || typeQuestion === 'Numerique') && rep) rep.style.display = 'block';
+        [vf, cm, mec, rep].forEach(el => {
+          if (!el) return;
+          el.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = true;
+          });
+        });
+
+        if (typeQuestion === 'VraiFaux' && vf) {
+          vf.style.display = 'block';
+          vf.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+        if (typeQuestion === 'ChoixMultiple' && cm) {
+          cm.style.display = 'block';
+          cm.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+        if (typeQuestion === 'MiseEnCorrespondance' && mec) {
+          mec.style.display = 'block';
+          mec.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+        if ((typeQuestion === 'ReponseCourte' || typeQuestion === 'Numerique') && rep) {
+          rep.style.display = 'block';
+          rep.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+      }
+
+      function nettoyerChampsTypeNonActif(typeQuestionActif) {
+        if (typeQuestionActif !== 'VraiFaux') {
+          const champVf = document.getElementById('edit-reponse-vf');
+          if (champVf) champVf.value = 'true';
+        }
+
+        if (typeQuestionActif !== 'ChoixMultiple') {
+          const checkCm = document.getElementById('edit-seulement-un-choix');
+          const reponsesCm = document.getElementById('edit-reponses-cm');
+          if (checkCm) checkCm.checked = false;
+          if (reponsesCm) reponsesCm.value = '';
+        }
+
+        if (typeQuestionActif !== 'MiseEnCorrespondance') {
+          const pairesMec = document.getElementById('edit-paires-mec');
+          if (pairesMec) pairesMec.value = '';
+        }
+
+        if (typeQuestionActif !== 'ReponseCourte' && typeQuestionActif !== 'Numerique') {
+          const champReponse = document.getElementById('edit-reponse');
+          if (champReponse) champReponse.value = '';
+        }
+      }
+
+      function construirePayloadModification() {
+        const type = document.getElementById('edit-type').value;
+        const payload = {
+          type,
+          nom: document.getElementById('edit-nom').value,
+          'énoncé': document.getElementById('edit-enonce').value,
+          retroactionValide: document.getElementById('edit-retroaction-valide').value,
+          retroactionInvalide: document.getElementById('edit-retroaction-invalide').value,
+          tags: document.getElementById('edit-tags').value,
+        };
+
+        if (type === 'VraiFaux') {
+          payload.reponse = document.getElementById('edit-reponse-vf').value;
+          return payload;
+        }
+
+        if (type === 'ChoixMultiple') {
+          payload.seulementUnChoix = document.getElementById('edit-seulement-un-choix').checked;
+          payload.reponses = document.getElementById('edit-reponses-cm').value;
+          return payload;
+        }
+
+        if (type === 'MiseEnCorrespondance') {
+          payload.paires = document.getElementById('edit-paires-mec').value;
+          return payload;
+        }
+
+        if (type === 'ReponseCourte' || type === 'Numerique') {
+          payload.reponse = document.getElementById('edit-reponse').value;
+          return payload;
+        }
+
+        return payload;
       }
 
       function preRemplirFormulaireModification(question) {
@@ -783,6 +869,7 @@ html
       if (editType) {
         editType.addEventListener('change', function() {
           afficherChampsModification(this.value);
+          nettoyerChampsTypeNonActif(this.value);
         });
       }
 
@@ -797,8 +884,7 @@ html
           }
 
           try {
-            const formData = new FormData(editForm);
-            const data = formDataToJson(formData);
+            const data = construirePayloadModification();
 
             if (!data.nom || !String(data.nom).trim() || !data['énoncé'] || !String(data['énoncé']).trim()) {
               alert('Erreur: Veuillez remplir les champs obligatoires (nom, énoncé)');
@@ -808,6 +894,19 @@ html
             if (data.type === 'VraiFaux' && (!data.reponse || String(data.reponse).trim() === '')) {
               alert('Erreur: la réponse est obligatoire pour une question vrai/faux');
               return;
+            }
+
+            if (data.type === 'ReponseCourte' && (!data.reponse || String(data.reponse).trim() === '')) {
+              alert('Erreur: la réponse attendue est obligatoire pour une question réponse courte');
+              return;
+            }
+
+            if (data.type === 'Numerique') {
+              const valeur = Number.parseFloat(String(data.reponse || '').trim());
+              if (!Number.isFinite(valeur)) {
+                alert('Erreur: la réponse d\'une question numérique doit être un nombre valide');
+                return;
+              }
             }
 
             const url = `/questions/${groupId}/questions/${encodeURIComponent(questionEnCoursModification)}/modifier`;
