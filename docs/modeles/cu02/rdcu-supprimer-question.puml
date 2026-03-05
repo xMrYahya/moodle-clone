@@ -3,31 +3,34 @@ hide footbox
 title RDCU – Supprimer une question (Demande)
 
 participant "qc:QuestionsController" as QC
-participant "qs:QuestionsStore" as QS
+participant "cs:CoursStore" as CS
 
 -> QC : supprimerQuestion(groupId : String, nom : String)
 note right: GRASP: Controller
 activate QC
 
-QC -> QS : questionUtiliseeDansQuestionnaire(groupId : String, nom : String)
-activate QS
-QS --> QC : utilisee : boolean
-deactivate QS
+'???'
+QC -> CS : questionUtiliseeDansQuestionnaire(groupId : String, nom : String)
+activate CS
+CS --> QC : utilisee : boolean
+deactivate CS
 
 alt Question non utilisee dans un questionnaire
-  QC -> QS : chercherInfoQuestion(groupId : String, nom : String)
-  activate QS
-  QS --> QC : question:String
-  deactivate QS
+'???'
+  QC -> CS : chercherInfoQuestion(groupId : String, nom : String)
+  activate CS
+  CS --> QC : question:String
+  deactivate CS
 
   'QC --> UI : afficherInfoQuestionASupprimer(question):String'
   <-- QC : demanderConfirmationSuppression():String
 
 else Question utilisee dans au moins un questionnaire
-  QC -> QS : listerQuestionnairesUtilisantQuestion(groupId : String, nom : String)
-  activate QS
-  QS --> QC : questionnaires : List<Questionnaire>
-  deactivate QS
+'???'
+  QC -> CS : listerQuestionnairesUtilisantQuestion(groupId : String, nom : String)
+  activate CS
+  CS --> QC : questionnaires : List<Questionnaire>
+  deactivate CS
 
   'QC --> UI : afficherQuestionnairesUtilisantQuestion(questionnaires):String'
   'QC --> UI : desactiverSuppression():boolean'

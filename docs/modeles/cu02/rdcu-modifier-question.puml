@@ -3,36 +3,35 @@ hide footbox
 title RDCU – Modifier une question
 
 participant "qc:QuestionsController" as QC
-participant "qs:QuestionsStore" as QS
+participant "cs:CoursStore" as CS
 participant "q:Question" as Q
 
 -> QC : modifierQuestion(groupId, nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
 note right: GRASP: Controller
 activate QC
 
-QC -> QS : questionNameExists(groupId : String, nom : String)
-activate QS
-QS --> QC : nomExiste : boolean
-deactivate QS
+QC -> CS : questionExistante(groupId : String, nom : String)
+activate CS
+CS --> QC : questionExistante : boolean
+deactivate CS
 
-alt Nom de question unique (nomExiste == false)
-  QC -> Q : modifierQuestion(nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
+alt Nom de question existant (nomExiste == false)
+  QC -> Q : modifierQuestion(nom, enonce, type,\n retroactionValide, retroactionInvalide, tags)
   activate Q
   Q --> QC : confirmationModificationQuestion : boolean
   deactivate Q
 
-  QC -> QS : updateQuestion(Q)
-  activate QS
-  QS --> QC : confirmationModificationQuestionStore : boolean
-  deactivate QS
+  QC -> CS : updateQuestion(Q)
+  activate CS
+  CS --> QC : confirmationModificationQuestionStore : boolean
+  deactivate CS
 
   <-- QC : afficherConfirmationModification(Q)
   deactivate QC
 
-else Nom de question deja utilise (nomExiste == true)
-
-  <-- QC : erreurNomNonUnique():String
-  deactivate UI
+else Nom de question n'existe pas (nomExiste == true)
+  <-- QC : erreurNomNonExistant():String
+  deactivate QC
 end
 
 @enduml

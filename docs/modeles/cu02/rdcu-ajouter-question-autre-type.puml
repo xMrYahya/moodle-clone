@@ -1,29 +1,29 @@
 @startuml
 hide footbox
-title RDCU - ajouterQuestionAutreType
+title RDCU - ajouterQuestionParType
 
 participant "qc:QuestionsController" as QC
-participant "qs:QuestionsStore" as QS
+participant "cs:CoursStore" as CS
 participant "q:Question" as Q
 
--> QC : ajouterQuestionAutreType(nom : String, enonce : String, type : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+-> QC : ajouterQuestionParType(nom : String, enonce : String, type : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
 note right: GRASP: Controller
 activate QC
 
-QC -> QS : questionNameExists(nom)
-activate QS
-QS --> QC : nomExiste:boolean
-deactivate QS
+QC -> CS : validerNomQuestionUnique(groupId: String, nom: String)
+activate CS
+CS --> QC : nomExiste:boolean
+deactivate CS
 
 alt Nom de question unique
   create Q
-  QC -> Q : <<create>> Question(nom, enonce, type,\n retroactionValide, retroactionInvalide, tags)
+  QC -> Q : <<create>> creerQuestionAutreType(nom, enonce, type,\n retroactionValide, retroactionInvalide, tags)
   activate Q
   deactivate Q
 
-  QC -> QS : addQuestion(q)
-  activate QS
-  deactivate QS
+  QC -> CS : addQuestion(q)
+  activate CS
+  deactivate CS
 
   <-- QC : confirmationAjout(listeQuestions):String
 else Nom de question deja utilise

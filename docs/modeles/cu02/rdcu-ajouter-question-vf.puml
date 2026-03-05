@@ -3,17 +3,17 @@ hide footbox
 title RDCU pour Ajouter une question Vrai ou Faux
 
 participant "qc:QuestionsController" as QC
-participant "qs:QuestionsStore" as QS
+participant "cs:CoursStore" as CS
 participant "q:QuestionVraiFaux" as Q
 
 -> QC : ajouterQuestionVraiFaux(nom : String, enonce : String,\n reponse : bool, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
 note right: GRASP: Controller
 activate QC
 
-QC -> QS : questionNameExists(nom)
-activate QS
-QS --> QC : nomExiste:boolean
-deactivate QS
+QC -> CS : validerNomQuestionUnique(groupId: String, nom: String)
+activate CS
+CS --> QC : nomExiste:boolean
+deactivate CS
 
 alt Nom de question unique
     create Q
@@ -21,9 +21,9 @@ alt Nom de question unique
     activate Q
     deactivate Q
 
-    QC -> QS : addQuestion(q)
-    activate QS
-    deactivate QS
+    QC -> CS : addQuestion(q)
+    activate CS
+    deactivate CS
 
     <-- QC : confirmationAjout(listeQuestions):String
 else Nom de question deja utilise

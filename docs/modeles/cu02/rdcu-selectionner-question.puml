@@ -3,17 +3,17 @@ hide footbox
 title RDCU – Sélectionner une question
 
 participant "qc:QuestionsController" as QC
-participant "qs:QuestionsStore" as QS
+participant "cs:CoursStore" as CS
 participant "q:Question" as Q
 
 -> QC : selectionnerQuestion(groupId : String, nom : String)
 note right: GRASP: Controller
 activate QC
 
-QC -> QS : chercherInfoQuestion(groupId : String, nom : String)
-activate QS
-QS --> QC : question : Question
-deactivate QS
+QC -> CS : chercherInfoQuestion(groupId : String, nom : String)
+activate CS
+CS --> QC : question : Question
+deactivate CS
 
 activate Q
 QC -> Q : getType()

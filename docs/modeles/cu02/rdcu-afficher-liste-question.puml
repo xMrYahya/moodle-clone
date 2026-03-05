@@ -3,16 +3,17 @@ hide footbox
 title RDCU - Afficher la liste des questions
 
 participant "qc:QuestionsController" as QC
-participant "qs:QuestionsStore" as QS
+participant "cs:CoursStore" as CS
 
 -> QC : consulterQuestionsCours(groupId : String)
 note right: GRASP: Controller
 activate QC
 
-QC -> QS : chercherListeQuestions(groupId : String)
-activate QS
-QS --> QC : questions : List<Question>
-deactivate QS
+QC -> CS : getQuestionsForCours(groupId : String)
+activate CS
+'???'
+CS --> QC : questions : List<Question>
+deactivate CS
 
 <-- QC : afficherListeQuestions(questions):String
 deactivate QC
