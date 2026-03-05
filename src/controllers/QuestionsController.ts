@@ -1,7 +1,12 @@
 import { Response } from "express";
 import { 
   addQuestion, 
-  questionNameExists 
+  getQuestionByName,
+  getQuestionsForCours,
+  questionNameExists,
+  questionNameExistsExcept,
+  removeQuestion,
+  updateQuestion,
 } from "../core/coursStore";
 import {
   PairDeCorrespondance,
@@ -16,9 +21,396 @@ import {
 } from "../types/questionTypes";
 import { AlreadyExistsError } from "../core/errors/alreadyExistsError";
 import { InvalidParameterError } from "../core/errors/invalidParameterError";
+import { NotFoundError } from "../core/errors/notFoundError";
 import { convertirQuestionModeleEnDonnees } from "../core/questionsFactory";
 
 export class QuestionsController {
+  private static lireValeurSimple(valeur: unknown): unknown {
+    if (!Array.isArray(valeur)) {
+      return valeur;
+    }
+
+    const valeurNonVide = valeur.find((element) => QuestionsController.lireTexte(element) !== "");
+    return valeurNonVide ?? valeur[0];
+  }
+
+  private static lireTexte(valeur: unknown): string {
+    return String(QuestionsController.lireValeurSimple(valeur) ?? "").trim();
+  }
+
+  private static lireBooleen(valeur: unknown): boolean | null {
+    const valeurSimple = QuestionsController.lireValeurSimple(valeur);
+
+    if (typeof valeurSimple === "boolean") {
+      return valeurSimple;
+    }
+
+    const texte = String(valeurSimple ?? "").trim().toLowerCase();
+    if (texte === "true") {
+      return true;
+    }
+    if (texte === "false") {
+      return false;
+    }
+
+    return null;
+  }
+
+  private static lireNombre(valeur: unknown): number | null {
+    const texte = QuestionsController.lireTexte(valeur);
+    if (!texte) {
+      return null;
+    }
+
+    const nombre = Number.parseFloat(texte);
+    if (!Number.isFinite(nombre)) {
+      return null;
+    }
+
+    return nombre;
+  }
+
+  private static lireContexteRequete(req: any): { teacherId: string; groupId: string } {
+    const teacherId = QuestionsController.lireTexte(req?.session?.user?.id);
+    const groupId = QuestionsController.lireTexte(req?.params?.groupId);
+
+    if (!teacherId || !groupId) {
+      throw new InvalidParameterError("Enseignant ou cours manquant");
+    }
+
+    return { teacherId, groupId };
+  }
+
+  private static validerChampsObligatoires(
+    donnees: Record<string, unknown>,
+    champsObligatoires: string[]
+  ): void {
+    const champsManquants = champsObligatoires.filter((champ) => {
+      const valeur = donnees[champ];
+      return valeur === undefined || valeur === null || QuestionsController.lireTexte(valeur) === "";
+    });
+
+    if (champsManquants.length > 0) {
+      throw new InvalidParameterError(`Champs manquants: ${champsManquants.join(", ")}`);
+    }
+  }
+
+  private static async validerNomQuestionUnique(
+    groupId: string,
+    nom: string,
+    nomAExclure?: string
+  ): Promise<void> {
+    const nomNettoye = QuestionsController.lireTexte(nom);
+    const nomExcluNettoye = QuestionsController.lireTexte(nomAExclure);
+
+    const existe = nomExcluNettoye
+      ? await questionNameExistsExcept(groupId, nomNettoye, nomExcluNettoye)
+      : await questionNameExists(groupId, nomNettoye);
+
+    if (existe) {
+      throw new AlreadyExistsError(`Une question avec le nom "${nomNettoye}" existe déjà`);
+    }
+  }
+
+  static async consulterQuestionsCours(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const questions = await getQuestionsForCours(groupId);
+
+      res.status(200).json({
+        success: true,
+        questions,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération des questions" });
+      }
+      return;
+    }
+  }
+
+  static async selectionnerQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nom = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nom) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const question = await getQuestionByName(groupId, nom);
+      if (!question) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
+      }
+
+      res.status(200).json({
+        success: true,
+        question,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération de la question" });
+      }
+      return;
+    }
+  }
+
+  static async modifierQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nomOriginal = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nomOriginal) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const questionExistante = await getQuestionByName(groupId, nomOriginal);
+      if (!questionExistante) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nomOriginal}"`);
+      }
+
+      const {
+        type,
+        nom,
+        énoncé,
+        retroactionValide,
+        retroactionInvalide,
+        tags,
+        ...otherData
+      } = req.body;
+
+      const typeFinal = QuestionsController.lireTexte(type ?? questionExistante.type);
+      const nomFinal = QuestionsController.lireTexte(nom ?? questionExistante.nom);
+      const enonceFinal = QuestionsController.lireTexte(énoncé ?? questionExistante.énoncé);
+
+      QuestionsController.validerChampsObligatoires(
+        {
+          type: typeFinal,
+          nom: nomFinal,
+          énoncé: enonceFinal,
+        },
+        ["type", "nom", "énoncé"]
+      );
+
+      await QuestionsController.validerNomQuestionUnique(groupId, nomFinal, nomOriginal);
+
+      const retroactionValideFinale = QuestionsController.lireTexte(
+        retroactionValide ?? questionExistante.retroactionValide
+      );
+      const retroactionInvalideFinale = QuestionsController.lireTexte(
+        retroactionInvalide ?? questionExistante.retroactionInvalide
+      );
+      const tagsFinaux =
+        tags !== undefined
+          ? QuestionsController.lireTags(tags)
+          : Array.isArray(questionExistante.tags)
+            ? questionExistante.tags
+            : [];
+
+      if (typeFinal === "VraiFaux") {
+        const reponseSource =
+          otherData.reponse !== undefined
+            ? otherData.reponse
+            : otherData.reponseVf !== undefined
+              ? otherData.reponseVf
+              : (questionExistante as any).reponse;
+
+        const reponseBoolean = QuestionsController.lireBooleen(reponseSource);
+        if (reponseBoolean === null) {
+          throw new InvalidParameterError("Champs manquants: reponse");
+        }
+
+        const questionMiseAJour = new QuestionVraiFauxModele(
+          nomFinal,
+          enonceFinal,
+          retroactionValideFinale,
+          retroactionInvalideFinale,
+          tagsFinaux,
+          reponseBoolean,
+          retroactionValideFinale
+        );
+
+        await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+
+        res.status(200).json({
+          success: true,
+          message: "Question modifiée avec succès",
+          question: convertirQuestionModeleEnDonnees(questionMiseAJour),
+        });
+        return;
+      }
+
+      const donneesComplementaires = {
+        ...otherData,
+        seulementUnChoix:
+          otherData.seulementUnChoix !== undefined
+            ? otherData.seulementUnChoix
+            : otherData.seulementUnChoixCm !== undefined
+              ? otherData.seulementUnChoixCm
+            : (questionExistante as any).seulementUnChoix,
+        reponses:
+          otherData.reponses !== undefined
+            ? otherData.reponses
+            : otherData.reponsesCm !== undefined
+              ? otherData.reponsesCm
+              : (questionExistante as any).reponses,
+        paires:
+          otherData.paires !== undefined
+            ? otherData.paires
+            : otherData.pairesMec !== undefined
+              ? otherData.pairesMec
+              : (questionExistante as any).paires,
+        reponse:
+          otherData.reponse !== undefined
+            ? otherData.reponse
+            : otherData.reponseLibre !== undefined
+              ? otherData.reponseLibre
+            : otherData.reponseAttendue !== undefined
+              ? otherData.reponseAttendue
+              : (questionExistante as any).reponseAttendue,
+      };
+
+      if (typeFinal === "ReponseCourte") {
+        const reponseTexte = QuestionsController.lireTexte(donneesComplementaires.reponse);
+        if (!reponseTexte) {
+          throw new InvalidParameterError("Champs manquants: reponse");
+        }
+      }
+
+      if (typeFinal === "Numerique") {
+        const valeurNumerique = QuestionsController.lireNombre(donneesComplementaires.reponse);
+        if (valeurNumerique === null) {
+          throw new InvalidParameterError("Valeur invalide: reponse numérique attendue");
+        }
+      }
+
+      if (typeFinal === "ChoixMultiple") {
+        const reponsesTexte = QuestionsController.lireTexte(donneesComplementaires.reponses);
+        const reponsesListe = Array.isArray(donneesComplementaires.reponses)
+          ? donneesComplementaires.reponses
+          : [];
+        if (!reponsesTexte && reponsesListe.length === 0) {
+          throw new InvalidParameterError("Champs manquants: reponses");
+        }
+      }
+
+      if (typeFinal === "MiseEnCorrespondance") {
+        const pairesTexte = QuestionsController.lireTexte(donneesComplementaires.paires);
+        const pairesListe = Array.isArray(donneesComplementaires.paires)
+          ? donneesComplementaires.paires
+          : [];
+        if (!pairesTexte && pairesListe.length === 0) {
+          throw new InvalidParameterError("Champs manquants: paires");
+        }
+      }
+
+      const questionMiseAJour = QuestionsController.creerQuestionAutreType(
+        typeFinal,
+        nomFinal,
+        enonceFinal,
+        retroactionValideFinale,
+        retroactionInvalideFinale,
+        tagsFinaux,
+        donneesComplementaires
+      );
+
+      await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+
+      res.status(200).json({
+        success: true,
+        message: "Question modifiée avec succès",
+        question: convertirQuestionModeleEnDonnees(questionMiseAJour),
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof AlreadyExistsError) {
+        res.status(409).json({ error: e.message });
+      } else if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la modification de la question" });
+      }
+      return;
+    }
+  }
+
+  static async supprimerQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nom = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nom) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const question = await getQuestionByName(groupId, nom);
+      if (!question) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Confirmation de suppression requise",
+        question,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la préparation de suppression" });
+      }
+      return;
+    }
+  }
+
+  static async confirmerSuppressionQuestion(req: any, res: Response): Promise<void> {
+    try {
+      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const nom = QuestionsController.lireTexte(req.params?.nom);
+
+      if (!nom) {
+        throw new InvalidParameterError("Nom de question manquant");
+      }
+
+      const question = await getQuestionByName(groupId, nom);
+      if (!question) {
+        throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
+      }
+
+      await removeQuestion(groupId, nom);
+      const questions = await getQuestionsForCours(groupId);
+
+      res.status(200).json({
+        success: true,
+        message: "Question supprimée avec succès",
+        questions,
+      });
+      return;
+    } catch (e: any) {
+      if (e instanceof InvalidParameterError) {
+        res.status(400).json({ error: e.message });
+      } else if (e instanceof NotFoundError) {
+        res.status(404).json({ error: e.message });
+      } else {
+        res.status(500).json({ error: e?.message ?? "Erreur lors de la suppression de la question" });
+      }
+      return;
+    }
+  }
+
   private static lireTags(tags: unknown): string[] {
     if (Array.isArray(tags)) {
       return tags.map(String).map((t) => t.trim()).filter((t) => t.length > 0);
@@ -181,26 +573,11 @@ export class QuestionsController {
   
   static async ajouterQuestionVraiFaux(req: any, res: Response): Promise<void> {
     try {
-      const teacher = req.session.user;
-      const { groupId } = req.params;
+      const { groupId } = QuestionsController.lireContexteRequete(req);
       const { nom, énoncé, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
 
-      if (!teacher?.id || !groupId) {
-        throw new InvalidParameterError("Enseignant ou cours manquant");
-      }
-
-      const missingFields: string[] = [];
-      if (!nom || String(nom).trim() === "") missingFields.push("nom");
-      if (!énoncé || String(énoncé).trim() === "") missingFields.push("énoncé");
-      if (reponse === undefined || reponse === "") missingFields.push("reponse");
-
-      if (missingFields.length > 0) {
-        throw new InvalidParameterError(`Champs manquants: ${missingFields.join(", ")}`);
-      }
-
-      if (await questionNameExists(groupId, nom)) {
-        throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
-      }
+      QuestionsController.validerChampsObligatoires({ nom, énoncé, reponse }, ["nom", "énoncé", "reponse"]);
+      await QuestionsController.validerNomQuestionUnique(groupId, String(nom));
 
       const reponseBoolean = reponse === "true" || reponse === true;
 
@@ -236,25 +613,11 @@ export class QuestionsController {
 
   private static async ajouterQuestionParType(req: any, res: Response, typeQuestion: string): Promise<void> {
     try {
-      const teacher = req.session.user;
-      const { groupId } = req.params;
+      const { groupId } = QuestionsController.lireContexteRequete(req);
       const { nom, énoncé, retroactionValide, retroactionInvalide, tags, ...otherData } = req.body;
 
-      if (!teacher?.id || !groupId) {
-        throw new InvalidParameterError("Enseignant ou cours manquant");
-      }
-
-      const missingFields: string[] = [];
-      if (!nom || String(nom).trim() === "") missingFields.push("nom");
-      if (!énoncé || String(énoncé).trim() === "") missingFields.push("énoncé");
-
-      if (missingFields.length > 0) {
-        throw new InvalidParameterError(`Champs manquants: ${missingFields.join(", ")}`);
-      }
-
-      if (await questionNameExists(groupId, nom)) {
-        throw new AlreadyExistsError(`Une question avec le nom "${nom}" existe déjà`);
-      }
+      QuestionsController.validerChampsObligatoires({ nom, énoncé }, ["nom", "énoncé"]);
+      await QuestionsController.validerNomQuestionUnique(groupId, String(nom));
 
       const nouvelleQuestion = QuestionsController.creerQuestionAutreType(
         typeQuestion,

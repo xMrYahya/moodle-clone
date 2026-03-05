@@ -105,6 +105,28 @@ export async function questionNameExists(groupId: string, nom: string): Promise<
   return questions.some(q => String(q.nom).toLowerCase() === String(nom).toLowerCase());
 }
 
+export async function questionNameExistsExcept(
+  groupId: string,
+  nom: string,
+  nomAExclure: string
+): Promise<boolean> {
+  const questions = await getQuestionsForCours(groupId);
+  const nomRecherche = String(nom).toLowerCase();
+  const nomExclu = String(nomAExclure).toLowerCase();
+
+  return questions.some(
+    (question) =>
+      String(question.nom).toLowerCase() === nomRecherche &&
+      String(question.nom).toLowerCase() !== nomExclu
+  );
+}
+
+export async function getQuestionByName(groupId: string, nom: string): Promise<AnyQuestion | undefined> {
+  const questions = await getQuestionsForCours(groupId);
+  const nomRecherche = String(nom).toLowerCase();
+  return questions.find((question) => String(question.nom).toLowerCase() === nomRecherche);
+}
+
 export async function addQuestion(groupId: string, question: AnyQuestion | Question): Promise<void> {
   const allCours = await getCoursStockes();
   const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
@@ -128,6 +150,78 @@ export async function addQuestion(groupId: string, question: AnyQuestion | Quest
   allCours[indexCours] = {
     ...allCours[indexCours],
     questions: serialiserQuestionsPourStockage(questionsModeles) as AnyQuestion[],
+  };
+
+  await ecrireCoursStockes(allCours);
+}
+
+export async function updateQuestion(
+  groupId: string,
+  nomOriginal: string,
+  questionMiseAJour: AnyQuestion | Question
+): Promise<void> {
+  const allCours = await getCoursStockes();
+  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
+
+  if (indexCours === -1) {
+    throw new Error(`Cours introuvable pour le groupe "${groupId}".`);
+  }
+
+  const questionsModeles = deserialiserQuestionsDepuisJson(allCours[indexCours].questions);
+  const indexQuestion = questionsModeles.findIndex(
+    (questionCourante) =>
+      String(questionCourante.nom).toLowerCase() === String(nomOriginal).toLowerCase()
+  );
+
+  if (indexQuestion === -1) {
+    throw new Error(`Question introuvable avec le nom "${nomOriginal}".`);
+  }
+
+  const nouveauModele: Question =
+    questionMiseAJour instanceof Question
+      ? questionMiseAJour
+      : deserialiserQuestionDepuisJson(questionMiseAJour);
+
+  const nomExiste = questionsModeles.some(
+    (questionCourante, index) =>
+      index !== indexQuestion &&
+      String(questionCourante.nom).toLowerCase() === String(nouveauModele.nom).toLowerCase()
+  );
+
+  if (nomExiste) {
+    throw new Error(`Une question avec le nom "${nouveauModele.nom}" existe déjà pour ce cours.`);
+  }
+
+  questionsModeles[indexQuestion] = nouveauModele;
+  allCours[indexCours] = {
+    ...allCours[indexCours],
+    questions: serialiserQuestionsPourStockage(questionsModeles) as AnyQuestion[],
+  };
+
+  await ecrireCoursStockes(allCours);
+}
+
+export async function removeQuestion(groupId: string, nom: string): Promise<void> {
+  const allCours = await getCoursStockes();
+  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
+
+  if (indexCours === -1) {
+    throw new Error(`Cours introuvable pour le groupe "${groupId}".`);
+  }
+
+  const questionsModeles = deserialiserQuestionsDepuisJson(allCours[indexCours].questions);
+  const nombreInitial = questionsModeles.length;
+  const questionsFiltrees = questionsModeles.filter(
+    (questionCourante) => String(questionCourante.nom).toLowerCase() !== String(nom).toLowerCase()
+  );
+
+  if (questionsFiltrees.length === nombreInitial) {
+    throw new Error(`Question introuvable avec le nom "${nom}".`);
+  }
+
+  allCours[indexCours] = {
+    ...allCours[indexCours],
+    questions: serialiserQuestionsPourStockage(questionsFiltrees) as AnyQuestion[],
   };
 
   await ecrireCoursStockes(allCours);
