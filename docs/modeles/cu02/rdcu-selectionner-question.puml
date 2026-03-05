@@ -2,16 +2,12 @@
 hide footbox
 title RDCU – Sélectionner une question
 
-participant "ui:UIQuestionsCours" as UI
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 participant "q:Question" as Q
 
-
--> UI : selectionnerQuestion(nom : String)
-activate UI
-
-UI -> QC : selectionnerQuestion(groupId : String, nom : String)
+-> QC : selectionnerQuestion(groupId : String, nom : String)
+note right: GRASP: Controller
 activate QC
 
 QC -> QS : chercherInfoQuestion(groupId : String, nom : String)
@@ -42,10 +38,7 @@ QC -> Q : getTags()
 Q --> QC : tags : List<String>
 deactivate Q
 
-QC --> UI : afficherInfoQuestion(type, nom, enonce, verite,\nretroBonne, retroMauvaise, tags)
+<-- QC : afficherInfoQuestion(type, nom, enonce, verite,\nretroBonne, retroMauvaise, tags)
 deactivate QC
-
-<-- UI  : affichageInfoQuestion()
-deactivate UI
 
 @enduml

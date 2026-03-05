@@ -7,7 +7,7 @@ participant "qs:QuestionsStore" as QS
 participant "q:Question" as Q
 
 -> QC : ajouterQuestionAutreType(nom : String, enonce : String, type : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
-
+note right: GRASP: Controller
 activate QC
 
 QC -> QS : questionNameExists(nom)

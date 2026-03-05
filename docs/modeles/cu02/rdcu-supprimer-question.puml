@@ -2,14 +2,11 @@
 hide footbox
 title RDCU – Supprimer une question (Demande)
 
-participant "ui:UIQuestionsCours" as UI
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 
--> UI : supprimerQuestion(nom : String)
-activate UI
-
-UI -> QC : supprimerQuestion(groupId : String, nom : String)
+-> QC : supprimerQuestion(groupId : String, nom : String)
+note right: GRASP: Controller
 activate QC
 
 QC -> QS : questionUtiliseeDansQuestionnaire(groupId : String, nom : String)
@@ -23,10 +20,8 @@ alt Question non utilisee dans un questionnaire
   QS --> QC : question:String
   deactivate QS
 
-  QC --> UI : afficherInfoQuestionASupprimer(question):String
-  QC --> UI : demanderConfirmationSuppression():String
-
-  <-- UI : demandeConfirmationSuppression():String
+  'QC --> UI : afficherInfoQuestionASupprimer(question):String'
+  <-- QC : demanderConfirmationSuppression():String
 
 else Question utilisee dans au moins un questionnaire
   QC -> QS : listerQuestionnairesUtilisantQuestion(groupId : String, nom : String)
@@ -34,12 +29,11 @@ else Question utilisee dans au moins un questionnaire
   QS --> QC : questionnaires : List<Questionnaire>
   deactivate QS
 
-  QC --> UI : afficherQuestionnairesUtilisantQuestion(questionnaires):String
-  QC --> UI : desactiverSuppression():boolean
-  deactivate QC
+  'QC --> UI : afficherQuestionnairesUtilisantQuestion(questionnaires):String'
+  'QC --> UI : desactiverSuppression():boolean'
 
-  <-- UI: suppressionImpossible():String
-  deactivate UI
+  <-- QC : suppressionImpossible():String
+  deactivate QC
 end
 
 @enduml

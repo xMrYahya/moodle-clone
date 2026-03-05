@@ -2,15 +2,11 @@
 hide footbox
 title RDCU – Supprimer une question (Confirmation)
 
-actor ":Enseignant" as e
-participant "ui:UIQuestionsCours" as UI
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 
-e -> UI : confirmerSuppression()
-activate UI
-
-UI -> QC : confirmerSuppression(groupId : String, nom : String)
+-> QC : confirmerSuppression(groupId : String, nom : String)
+note right: GRASP: Controller
 activate QC
 
 QC -> QS : supprimerQuestion(groupId : String, nom : String)
@@ -22,11 +18,8 @@ activate QS
 QS --> QC : questions : List<Question>
 deactivate QS
 
-QC --> UI : afficherListeQuestions(questions):String
-QC --> UI : afficherConfirmationSuppression():String
+'QC --> UI : afficherListeQuestions(questions):String'
+<-- QC : afficherConfirmationSuppression():String
 deactivate QC
-
-UI --> e : suppressionConfirmee():String
-deactivate UI
 
 @enduml

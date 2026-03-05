@@ -1,5 +1,6 @@
 @startuml
-title RDCU Ajouter une question
+hide footbox
+title RDCU - Ajouter une question
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

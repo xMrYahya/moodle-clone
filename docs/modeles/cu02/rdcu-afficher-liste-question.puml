@@ -2,15 +2,11 @@
 hide footbox
 title RDCU - Afficher la liste des questions
 
-
-participant "ui:UIQuestionsCours" as UI
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 
--> UI : consulterQuestionsCours(groupId : String)
-activate UI
-
-UI -> QC : consulterQuestionsCours(groupId : String)
+-> QC : consulterQuestionsCours(groupId : String)
+note right: GRASP: Controller
 activate QC
 
 QC -> QS : chercherListeQuestions(groupId : String)
@@ -18,10 +14,7 @@ activate QS
 QS --> QC : questions : List<Question>
 deactivate QS
 
-QC --> UI : afficherListeQuestions(questions):String
+<-- QC : afficherListeQuestions(questions):String
 deactivate QC
-
-<-- UI : listeQuestionsAffichee():String
-deactivate UI
 
 @enduml

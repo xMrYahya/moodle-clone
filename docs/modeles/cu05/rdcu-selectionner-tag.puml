@@ -1,5 +1,6 @@
 @startuml
-title RDCU Selectionner un tag
+hide footbox
+title RDCU - Selectionner un tag
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

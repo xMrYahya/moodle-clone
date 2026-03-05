@@ -1,5 +1,6 @@
 @startuml
-title RDCU Gerer les questionnaires
+hide footbox
+title RDCU - Gerer les questionnaires
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

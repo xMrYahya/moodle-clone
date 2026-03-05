@@ -1,5 +1,6 @@
 @startuml
-title RDCU Dissocier une question du questionnaire
+hide footbox
+title RDCU - Dissocier une question du questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

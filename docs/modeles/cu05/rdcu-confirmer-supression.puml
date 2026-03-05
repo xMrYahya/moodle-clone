@@ -1,5 +1,6 @@
 @startuml
-title RDCU Supprimer un questionnaire
+hide footbox
+title RDCU - Supprimer un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

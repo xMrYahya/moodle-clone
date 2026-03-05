@@ -1,5 +1,6 @@
 @startuml
-title RDCU Selectionner un questionnaire
+hide footbox
+title RDCU - Selectionner un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

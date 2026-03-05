@@ -1,5 +1,6 @@
 @startuml
-title RDCU Obtenir les tags des questions
+hide footbox
+title RDCU - Obtenir les tags des questions
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

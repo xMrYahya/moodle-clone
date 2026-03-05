@@ -2,15 +2,12 @@
 hide footbox
 title RDCU – Modifier une question
 
-participant "ui:UIQuestionsCours" as UI
 participant "qc:QuestionsController" as QC
 participant "qs:QuestionsStore" as QS
 participant "q:Question" as Q
 
--> UI : modifierQuestion(nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
-activate UI
-
-UI -> QC : modifierQuestion(groupId, nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
+-> QC : modifierQuestion(groupId, nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
+note right: GRASP: Controller
 activate QC
 
 QC -> QS : questionNameExists(groupId : String, nom : String)
@@ -29,17 +26,12 @@ alt Nom de question unique (nomExiste == false)
   QS --> QC : confirmationModificationQuestionStore : boolean
   deactivate QS
 
-  QC --> UI : afficherConfirmationModification(Q)
+  <-- QC : afficherConfirmationModification(Q)
   deactivate QC
-
-  <-- UI : questionModifiee()
-  deactivate UI
 
 else Nom de question deja utilise (nomExiste == true)
-  QC --> UI : signalerErreurNomExistant():String
-  deactivate QC
 
-  <-- UI : erreurNomNonUnique():String
+  <-- QC : erreurNomNonUnique():String
   deactivate UI
 end
 

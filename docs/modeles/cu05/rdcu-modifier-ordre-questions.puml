@@ -1,5 +1,6 @@
 @startuml
-title RDCU Modifier l'ordre d'une question
+hide footbox
+title RDCU - Modifier l'ordre d'une question
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele

@@ -1,5 +1,6 @@
 @startuml
-title RDCU Verifier pour supprimer un questionnaire
+hide footbox
+title RDCU - Verifier pour supprimer un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
