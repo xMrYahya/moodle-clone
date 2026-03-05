@@ -47,6 +47,10 @@ html
                         small Type: #{q.typeAffichage}
                       p.card-text.mb-2
                         em #{q.énoncé}
+                      .d-flex.flex-wrap.gap-2.mt-3
+                        button.btn.btn-sm.btn-outline-primary.js-btn-details(type="button" data-question-nom=q.nom) Détails
+                        button.btn.btn-sm.btn-outline-warning.js-btn-edit(type="button" data-question-nom=q.nom) Modifier
+                        button.btn.btn-sm.btn-outline-danger.js-btn-delete(type="button" data-question-nom=q.nom) Supprimer
           else
             p.text-muted.mt-3 Aucune question disponible.
 
@@ -336,6 +340,118 @@ html
           .modal-footer
             a.btn.btn-secondary(href=`/cours/${groupId}/details-cours`) Fermer
 
+    // ======================
+    // MODAL : DÉTAIL QUESTION (CU02b)
+    // ======================
+    .modal-overlay#question-details-modal(style="display: none;")
+      .modal-card
+        .modal-header
+          h5.mb-0 Détails de la question
+          button.close.js-close-details(type="button" aria-label="Fermer") ×
+        .modal-body
+          dl.row.mb-0
+            dt.col-sm-4 Type
+            dd.col-sm-8#details-type -
+            dt.col-sm-4 Nom
+            dd.col-sm-8#details-nom -
+            dt.col-sm-4 Énoncé
+            dd.col-sm-8#details-enonce -
+            dt.col-sm-4#details-reponse-label Réponse/Valeur
+            dd.col-sm-8#details-reponse -
+            dt.col-sm-4 Rétroaction valide
+            dd.col-sm-8#details-retro-valide -
+            dt.col-sm-4 Rétroaction invalide
+            dd.col-sm-8#details-retro-invalide -
+            dt.col-sm-4 Tags
+            dd.col-sm-8#details-tags -
+        .modal-footer
+          button.btn.btn-secondary.js-close-details(type="button") Fermer
+
+    // ======================
+    // MODAL : MODIFIER QUESTION (CU02c)
+    // ======================
+    .modal-overlay#question-edit-modal(style="display: none;")
+      .modal-card
+        .modal-header
+          h5.mb-0 Modifier la question
+          button.close.js-close-edit(type="button" aria-label="Fermer") ×
+        .modal-body
+          form#question-edit-form
+            .form-group
+              label(for="edit-type") Type
+              select.form-control#edit-type(name="type" required)
+                option(value="VraiFaux") Vrai ou Faux
+                option(value="ChoixMultiple") Choix Multiple
+                option(value="MiseEnCorrespondance") Mise en Correspondance
+                option(value="ReponseCourte") Réponse Courte
+                option(value="Numerique") Numérique
+                option(value="Essai") Essai
+
+            .form-group
+              label(for="edit-nom") Nom
+              input.form-control#edit-nom(type="text" name="nom" required)
+
+            .form-group
+              label(for="edit-enonce") Énoncé
+              textarea.form-control#edit-enonce(name="énoncé" rows="3" required)
+
+            .form-group
+              label(for="edit-retroaction-valide") Rétroaction valide
+              input.form-control#edit-retroaction-valide(type="text" name="retroactionValide")
+
+            .form-group
+              label(for="edit-retroaction-invalide") Rétroaction invalide
+              input.form-control#edit-retroaction-invalide(type="text" name="retroactionInvalide")
+
+            .form-group
+              label(for="edit-tags") Tags (séparés par des virgules)
+              input.form-control#edit-tags(type="text" name="tags")
+
+            #edit-field-vf(style="display: none;")
+              .form-group
+                label(for="edit-reponse-vf") Réponse correcte
+                select.form-control#edit-reponse-vf(name="reponseVf")
+                  option(value="true") Vrai
+                  option(value="false") Faux
+
+            #edit-field-cm(style="display: none;")
+              .form-group
+                .form-check.mb-2
+                  input.form-check-input#edit-seulement-un-choix(type="checkbox" name="seulementUnChoixCm" value="true")
+                  label.form-check-label(for="edit-seulement-un-choix") Un seul choix correct
+              .form-group
+                label(for="edit-reponses-cm") Réponses (format: choix1|choix2|choix3)
+                input.form-control#edit-reponses-cm(type="text" name="reponsesCm")
+
+            #edit-field-mec(style="display: none;")
+              .form-group
+                label(for="edit-paires-mec") Paires (format: question:réponse|question:réponse)
+                input.form-control#edit-paires-mec(type="text" name="pairesMec")
+
+            #edit-field-reponse(style="display: none;")
+              .form-group
+                label(for="edit-reponse") Réponse attendue
+                input.form-control#edit-reponse(type="text" name="reponseLibre")
+
+            .d-flex.justify-content-end.gap-2
+              button.btn.btn-secondary.js-close-edit(type="button") Annuler
+              button.btn.btn-primary(type="submit") Enregistrer
+
+    // ======================
+    // MODAL : CONFIRMER SUPPRESSION (CU02d)
+    // ======================
+    .modal-overlay#question-delete-modal(style="display: none;")
+      .modal-card
+        .modal-header
+          h5.mb-0 Confirmation de suppression
+          button.close.js-close-delete(type="button" aria-label="Fermer") ×
+        .modal-body
+          p.mb-2 Voulez-vous vraiment supprimer cette question ?
+          p.text-muted.mb-0#delete-question-name -
+        .modal-footer
+          button.btn.btn-secondary.js-close-delete(type="button") Annuler
+          button.btn.btn-danger#confirm-delete-question(type="button") Confirmer la suppression
+
     style.
       .question-type-card:hover {
         background-color: #f8f9fa;
@@ -493,6 +609,388 @@ html
 
       const fEss = document.getElementById('form-essai');
       if (fEss) fEss.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé']));
+
+      const detailsModal = document.getElementById('question-details-modal');
+      const editModal = document.getElementById('question-edit-modal');
+      const deleteModal = document.getElementById('question-delete-modal');
+
+      let questionEnCoursModification = null;
+      let questionEnCoursSuppression = null;
+
+      function ouvrirModal(modal) {
+        if (modal) {
+          modal.style.display = 'flex';
+        }
+      }
+
+      function fermerModal(modal) {
+        if (modal) {
+          modal.style.display = 'none';
+        }
+      }
+
+      async function fetchQuestionParNom(nomQuestion) {
+        const url = `/questions/${groupId}/questions/${encodeURIComponent(nomQuestion)}`;
+        const response = await fetch(url, { method: 'GET' });
+        if (!response.ok) {
+          let errPayload = null;
+          try { errPayload = await response.json(); } catch {}
+          throw new Error(errPayload?.error || response.statusText || 'Erreur lors de la récupération de la question');
+        }
+        const payload = await response.json();
+        return payload.question;
+      }
+
+      function extraireValeurReponse(question) {
+        if (!question) return '-';
+        if (question.type === 'VraiFaux') return question.reponse === true ? 'vrai' : 'faux';
+        if (question.type === 'Numerique') return String(question.reponseAttendue ?? '-');
+        if (question.type === 'ReponseCourte') return String(question.reponseAttendue ?? '-');
+        if (question.type === 'ChoixMultiple') {
+          const bonnesReponses = Array.isArray(question.reponses)
+            ? question.reponses.filter(r => r && r.estBonneReponse === true).map(r => r.text)
+            : [];
+          return bonnesReponses.length ? bonnesReponses.join(' | ') : '-';
+        }
+        if (question.type === 'MiseEnCorrespondance') {
+          const paires = Array.isArray(question.paires)
+            ? question.paires.map(p => `${p.question}:${p.reponse}`)
+            : [];
+          return paires.length ? paires.join(' | ') : '-';
+        }
+        return '-';
+      }
+
+      function libelleReponse(question) {
+        if (!question) return 'Réponse/Valeur';
+
+        if (question.type === 'ChoixMultiple') {
+          const nbBonnesReponses = Array.isArray(question.reponses)
+            ? question.reponses.filter(r => r && r.estBonneReponse === true).length
+            : 0;
+          return nbBonnesReponses > 1 ? 'Bonnes réponses' : 'Bonne réponse';
+        }
+
+        if (question.type === 'MiseEnCorrespondance') return 'Paires de correspondance';
+        if (question.type === 'Numerique') return 'Réponse numérique';
+        if (question.type === 'ReponseCourte') return 'Réponse attendue';
+        if (question.type === 'VraiFaux') return 'Réponse';
+
+        return 'Réponse/Valeur';
+      }
+
+      function afficherDetailsQuestion(question) {
+        document.getElementById('details-type').textContent = question?.type || '-';
+        document.getElementById('details-nom').textContent = question?.nom || '-';
+        document.getElementById('details-enonce').textContent = question?.['énoncé'] || '-';
+        document.getElementById('details-reponse-label').textContent = libelleReponse(question);
+        document.getElementById('details-reponse').textContent = extraireValeurReponse(question);
+        document.getElementById('details-retro-valide').textContent = question?.retroactionValide || '-';
+        document.getElementById('details-retro-invalide').textContent = question?.retroactionInvalide || '-';
+        const tags = Array.isArray(question?.tags) ? question.tags.join(', ') : '';
+        document.getElementById('details-tags').textContent = tags || '-';
+      }
+
+      function afficherChampsModification(typeQuestion) {
+        const vf = document.getElementById('edit-field-vf');
+        const cm = document.getElementById('edit-field-cm');
+        const mec = document.getElementById('edit-field-mec');
+        const rep = document.getElementById('edit-field-reponse');
+
+        [vf, cm, mec, rep].forEach(el => {
+          if (el) el.style.display = 'none';
+        });
+
+        [vf, cm, mec, rep].forEach(el => {
+          if (!el) return;
+          el.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = true;
+          });
+        });
+
+        if (typeQuestion === 'VraiFaux' && vf) {
+          vf.style.display = 'block';
+          vf.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+        if (typeQuestion === 'ChoixMultiple' && cm) {
+          cm.style.display = 'block';
+          cm.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+        if (typeQuestion === 'MiseEnCorrespondance' && mec) {
+          mec.style.display = 'block';
+          mec.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+        if ((typeQuestion === 'ReponseCourte' || typeQuestion === 'Numerique') && rep) {
+          rep.style.display = 'block';
+          rep.querySelectorAll('input, select, textarea').forEach(field => {
+            field.disabled = false;
+          });
+        }
+      }
+
+      function nettoyerChampsTypeNonActif(typeQuestionActif) {
+        if (typeQuestionActif !== 'VraiFaux') {
+          const champVf = document.getElementById('edit-reponse-vf');
+          if (champVf) champVf.value = 'true';
+        }
+
+        if (typeQuestionActif !== 'ChoixMultiple') {
+          const checkCm = document.getElementById('edit-seulement-un-choix');
+          const reponsesCm = document.getElementById('edit-reponses-cm');
+          if (checkCm) checkCm.checked = false;
+          if (reponsesCm) reponsesCm.value = '';
+        }
+
+        if (typeQuestionActif !== 'MiseEnCorrespondance') {
+          const pairesMec = document.getElementById('edit-paires-mec');
+          if (pairesMec) pairesMec.value = '';
+        }
+
+        if (typeQuestionActif !== 'ReponseCourte' && typeQuestionActif !== 'Numerique') {
+          const champReponse = document.getElementById('edit-reponse');
+          if (champReponse) champReponse.value = '';
+        }
+      }
+
+      function construirePayloadModification() {
+        const type = document.getElementById('edit-type').value;
+        const payload = {
+          type,
+          nom: document.getElementById('edit-nom').value,
+          'énoncé': document.getElementById('edit-enonce').value,
+          retroactionValide: document.getElementById('edit-retroaction-valide').value,
+          retroactionInvalide: document.getElementById('edit-retroaction-invalide').value,
+          tags: document.getElementById('edit-tags').value,
+        };
+
+        if (type === 'VraiFaux') {
+          payload.reponse = document.getElementById('edit-reponse-vf').value;
+          return payload;
+        }
+
+        if (type === 'ChoixMultiple') {
+          payload.seulementUnChoix = document.getElementById('edit-seulement-un-choix').checked;
+          payload.reponses = document.getElementById('edit-reponses-cm').value;
+          return payload;
+        }
+
+        if (type === 'MiseEnCorrespondance') {
+          payload.paires = document.getElementById('edit-paires-mec').value;
+          return payload;
+        }
+
+        if (type === 'ReponseCourte' || type === 'Numerique') {
+          payload.reponse = document.getElementById('edit-reponse').value;
+          return payload;
+        }
+
+        return payload;
+      }
+
+      function preRemplirFormulaireModification(question) {
+        document.getElementById('edit-type').value = question.type;
+        document.getElementById('edit-nom').value = question.nom || '';
+        document.getElementById('edit-enonce').value = question['énoncé'] || '';
+        document.getElementById('edit-retroaction-valide').value = question.retroactionValide || '';
+        document.getElementById('edit-retroaction-invalide').value = question.retroactionInvalide || '';
+        document.getElementById('edit-tags').value = Array.isArray(question.tags) ? question.tags.join(', ') : '';
+
+        const champReponseVF = document.getElementById('edit-reponse-vf');
+        if (champReponseVF) {
+          champReponseVF.value = question.reponse === true ? 'true' : 'false';
+        }
+
+        const seulementUnChoix = document.getElementById('edit-seulement-un-choix');
+        if (seulementUnChoix) {
+          seulementUnChoix.checked = question.seulementUnChoix === true;
+        }
+
+        const champReponsesCM = document.getElementById('edit-reponses-cm');
+        if (champReponsesCM) {
+          const reponses = Array.isArray(question.reponses) ? question.reponses.map(r => r.text) : [];
+          champReponsesCM.value = reponses.join('|');
+        }
+
+        const champPaires = document.getElementById('edit-paires-mec');
+        if (champPaires) {
+          const paires = Array.isArray(question.paires)
+            ? question.paires.map(p => `${p.question}:${p.reponse}`)
+            : [];
+          champPaires.value = paires.join('|');
+        }
+
+        const champReponse = document.getElementById('edit-reponse');
+        if (champReponse) {
+          if (question.type === 'Numerique' || question.type === 'ReponseCourte') {
+            champReponse.value = String(question.reponseAttendue ?? '');
+          } else {
+            champReponse.value = '';
+          }
+        }
+
+        afficherChampsModification(question.type);
+      }
+
+      document.querySelectorAll('.js-btn-details').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          try {
+            const nom = this.dataset.questionNom;
+            const question = await fetchQuestionParNom(nom);
+            afficherDetailsQuestion(question);
+            ouvrirModal(detailsModal);
+          } catch (err) {
+            alert('Erreur: ' + err.message);
+          }
+        });
+      });
+
+      document.querySelectorAll('.js-btn-edit').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          try {
+            const nom = this.dataset.questionNom;
+            const question = await fetchQuestionParNom(nom);
+            questionEnCoursModification = question.nom;
+            preRemplirFormulaireModification(question);
+            ouvrirModal(editModal);
+          } catch (err) {
+            alert('Erreur: ' + err.message);
+          }
+        });
+      });
+
+      document.querySelectorAll('.js-btn-delete').forEach(btn => {
+        btn.addEventListener('click', async function() {
+          try {
+            const nom = this.dataset.questionNom;
+            const url = `/questions/${groupId}/questions/${encodeURIComponent(nom)}/suppression`;
+            const response = await fetch(url, { method: 'GET' });
+            if (!response.ok) {
+              let errPayload = null;
+              try { errPayload = await response.json(); } catch {}
+              throw new Error(errPayload?.error || response.statusText || 'Erreur lors de la préparation de la suppression');
+            }
+
+            const payload = await response.json();
+            questionEnCoursSuppression = payload?.question?.nom || nom;
+            document.getElementById('delete-question-name').textContent = questionEnCoursSuppression;
+            ouvrirModal(deleteModal);
+          } catch (err) {
+            alert('Erreur: ' + err.message);
+          }
+        });
+      });
+
+      const editType = document.getElementById('edit-type');
+      if (editType) {
+        editType.addEventListener('change', function() {
+          afficherChampsModification(this.value);
+          nettoyerChampsTypeNonActif(this.value);
+        });
+      }
+
+      const editForm = document.getElementById('question-edit-form');
+      if (editForm) {
+        editForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+
+          if (!questionEnCoursModification) {
+            alert('Erreur: aucune question sélectionnée pour modification');
+            return;
+          }
+
+          try {
+            const data = construirePayloadModification();
+
+            if (!data.nom || !String(data.nom).trim() || !data['énoncé'] || !String(data['énoncé']).trim()) {
+              alert('Erreur: Veuillez remplir les champs obligatoires (nom, énoncé)');
+              return;
+            }
+
+            if (data.type === 'VraiFaux' && (!data.reponse || String(data.reponse).trim() === '')) {
+              alert('Erreur: la réponse est obligatoire pour une question vrai/faux');
+              return;
+            }
+
+            if (data.type === 'ReponseCourte' && (!data.reponse || String(data.reponse).trim() === '')) {
+              alert('Erreur: la réponse attendue est obligatoire pour une question réponse courte');
+              return;
+            }
+
+            if (data.type === 'Numerique') {
+              const valeur = Number.parseFloat(String(data.reponse || '').trim());
+              if (!Number.isFinite(valeur)) {
+                alert('Erreur: la réponse d\'une question numérique doit être un nombre valide');
+                return;
+              }
+            }
+
+            const url = `/questions/${groupId}/questions/${encodeURIComponent(questionEnCoursModification)}/modifier`;
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+              let errPayload = null;
+              try { errPayload = await response.json(); } catch {}
+              throw new Error(errPayload?.error || response.statusText || 'Erreur lors de la modification');
+            }
+
+            window.location.href = `/cours/${groupId}/details-cours?ts=${Date.now()}`;
+          } catch (err) {
+            alert('Erreur: ' + err.message);
+          }
+        });
+      }
+
+      const confirmerSuppression = document.getElementById('confirm-delete-question');
+      if (confirmerSuppression) {
+        confirmerSuppression.addEventListener('click', async function() {
+          if (!questionEnCoursSuppression) {
+            alert('Erreur: aucune question sélectionnée pour suppression');
+            return;
+          }
+
+          try {
+            const url = `/questions/${groupId}/questions/${encodeURIComponent(questionEnCoursSuppression)}/suppression`;
+            const response = await fetch(url, { method: 'POST' });
+            if (!response.ok) {
+              let errPayload = null;
+              try { errPayload = await response.json(); } catch {}
+              throw new Error(errPayload?.error || response.statusText || 'Erreur lors de la suppression');
+            }
+
+            window.location.href = `/cours/${groupId}/details-cours?ts=${Date.now()}`;
+          } catch (err) {
+            alert('Erreur: ' + err.message);
+          }
+        });
+      }
+
+      document.querySelectorAll('.js-close-details').forEach(btn => {
+        btn.addEventListener('click', () => fermerModal(detailsModal));
+      });
+
+      document.querySelectorAll('.js-close-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+          questionEnCoursModification = null;
+          fermerModal(editModal);
+        });
+      });
+
+      document.querySelectorAll('.js-close-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          questionEnCoursSuppression = null;
+          fermerModal(deleteModal);
+        });
+      });
 
       // ---- Format affichage (minimal) : Jeu->Jeudi, P/D -> Présentiel/Distance ----
       // On modifie juste le texte déjà rendu, sans toucher au backend.
