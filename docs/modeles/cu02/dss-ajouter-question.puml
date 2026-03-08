@@ -8,9 +8,18 @@ s-->>e : Liste des questions associees au cours
 loop Tant que l'enseignant veut ajouter des questions
 alt Ajout de Question Vrai ou Faux
 e->s : ajouterQuestionVraiFaux(nom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])
-else Ajout d'autre type de question
- e->s : ajouterQuestionAutreType(nom : String, enonce : String, type : String, retroactionValide : String, retroactionInvalide : String, tags : String[])
+else Ajout de Question a choix multiple
+ e->s : ajouterQuestionChoixMultiple(nom : String, enonce : String, reponses : String[], retroactionValide : String, retroactionInvalide : String, tags : String[],seulementUnChoix : bool)
+else Ajout de Question a reponse courte
+ e->s : ajouterQuestionReponseCourte(nom : String, enonce : String, reponseAttendue : String, retroactionValide : String, retroactionInvalide : String, tags : String[],retroaction : String)
+else Ajout de Question a reponse numerique
+ e->s : ajouterQuestionReponseNumerique(nom : String, enonce : String, reponseAttendue : number, retroactionValide : String, retroactionInvalide : String, tags : String[],retroaction : String)
+else Ajout de Question essai
+    e->s : ajouterQuestionEssai(nom : String, enonce : String, reponse : string, retroactionValide : String, retroactionInvalide : String, tags : String[])
+else Ajout de Question de mise en correspondance
+    e->s : ajouterQuestionMiseCorrespondance(nom : String, enonce : String, pairesQuestion : String[], pairesReponse : String[], retroactionValide : String, retroactionInvalide : String, tags : String[])
 end alt
+
 
 alt Nom de question unique
     s-->>e : Liste des questions associees au cours mise a jour et confirmation de l'ajout
