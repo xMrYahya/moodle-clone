@@ -2,14 +2,18 @@
 title CU02d - Supprimer une question
 actor ":Enseignant" as e
 participant ":Systeme" as s
+
 e->s : consulterQuestionsCours(groupId : String)
 s-->>e : Liste des questions associees au cours
+
 e->s : supprimerQuestion(nom : String)
-alt Question non utilise dans un questionnaire
-s-->>e : Valeurs actuelles de la question a supprimer\n et demande de confirmation de suppression
-e->s : confirmerSuppression()
-s-->>e : Message confirmant la suppression de la question \n et nouvelle liste de questions
-else Question utilise dans au moins un questionnaire
-s-->>e : Liste des questionnaires utilisant la question
+alt Question existante
+	s-->>e : Valeurs actuelles de la question et demande de confirmation
+	e->s : confirmerSuppression(nom : String)
+	alt Suppression reussie
+		s-->>e : Message confirmant la suppression et nouvelle liste de questions
+	else Erreur de suppression
+		s-->>e : Signalement d'erreur
+	end alt
 end alt
 @enduml

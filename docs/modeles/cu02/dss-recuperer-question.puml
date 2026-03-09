@@ -2,8 +2,10 @@
 title CU02b - Récupérer une question
 actor ":Enseignant" as e
 participant ":Systeme" as s
+
 e->s : consulterQuestionsCours(groupId : String)
 s-->>e : Liste des questions associees au cours
 e->s : selectionnerQuestion(nom : String)
-s-->>e : Détails de la question (Type, Nom,\nÉnoncé, Vérité, \nRétroaction pour la bonne réponse, \nRétroaction pour la mauvaise réponse, tags)
+s-->>e : Détails de la question (type, nom, enonce, reponse, retroactions, tags)
+
 @enduml

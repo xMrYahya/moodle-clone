@@ -2,15 +2,18 @@
 title CU02c - Modifier une question
 actor ":Enseignant" as e
 participant ":Systeme" as s
+
 e->s : consulterQuestionsCours(groupId : String)
 s-->>e : Liste des questions associees au cours
-'Noter qu'il faudrait 2 boutons 1 pour details, un pour modifier
-e->s : selectionnerModifierQuestion(nom : String)
-s-->>e : Détails de la question (Type, Nom,\nÉnoncé, Vérité, \nRétroaction pour la bonne réponse, \nRétroaction pour la mauvaise réponse, tags)
-e->s : modifierQuestion(nom : String, enonce : String, type : String, \nretroactionValide : String, retroactionInvalide : String, tags : String[])
-alt Nom de question unique
-s-->>e : Question modifiée et message de confirmation
-else Nom de question deja utilise 
-s-->>e : Signalement d'erreur
+
+e->s : selectionnerQuestion(nom : String)
+alt Question existante
+	s-->>e : Details de la question (type, nom, enonce, reponse, retroactions, tags)
+	e->s : modifierQuestion(nomOriginal : String, nom : String, enonce : String, type : String, retroactionValide : String, retroactionInvalide : String, tags : String[], donneesType)
+	alt Modification valide
+		s-->>e : Question modifiee et message de confirmation
+	else Nom deja utilise ou donnees invalides
+		s-->>e : Signalement d'erreur
+	end alt
 end alt
 @enduml
