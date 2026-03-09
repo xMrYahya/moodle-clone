@@ -14,7 +14,7 @@ function exigerAuthentification(req: any, res: any, next: any) {
 router.get("/:idGroupe", exigerAuthentification, QuestionsController.consulterQuestionsCours);
 router.get("/:idGroupe/:nom", exigerAuthentification, QuestionsController.selectionnerQuestion);
 router.post("/:idGroupe/:nom/modifier", exigerAuthentification, QuestionsController.modifierQuestion);
-router.get("/:idGroupe/:nom/supprimer", exigerAuthentification, QuestionsController.supprimerQuestion);
+router.get("/:idGroupe/:nom/suppression", exigerAuthentification, QuestionsController.supprimerQuestion);
 router.post("/:idGroupe/:nom/confirmer-suppression", exigerAuthentification, QuestionsController.confirmerSuppressionQuestion);
 
 router.get("/:idGroupe/questions", exigerAuthentification, QuestionsController.consulterQuestionsCours);

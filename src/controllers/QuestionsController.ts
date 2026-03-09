@@ -130,11 +130,11 @@ export class QuestionsController {
         questions,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération des questions" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la récupération des questions" });
       }
       return;
     }
@@ -159,13 +159,13 @@ export class QuestionsController {
         question,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la récupération de la question" });
       }
       return;
     }
@@ -188,7 +188,7 @@ export class QuestionsController {
       const {
         type,
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -197,15 +197,15 @@ export class QuestionsController {
 
       const typeFinal = QuestionsController.lireTexte(type ?? questionExistante.type);
       const nomFinal = QuestionsController.lireTexte(nom ?? questionExistante.nom);
-      const enonceFinal = QuestionsController.lireTexte(énoncé ?? questionExistante.énoncé);
+      const enonceFinal = QuestionsController.lireTexte(enonce ?? questionExistante.enonce);
 
       QuestionsController.validerChampsObligatoires(
         {
           type: typeFinal,
           nom: nomFinal,
-          énoncé: enonceFinal,
+          enonce: enonceFinal,
         },
-        ["type", "nom", "énoncé"]
+        ["type", "nom", "enonce"]
       );
 
       await QuestionsController.validerNomQuestionUnique(idGroupe, nomFinal, nomOriginal);
@@ -338,15 +338,15 @@ export class QuestionsController {
         question: convertirQuestionModeleEnDonnees(questionMiseAJour),
       });
       return;
-    } catch (e: any) {
-      if (e instanceof AlreadyExistsError) {
-        res.status(409).json({ error: e.message });
-      } else if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof AlreadyExistsError) {
+        res.status(409).json({ error: erreur.message });
+      } else if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la modification de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la modification de la question" });
       }
       return;
     }
@@ -372,13 +372,13 @@ export class QuestionsController {
         question,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la préparation de suppression" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la préparation de suppression" });
       }
       return;
     }
@@ -407,13 +407,13 @@ export class QuestionsController {
         questions,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la suppression de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la suppression de la question" });
       }
       return;
     }
@@ -435,11 +435,11 @@ export class QuestionsController {
     if (Array.isArray(reponses)) {
       return reponses
         .map((item: any) => ({
-          text: String(item?.text ?? "").trim(),
+          texte: String(item?.texte ?? "").trim(),
           estBonneReponse: item?.estBonneReponse === true,
           retroaction: String(item?.retroaction ?? "").trim(),
         }))
-        .filter((item) => item.text.length > 0);
+        .filter((item) => item.texte.length > 0);
     }
 
     const texte = String(reponses ?? "").trim();
@@ -452,7 +452,7 @@ export class QuestionsController {
       .map((item) => item.trim())
       .filter((item) => item.length > 0)
       .map((item, index) => ({
-        text: item,
+        texte: item,
         estBonneReponse: index === 0,
         retroaction: "",
       }));
@@ -493,7 +493,7 @@ export class QuestionsController {
   private static creerQuestionAutreType(
     type: string,
     nom: string,
-    énoncé: string,
+    enonce: string,
     retroactionValide: string,
     retroactionInvalide: string,
     tags: string[],
@@ -507,7 +507,7 @@ export class QuestionsController {
 
       return new QuestionChoixMultipleModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -524,7 +524,7 @@ export class QuestionsController {
 
       return new QuestionMiseEnCorrespondanceModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -540,7 +540,7 @@ export class QuestionsController {
 
       return new QuestionReponseCourteModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -557,7 +557,7 @@ export class QuestionsController {
 
       return new QuestionNumeriqueModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -569,7 +569,7 @@ export class QuestionsController {
     if (type === "Essai") {
       return new QuestionEssaiModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags
@@ -582,9 +582,9 @@ export class QuestionsController {
   static async ajouterQuestionVraiFaux(req: any, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
-      const { nom, énoncé, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
+      const { nom, enonce, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
 
-      QuestionsController.validerChampsObligatoires({ nom, énoncé, reponse }, ["nom", "énoncé", "reponse"]);
+      QuestionsController.validerChampsObligatoires({ nom, enonce, reponse }, ["nom", "enonce", "reponse"]);
       await QuestionsController.validerNomQuestionUnique(idGroupe, String(nom));
 
       const reponseBoolean = reponse === "true" || reponse === true;
@@ -593,7 +593,7 @@ export class QuestionsController {
 
       const nouvelleQuestion = new QuestionVraiFauxModele(
         String(nom).trim(),
-        String(énoncé).trim(),
+        String(enonce).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
         tagsValides,
@@ -609,13 +609,13 @@ export class QuestionsController {
         question: convertirQuestionModeleEnDonnees(nouvelleQuestion),
       });
       return;
-    } catch (e: any) {
-      if (e instanceof AlreadyExistsError) {
-        res.status(409).json({ error: e.message });
-      } else if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof AlreadyExistsError) {
+        res.status(409).json({ error: erreur.message });
+      } else if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de l'ajout de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de l'ajout de la question" });
       }
       return;
     }
@@ -624,9 +624,9 @@ export class QuestionsController {
   private static async ajouterQuestionParType(req: any, res: Response, typeQuestion: string): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
-      const { nom, énoncé, retroactionValide, retroactionInvalide, tags, ...donneesComplementairesBrutes } = req.body;
+      const { nom, enonce, retroactionValide, retroactionInvalide, tags, ...donneesComplementairesBrutes } = req.body;
 
-      QuestionsController.validerChampsObligatoires({ nom, énoncé }, ["nom", "énoncé"]);
+      QuestionsController.validerChampsObligatoires({ nom, enonce }, ["nom", "enonce"]);
       await QuestionsController.validerNomQuestionUnique(idGroupe, String(nom));
 
       const tagsValides = QuestionsController.validerTagsObligatoires(tags);
@@ -634,7 +634,7 @@ export class QuestionsController {
       const nouvelleQuestion = QuestionsController.creerQuestionAutreType(
         typeQuestion,
         String(nom).trim(),
-        String(énoncé).trim(),
+        String(enonce).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
         tagsValides,
@@ -649,13 +649,13 @@ export class QuestionsController {
         question: convertirQuestionModeleEnDonnees(nouvelleQuestion),
       });
       return;
-    } catch (e: any) {
-      if (e instanceof AlreadyExistsError) {
-        res.status(409).json({ error: e.message });
-      } else if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof AlreadyExistsError) {
+        res.status(409).json({ error: erreur.message });
+      } else if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de l'ajout de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de l'ajout de la question" });
       }
       return;
     }
@@ -681,3 +681,5 @@ export class QuestionsController {
     await QuestionsController.ajouterQuestionParType(req, res, "Essai");
   }
 }
+
+

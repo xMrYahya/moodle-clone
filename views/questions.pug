@@ -56,7 +56,7 @@ html
                       p.card-text.text-muted.mb-2
                         small Type: #{questionCourante.typeAffichage}
                       p.card-text.mb-2
-                        em #{questionCourante.énoncé}
+                        em #{questionCourante.enonce}
                       .d-flex.flex-wrap.mt-3
                         button.btn.btn-sm.btn-outline-primary.js-btn-details.mr-2.mb-2(type="button" data-question-nom=questionCourante.nom) Détails
                         button.btn.btn-sm.btn-outline-warning.js-btn-edit.mr-2.mb-2(type="button" data-question-nom=questionCourante.nom) Modifier
@@ -71,10 +71,10 @@ html
         .card-body
           .d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
             h4.mb-0 Étudiants
-            if students && students.length
-              span.badge.bg-secondary #{students.length}
+            if etudiants && etudiants.length
+              span.badge.bg-secondary #{etudiants.length}
 
-          if students && students.length
+          if etudiants && etudiants.length
             // petit champ de recherche simple côté client
             input.form-control.mt-3(type="text" id="student-search" placeholder="Rechercher un étudiant (prénom, nom ou email)...")
 
@@ -85,8 +85,8 @@ html
                     th Prénom
                     th Nom
                     th Email
-                tbody#students-tbody
-                  each st in students
+                tbody#etudiants-tbody
+                  each st in etudiants
                     tr.student-row
                       td #{st.first_name}
                       td #{st.last_name}
@@ -97,7 +97,7 @@ html
     // ======================
     // MODAL : AJOUTER QUESTION
     // ======================
-    if showAddQuestionModal
+    if afficherModalAjoutQuestion
       .modal-overlay
         .modal-card
           .modal-header
@@ -152,7 +152,7 @@ html
 
                 .form-group
                   label(for="enonce-vf") Énoncé:
-                  textarea.form-control(id="enonce-vf" name="énoncé" required rows="3")
+                  textarea.form-control(id="enonce-vf" name="enonce" required rows="3")
 
                 .form-group
                   label(for="reponse-vf") Réponse correcte:
@@ -188,7 +188,7 @@ html
 
                 .form-group
                   label(for="enonce-cm") Énoncé:
-                  textarea.form-control(id="enonce-cm" name="énoncé" required rows="3")
+                  textarea.form-control(id="enonce-cm" name="enonce" required rows="3")
 
                 .form-group
                   .form-check.mb-2
@@ -227,7 +227,7 @@ html
 
                 .form-group
                   label(for="enonce-num") Énoncé:
-                  textarea.form-control(id="enonce-num" name="énoncé" required rows="3")
+                  textarea.form-control(id="enonce-num" name="enonce" required rows="3")
 
                 .form-group
                   label(for="reponse-num") Réponse numérique:
@@ -260,7 +260,7 @@ html
 
                 .form-group
                   label(for="enonce-rc") Énoncé:
-                  textarea.form-control(id="enonce-rc" name="énoncé" required rows="3")
+                  textarea.form-control(id="enonce-rc" name="enonce" required rows="3")
 
                 .form-group
                   label(for="reponse-rc") Réponse attendue:
@@ -293,7 +293,7 @@ html
 
                 .form-group
                   label(for="enonce-mec") Énoncé:
-                  textarea.form-control(id="enonce-mec" name="énoncé" required rows="3")
+                  textarea.form-control(id="enonce-mec" name="enonce" required rows="3")
 
                 .form-group
                   .alert.alert-info.small
@@ -328,7 +328,7 @@ html
 
                 .form-group
                   label(for="enonce-essai") Énoncé:
-                  textarea.form-control(id="enonce-essai" name="énoncé" required rows="5")
+                  textarea.form-control(id="enonce-essai" name="enonce" required rows="5")
 
                 .alert.alert-info.small
                   | Les questions de type essai sont des questions ouvertes qui nécessitent une correction manuelle.
@@ -403,7 +403,7 @@ html
 
             .form-group
               label(for="edit-enonce") Énoncé
-              textarea.form-control#edit-enonce(name="énoncé" rows="3" required)
+              textarea.form-control#edit-enonce(name="enonce" rows="3" required)
 
             .form-group
               label(for="edit-retroaction-valide") Rétroaction valide
@@ -549,8 +549,8 @@ html
         searchInput.addEventListener('input', function() {
           const termeRecherche = (this.value || '').toLowerCase();
           document.querySelectorAll('.student-row').forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(termeRecherche) ? '' : 'none';
+            const texte = row.textContent.toLowerCase();
+            row.style.display = texte.includes(termeRecherche) ? '' : 'none';
           });
         });
       }
@@ -643,22 +643,22 @@ html
       }
 
       const formulaireVraiFaux = document.getElementById('form-vrai-faux');
-      if (formulaireVraiFaux) formulaireVraiFaux.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponse', 'tags']));
+      if (formulaireVraiFaux) formulaireVraiFaux.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'enonce', 'reponse', 'tags']));
 
       const formulaireChoixMultiple = document.getElementById('form-choix-multiple');
-      if (formulaireChoixMultiple) formulaireChoixMultiple.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponses', 'tags']));
+      if (formulaireChoixMultiple) formulaireChoixMultiple.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'enonce', 'reponses', 'tags']));
 
       const formulaireNumerique = document.getElementById('form-numerique');
-      if (formulaireNumerique) formulaireNumerique.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponse', 'tags']));
+      if (formulaireNumerique) formulaireNumerique.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'enonce', 'reponse', 'tags']));
 
       const formulaireReponseCourte = document.getElementById('form-reponse-courte');
-      if (formulaireReponseCourte) formulaireReponseCourte.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponse', 'tags']));
+      if (formulaireReponseCourte) formulaireReponseCourte.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'enonce', 'reponse', 'tags']));
 
       const formulaireMiseEnCorrespondance = document.getElementById('form-mise-correspondance');
-      if (formulaireMiseEnCorrespondance) formulaireMiseEnCorrespondance.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'paires', 'tags']));
+      if (formulaireMiseEnCorrespondance) formulaireMiseEnCorrespondance.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'enonce', 'paires', 'tags']));
 
       const formulaireEssai = document.getElementById('form-essai');
-      if (formulaireEssai) formulaireEssai.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'tags']));
+      if (formulaireEssai) formulaireEssai.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'enonce', 'tags']));
 
       const modalDetailsQuestion = document.getElementById('question-details-modal');
       const modalModificationQuestion = document.getElementById('question-edit-modal');
@@ -698,7 +698,7 @@ html
         if (question.type === 'ReponseCourte') return String(question.reponseAttendue ?? '-');
         if (question.type === 'ChoixMultiple') {
           const bonnesReponses = Array.isArray(question.reponses)
-            ? question.reponses.filter(r => r && r.estBonneReponse === true).map(r => r.text)
+            ? question.reponses.filter(r => r && r.estBonneReponse === true).map(r => r.texte)
             : [];
           return bonnesReponses.length ? bonnesReponses.join(' | ') : '-';
         }
@@ -732,7 +732,7 @@ html
       function afficherDetailsQuestion(question) {
         document.getElementById('details-type').textContent = question?.type || '-';
         document.getElementById('details-nom').textContent = question?.nom || '-';
-        document.getElementById('details-enonce').textContent = question?.['énoncé'] || '-';
+        document.getElementById('details-enonce').textContent = question?.['enonce'] || '-';
         document.getElementById('details-reponse-label').textContent = libelleReponse(question);
         document.getElementById('details-reponse').textContent = extraireValeurReponse(question);
         document.getElementById('details-retro-valide').textContent = question?.retroactionValide || '-';
@@ -813,7 +813,7 @@ html
         const payload = {
           type,
           nom: document.getElementById('edit-nom').value,
-          'énoncé': document.getElementById('edit-enonce').value,
+          enonce: document.getElementById('edit-enonce').value,
           retroactionValide: document.getElementById('edit-retroaction-valide').value,
           retroactionInvalide: document.getElementById('edit-retroaction-invalide').value,
           tags: document.getElementById('edit-tags').value,
@@ -846,7 +846,7 @@ html
       function preRemplirFormulaireModification(question) {
         document.getElementById('edit-type').value = question.type;
         document.getElementById('edit-nom').value = question.nom || '';
-        document.getElementById('edit-enonce').value = question['énoncé'] || '';
+        document.getElementById('edit-enonce').value = question['enonce'] || '';
         document.getElementById('edit-retroaction-valide').value = question.retroactionValide || '';
         document.getElementById('edit-retroaction-invalide').value = question.retroactionInvalide || '';
         document.getElementById('edit-tags').value = Array.isArray(question.tags) ? question.tags.join(', ') : '';
@@ -863,7 +863,7 @@ html
 
         const champReponsesCM = document.getElementById('edit-reponses-cm');
         if (champReponsesCM) {
-          const reponses = Array.isArray(question.reponses) ? question.reponses.map(r => r.text) : [];
+          const reponses = Array.isArray(question.reponses) ? question.reponses.map(r => r.texte) : [];
           champReponsesCM.value = reponses.join('|');
         }
 
@@ -957,7 +957,7 @@ html
           try {
             const data = construirePayloadModification();
 
-            if (!data.nom || !String(data.nom).trim() || !data['énoncé'] || !String(data['énoncé']).trim()) {
+            if (!data.nom || !String(data.nom).trim() || !data.enonce || !String(data.enonce).trim()) {
               alert('Erreur: Veuillez remplir les champs obligatoires (nom, énoncé)');
               return;
             }
@@ -1053,4 +1053,8 @@ html
             .replace(/\bD\b/g, 'Distance');
         });
       })();
+
+
+
+
 

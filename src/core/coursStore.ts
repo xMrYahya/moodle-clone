@@ -45,10 +45,10 @@ export async function viderStoreAuDemarrage(): Promise<void> {
   await fs.writeFile(STORE_PATH, JSON.stringify({ courses: [] }, null, 2), "utf-8");
 }
 
-export async function getCoursStockes(): Promise<Cours[]> {
+export async function recupererCoursStockes(): Promise<Cours[]> {
   await assurerFichier();
-  const raw = await fs.readFile(STORE_PATH, "utf-8");
-  const json = JSON.parse(raw);
+  const contenuJsonBrut = await fs.readFile(STORE_PATH, "utf-8");
+  const json = JSON.parse(contenuJsonBrut);
   if (!Array.isArray(json.courses)) {
     return [];
   }
@@ -65,34 +65,34 @@ async function ecrireCoursStockes(courses: CoursStockage[]): Promise<void> {
 }
 
 export async function recupererCoursStockesPourEnseignant(idEnseignant: string): Promise<Cours[]> {
-  const all = await getCoursStockes();
-  return all.filter(c => String(c.idEnseignant) === String(idEnseignant));
+  const coursStockes = await recupererCoursStockes();
+  return coursStockes.filter(c => String(c.idEnseignant) === String(idEnseignant));
 }
 
 export async function recupererCoursStockeParIdGroupe(idGroupe: string): Promise<Cours | undefined> {
-  const all = await getCoursStockes();
-  return all.find(c => c.idGroupe === String(idGroupe));
+  const coursStockes = await recupererCoursStockes();
+  return coursStockes.find(c => c.idGroupe === String(idGroupe));
 }
 
 export async function ajouterCoursStocke(course: Cours
 
 ): Promise<void> {
-  const all = await getCoursStockes();
-  const exists = all.some(c => c.idGroupe === course.idGroupe);
-  if (!exists) {
-    all.push({
+  const coursStockes = await recupererCoursStockes();
+  const coursExisteDeja = coursStockes.some(c => c.idGroupe === course.idGroupe);
+  if (!coursExisteDeja) {
+    coursStockes.push({
       ...course,
       etudiants: Array.isArray(course.etudiants) ? course.etudiants : [],
       questions: Array.isArray(course.questions) ? course.questions : [],
     });
-    await ecrireCoursStockes(all);
+    await ecrireCoursStockes(coursStockes);
   }
 }
 
 export async function retirerCoursStocke(idGroupe: string): Promise<void> {
-  const all = await getCoursStockes();
-  const next = all.filter(c => c.idGroupe !== idGroupe);
-  await ecrireCoursStockes(next);
+  const coursStockes = await recupererCoursStockes();
+  const coursRestants = coursStockes.filter(c => c.idGroupe !== idGroupe);
+  await ecrireCoursStockes(coursRestants);
 }
 
 export async function recupererQuestionsDuCours(idGroupe: string): Promise<AnyQuestion[]> {
@@ -128,7 +128,7 @@ export async function recupererQuestionParNom(idGroupe: string, nom: string): Pr
 }
 
 export async function ajouterQuestionAuCours(idGroupe: string, question: AnyQuestion | Question): Promise<void> {
-  const allCours = await getCoursStockes();
+  const allCours = await recupererCoursStockes();
   const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(idGroupe));
 
   if (indexCours === -1) {
@@ -160,7 +160,7 @@ export async function modifierQuestionDuCours(
   nomOriginal: string,
   questionMiseAJour: AnyQuestion | Question
 ): Promise<void> {
-  const allCours = await getCoursStockes();
+  const allCours = await recupererCoursStockes();
   const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(idGroupe));
 
   if (indexCours === -1) {
@@ -202,7 +202,7 @@ export async function modifierQuestionDuCours(
 }
 
 export async function supprimerQuestionDuCours(idGroupe: string, nom: string): Promise<void> {
-  const allCours = await getCoursStockes();
+  const allCours = await recupererCoursStockes();
   const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(idGroupe));
 
   if (indexCours === -1) {

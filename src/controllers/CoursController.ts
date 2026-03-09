@@ -38,10 +38,10 @@ export class CoursController {
 
   static async selectionnerGroupeCours(req: any, res: Response): Promise<void> {
     try {
-      const teacher = req.session.user;
+      const enseignantConnecte = req.session.user;
       const idGroupe = req.body?.idGroupe ?? req.body?.idGroupe;
 
-      if (!teacher?.id || !idGroupe) {
+      if (!enseignantConnecte?.id || !idGroupe) {
         res.status(400).send("Enseignant ou idGroupe manquant");
         return;
       }
@@ -49,9 +49,9 @@ export class CoursController {
       const coursSelectionne = await accesSGA.getCoursParGroupe(
         String(idGroupe),
         req.session.token,
-        String(teacher.id)
+        String(enseignantConnecte.id)
       );
-      const students = await accesSGA.getEtudiantsParGroupe(req.session.token, String(idGroupe));
+      const etudiantsDuGroupe = await accesSGA.getEtudiantsParGroupe(req.session.token, String(idGroupe));
 
       if (!coursSelectionne) {
         res.status(404).send("Horaire introuvable pour ce groupe");
@@ -75,7 +75,7 @@ export class CoursController {
         idEnseignant: String(coursSelectionne.idEnseignant),
         idCours: idCoursFinal,
         titreCours: titreCoursFinal,
-        etudiants: students,
+        etudiants: etudiantsDuGroupe,
         questions: [],
       });
 
@@ -83,8 +83,8 @@ export class CoursController {
         `/index?succes=${encodeURIComponent("Cours ajoute avec succes.")}`
       );
       return;
-    } catch (e: any) {
-      res.status(500).send(e?.message ?? "Echec de creation");
+    } catch (erreur: any) {
+      res.status(500).send(erreur?.message ?? "Echec de creation");
       return;
     }
   }
@@ -119,8 +119,8 @@ export class CoursController {
         `/index?succes=${encodeURIComponent("Cours retire avec succes.")}`
       );
       return;
-    } catch (e: any) {
-      res.status(500).send(e?.message ?? "Echec de suppression");
+    } catch (erreur: any) {
+      res.status(500).send(erreur?.message ?? "Echec de suppression");
       return;
     }
   }
@@ -128,9 +128,9 @@ export class CoursController {
   static async afficherDetailsCours(req: any, res: Response): Promise<void> {
     try {
       const idCours = req.params?.idCours ?? req.params?.idGroupe;
-      const teacher = req.session.user;
+      const enseignantConnecte = req.session.user;
 
-      if (!idCours || !teacher?.id) {
+      if (!idCours || !enseignantConnecte?.id) {
         res.status(400).send("idGroupe ou infos utilisateur manquant");
         return;
       }
@@ -146,10 +146,10 @@ export class CoursController {
         ...question,
         typeAffichage: CoursController.obtenirTypeQuestionPourAffichage(question),
       }));
-      const showAddQuestionModal = req.query.addQuestion === "1";
+      const afficherModalAjoutQuestion = req.query.addQuestion === "1";
       const messageSucces = typeof req.query.succes === "string" ? req.query.succes : "";
       const messageErreur = typeof req.query.erreur === "string" ? req.query.erreur : "";
-      const displayName = `${teacher.first_name} ${teacher.last_name}`;
+      const displayName = `${enseignantConnecte.first_name} ${enseignantConnecte.last_name}`;
 
       res.render("questions", {
         title: "Questions",
@@ -159,14 +159,14 @@ export class CoursController {
         coursId: cours.idCours,
         coursTitre: cours.titreCours || cours.activite,
         cours,                         
-        students: cours.etudiants ?? [],
+        etudiants: cours.etudiants ?? [],
         questions,
-        showAddQuestionModal,
+        afficherModalAjoutQuestion,
         messageSucces,
         messageErreur,
       });
-    } catch (e: any) {
-      res.status(500).send(e?.message ?? "Echec du chargement des questions");
+    } catch (erreur: any) {
+      res.status(500).send(erreur?.message ?? "Echec du chargement des questions");
     }
   }
 }
