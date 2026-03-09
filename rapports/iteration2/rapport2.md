@@ -191,6 +191,7 @@
 - CU05a - Ajouter un questionnaire
 - MDD - Enseignant, Cours, Question
 - DSS -Ajouter un questionnaire
+
 **Préconditions:**
 - Un questionnaire est sélectionné
 
@@ -204,25 +205,27 @@
 - CU05a - Ajouter un questionnaire
 - MDD - Enseignant, Cours, Question
 - DSS -Ajouter un questionnaire
+
 **Préconditions:**
 - Un questionnaire temporaire est selectionné
 
 **PostConditions:**
 - une question a été ajouté au questionnaireTemp avec la correspondance du nomQuestion
 
-### Contrat CO20 - Gérer les questionnaires
+### Contrat CO20 - Sélectionner une question a modifier
 ---
 
-**Opération: gererQuestionnaires()**
+**Opération: selectionnerModifierQuestion(groupId: String, nom: String)**
 **Références croisées:**
-- CU05b - afficher un questionnaire
-- DSS - Afficher un questionnaire
+- CU02c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
 **Préconditions:**
 - L'enseignant est authentifié
 - Un cours est sélectionné
 
 **Postconditions:**
-- Aucune postcondition (La liste des questionnaire est affiché)
+- Aucune postcondition (les informations de la question ont été récupéré et affiché)
 
 ### Contrat CO21 - Sélectionner un questionnaire
 ---
@@ -231,7 +234,7 @@
 **Références croisées:**
 - CU05b - Afficher un questionnaire
 - DSS - Afficher un questionnaire
-- CO20 - Gérer les questionnaires
+- CO15 - Gérer les questionnaires
 
 **Préconditions:**
 - Aucune précondition
@@ -246,14 +249,14 @@
 **Références croisées:**
 - CU05c - Modifier un questionnaire
 - DSS - Modifier un questionnaire
-- CO20 - Gérer les questionnaires
+- CO15 - Gérer les questionnaires
 
 **Préconditions:**
 - L'enseignant est authentifié
 - L'enseignant appuie sur gérer les questionnaires
 
 **Postconditions:**
-- f
+- tout les attributs de questionnaieTemp ont pris les valeurs de celui du questionnaire q
 
 ### Contrat CO23 - Obtenir les tags
 ---
@@ -282,11 +285,42 @@
 - Un questionnaire est sélectionné avec selectionModifierQuestionnaire(nom : String)
 
 **Postconditions:**
-- 
+- la question avec le nom nomQuestion a été dissocié de questionnaireTemp.questions
+
+### Contrat CO25 - Modifier l'ordre d'une question
+---
+
+**Opération: modifierOrdreQuestion(nomQuestion:String, nouvellePosition:int)**
+
+**Référence croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
+**Préconditions:**
+- Le questionnaire a au moins deux questions d'associé
+- La nouvelle position doit etre plus petite ou égale au nombre de questions dans le questionnaire
+
+**PostConditions:**
+- la question avec le nom nomQuestion a été associé à questionnaireTemp.question[nouvellePosition]
+
+
+
+### Contrat CO26 - Modifier un questionnaire
+---
+
+**Opération: modifierQuestionnaire(nom:String, description: String, actif:boolean)**
+
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
+**Préconditions:**
+
+**Postconditions:**
+
+
 
 ## Réalisation de cas d'utilisation (RDCU)
-
-![RDCU  ](../../docs/modeles/exports/ "RDCU ")
 
 ![RDCU consulter question d'un cours ](../../docs/modeles/exports/rdcu-afficher-liste-questions.png "RDCU consulter les questions d'un cours")
 
