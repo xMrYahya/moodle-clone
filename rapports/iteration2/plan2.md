@@ -92,14 +92,14 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 4. Y a-t-il des problèmes de [Code smell](https://refactoring.guru/fr/refactoring/smells) dans notre projet?
    1. Mysterious name relié au décalage des représentations ou pas
-      1. Nous avons encore à nous assurer d'avoir tous changer les noms de l'anglais au français 
+      1. Nous avons encore à nous assurer d'avoir tous changer les noms du MDD
 
    2. Large class (cohésion)
       1. Nous avons seulement les contrôleurs qui sont de grande taille, les autres classes sont assez petites.
 
    3. Trop de paramètres (4+)
       1. Nous ne pensons pas que nos fonctions utilisent trop de paramètres.
-   
+  
 ### Évaluation par rapport aux objectifs
 
 - Convertir le code pour utiliser la même langue partout 
@@ -113,38 +113,28 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 ### Éléments de travail: prévus vs réalisés
 
-Tous les éléments ont été complétés, mais il faut compléter les tests des CU02 et CU05
+Tout les éléments de travail du plan on été réalisé sauf les tests
 
 ### Évaluation par rapport aux résultats selon les critères d'évaluation
 
-> Documentez si vous avez satisfait les critères d'évaluation précisés dans le plan d'itération. Cela pourrait inclure des informations telles que «&nbsp;Démo pour le département X a été bien accueilli, avec quelques préoccupations soulevées autour de la convivialité&nbsp;», ou, «&nbsp;495 cas de tests ont été automatisés avec un taux de réussite de 98&nbsp;%. 9 cas de test ont été reportés parce que les éléments de travail correspondants ont été reportés.&nbsp;»
-
-La solution a répondu à tous les critères, mais attention: il faut rajouter des cas de tests.
+Les démos pour touts les cas d'utilisation ont réussi mais il manque un message de confirmation lors de modification et suppression de question. Il faut aussi ajouter des cas de tests
 
 ## Autres préoccupations et écarts
 
-> Documentez d'autres domaines qui ont été évalués, tels que la finance ou un type de programme, ainsi que la rétroaction des intervenants qui n'a pas été saisie ailleurs
-
-Nous avons discuté avec plusieurs professeurs pour comprendre le flux de travail de construction des devoirs à faire en ligne (CU06).
+Nous avons communiqué avec les chargé de lab afin de mieux comprendre comment représenter les controlleurs et les modèles dans les diagrammes
 
 ## Évaluation du travail d'équipe
 
-> Évaluez la contribution de chaque membre de l'équipe au projet durant l'itération. Pour vous aider, utilisez `GitHub Insights`. Toutefois, tenez aussi compte des éléments qui ne peuvent être évalués par l'outil (apprentissage, connaissances préalables, participation, communication, etc.)
+- Alexandre a fait les DSS, les CO et a mis à jour le MDD
+- Alex a fait les RDCUs pour le CU02b,c,d
+- Raphael a fait les RDCUs pour le CU05  
+- Le code pour le CU02b,c,d a été fait par Yahya.
+- Le code pour le CU05 a été fait par Kassem
+- Les Diagramme de l'itération précédente ont été réparé par Alexandre, Alex et Raphael
+- Le rapport à été fait par Alexandre et Alex
 
-Selon les statistiques générées par `GitHub Insights` Pierre et Jérémie font 90 % de la programmation et les deux autres membres doivent contribuer plus. 
-
-Nous devons trouver un autre moyen de faire les commits (peut-être avec des branches et PR), car il y avait trop de merges difficiles de la documentation.
+Nous n'avons toujours pas voulu utiliser Github insights puisque la modifications des diagrammes et des pdf augmentent la quantité de lignes et commit et n'est pas représentatif
 
 ### Retrait d'un membre de l'équipe pour contribution non significative
-
-- C'est ici que vous mettez le nom de la personne ainsi que les raisons du retrait. Cette section doit nécessairement inclure une liste d'objectifs que cette personne doit respecter pour pouvoir s'assurer de faire partie de l'itération suivante. 
-
-
----
-
-<a name="commentPlanifier">Comment planifier une itération selon le
-    processus unifié :</a>
-    <https://etsmtl365-my.sharepoint.com/:w:/g/personal/christopher_fuhrman_etsmtl_ca/EWVA3MlzFHdElIMlduUvg6oBSAlrgHO7hjM2J93D1LGPSg?e=kCbXch>
-
-<a name="commentEstimer">Comment estimer la taille :</a>
-    <https://etsmtl365-my.sharepoint.com/:w:/g/personal/christopher_fuhrman_etsmtl_ca/EaEe2fDK94RAkfWthKX1pr4B7KBgbD9BW4UMrzwtQzOrkg?e=XMf4IK>
+ 
+   Lucas Montion s'est retiré de l'équipe (abandon de cours)
