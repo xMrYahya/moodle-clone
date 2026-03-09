@@ -14,7 +14,7 @@ html
           h1.mb-1 #{coursTitre}
           .text-muted.fs-5
             strong #{coursId}
-            |  · Groupe: #{groupId}
+            |  · Groupe: #{idGroupe}
 
           if cours
             .mt-2
@@ -43,24 +43,24 @@ html
           .d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
             h4.mb-0 Questions
             .d-flex.align-items-center.flex-wrap
-              a.btn.btn-primary.mr-2.mb-2(href=`/cours/${groupId}/details-cours?addQuestion=1` id="btn-add-question") Ajouter une question
-              a.btn.btn-outline-secondary.mb-2(href=`/cours/${groupId}/questionnaires`) Gerer les questionnaires
+              a.btn.btn-primary.mr-2.mb-2(href=`/cours/${idGroupe}/details-cours?addQuestion=1` id="btn-add-question") Ajouter une question
+              a.btn.btn-outline-secondary.mb-2(href=`/cours/${idGroupe}/questionnaires`) Gerer les questionnaires
 
           if questions && questions.length
             .row.mt-3
-              each q in questions
+              each questionCourante in questions
                 .col-12.col-md-6.col-lg-4.mb-3
                   .card.h-100
                     .card-body
-                      h5.card-title.mb-1 #{q.nom}
+                      h5.card-title.mb-1 #{questionCourante.nom}
                       p.card-text.text-muted.mb-2
-                        small Type: #{q.typeAffichage}
+                        small Type: #{questionCourante.typeAffichage}
                       p.card-text.mb-2
-                        em #{q.énoncé}
+                        em #{questionCourante.énoncé}
                       .d-flex.flex-wrap.mt-3
-                        button.btn.btn-sm.btn-outline-primary.js-btn-details.mr-2.mb-2(type="button" data-question-nom=q.nom) Détails
-                        button.btn.btn-sm.btn-outline-warning.js-btn-edit.mr-2.mb-2(type="button" data-question-nom=q.nom) Modifier
-                        button.btn.btn-sm.btn-outline-danger.js-btn-delete.mb-2(type="button" data-question-nom=q.nom) Supprimer
+                        button.btn.btn-sm.btn-outline-primary.js-btn-details.mr-2.mb-2(type="button" data-question-nom=questionCourante.nom) Détails
+                        button.btn.btn-sm.btn-outline-warning.js-btn-edit.mr-2.mb-2(type="button" data-question-nom=questionCourante.nom) Modifier
+                        button.btn.btn-sm.btn-outline-danger.js-btn-delete.mb-2(type="button" data-question-nom=questionCourante.nom) Supprimer
           else
             p.text-muted.mt-3 Aucune question disponible.
 
@@ -102,7 +102,7 @@ html
         .modal-card
           .modal-header
             h5.mb-0#modal-title Choisir le type de question
-            a.close(href=`/cours/${groupId}/details-cours` aria-label="Fermer") ×
+            a.close(href=`/cours/${idGroupe}/details-cours` aria-label="Fermer") ×
 
           .modal-body
             // === ÉCRAN DE SÉLECTION DU TYPE ===
@@ -110,40 +110,40 @@ html
               p.text-muted.mb-4 Sélectionnez le type de question que vous souhaitez créer:
               .row
                 .col-md-4.mb-3
-                  .card.question-type-card(onclick="selectQuestionType('VraiFaux')" style="cursor: pointer;")
+                  .card.question-type-card(onclick="selectionnerTypeQuestion('VraiFaux')" style="cursor: pointer;")
                     .card-body.text-center
                       h5.card-title.mb-0 Vrai ou Faux
 
                 .col-md-4.mb-3
-                  .card.question-type-card(onclick="selectQuestionType('ChoixMultiple')" style="cursor: pointer;")
+                  .card.question-type-card(onclick="selectionnerTypeQuestion('ChoixMultiple')" style="cursor: pointer;")
                     .card-body.text-center
                       h5.card-title.mb-0 Choix Multiple
 
                 .col-md-4.mb-3
-                  .card.question-type-card(onclick="selectQuestionType('MiseEnCorrespondance')" style="cursor: pointer;")
+                  .card.question-type-card(onclick="selectionnerTypeQuestion('MiseEnCorrespondance')" style="cursor: pointer;")
                     .card-body.text-center
                       h5.card-title.mb-0 Mise en Correspondance
 
                 .col-md-4.mb-3
-                  .card.question-type-card(onclick="selectQuestionType('ReponseCourte')" style="cursor: pointer;")
+                  .card.question-type-card(onclick="selectionnerTypeQuestion('ReponseCourte')" style="cursor: pointer;")
                     .card-body.text-center
                       h5.card-title.mb-0 Réponse Courte
 
                 .col-md-4.mb-3
-                  .card.question-type-card(onclick="selectQuestionType('Numerique')" style="cursor: pointer;")
+                  .card.question-type-card(onclick="selectionnerTypeQuestion('Numerique')" style="cursor: pointer;")
                     .card-body.text-center
                       h5.card-title.mb-0 Numérique
 
                 .col-md-4.mb-3
-                  .card.question-type-card(onclick="selectQuestionType('Essai')" style="cursor: pointer;")
+                  .card.question-type-card(onclick="selectionnerTypeQuestion('Essai')" style="cursor: pointer;")
                     .card-body.text-center
                       h5.card-title.mb-0 Essai
 
             // === FORMULAIRE VRAI/FAUX ===
             #form-screen-vraifaux(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="retournerSelectionTypeQuestion()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-vrai-faux` id="form-vrai-faux")
+              form(method="post" action=`/questions/${idGroupe}/ajouter-vrai-faux` id="form-vrai-faux")
                 h6.mb-3 Question Vrai ou Faux
 
                 .form-group
@@ -177,9 +177,9 @@ html
 
             // === FORMULAIRE CHOIX MULTIPLE ===
             #form-screen-choixmultiple(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="retournerSelectionTypeQuestion()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-choix-multiple` id="form-choix-multiple")
+              form(method="post" action=`/questions/${idGroupe}/ajouter-choix-multiple` id="form-choix-multiple")
                 h6.mb-3 Question Choix Multiple
 
                 .form-group
@@ -216,9 +216,9 @@ html
 
             // === FORMULAIRE NUMÉRIQUE ===
             #form-screen-numerique(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="retournerSelectionTypeQuestion()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-numerique` id="form-numerique")
+              form(method="post" action=`/questions/${idGroupe}/ajouter-numerique` id="form-numerique")
                 h6.mb-3 Question Numérique
 
                 .form-group
@@ -249,9 +249,9 @@ html
 
             // === FORMULAIRE RÉPONSE COURTE ===
             #form-screen-reponsecourte(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="retournerSelectionTypeQuestion()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-reponse-courte` id="form-reponse-courte")
+              form(method="post" action=`/questions/${idGroupe}/ajouter-reponse-courte` id="form-reponse-courte")
                 h6.mb-3 Question Réponse Courte
 
                 .form-group
@@ -282,9 +282,9 @@ html
 
             // === FORMULAIRE MISE EN CORRESPONDANCE ===
             #form-screen-miseencorrespondance(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="retournerSelectionTypeQuestion()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-mise-en-correspondance` id="form-mise-correspondance")
+              form(method="post" action=`/questions/${idGroupe}/ajouter-mise-en-correspondance` id="form-mise-correspondance")
                 h6.mb-3 Question Mise en Correspondance
 
                 .form-group
@@ -317,9 +317,9 @@ html
 
             // === FORMULAIRE ESSAI ===
             #form-screen-essai(style="display: none;")
-              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="backToTypeSelection()") Retour
+              button.btn.btn-sm.btn-link.mb-3(type="button" onclick="retournerSelectionTypeQuestion()") Retour
 
-              form(method="post" action=`/questions/${groupId}/ajouter-essai` id="form-essai")
+              form(method="post" action=`/questions/${idGroupe}/ajouter-essai` id="form-essai")
                 h6.mb-3 Question Essai
 
                 .form-group
@@ -348,7 +348,7 @@ html
                 button.btn.btn-primary.w-100(type="submit") Ajouter cette question
 
           .modal-footer
-            a.btn.btn-secondary(href=`/cours/${groupId}/details-cours`) Fermer
+            a.btn.btn-secondary(href=`/cours/${idGroupe}/details-cours`) Fermer
 
     // ======================
     // MODAL : DÉTAIL QUESTION (CU02b)
@@ -520,7 +520,7 @@ html
       }
 
     script.
-      const groupId = "#{groupId}";
+      const idGroupe = "#{idGroupe}";
       function nettoyerParametresFlashUrl() {
         const url = new URL(window.location.href);
         const hadSucces = url.searchParams.has("succes");
@@ -547,15 +547,15 @@ html
       const searchInput = document.getElementById('student-search');
       if (searchInput) {
         searchInput.addEventListener('input', function() {
-          const q = (this.value || '').toLowerCase();
+          const termeRecherche = (this.value || '').toLowerCase();
           document.querySelectorAll('.student-row').forEach(row => {
             const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(q) ? '' : 'none';
+            row.style.display = text.includes(termeRecherche) ? '' : 'none';
           });
         });
       }
 
-      function selectQuestionType(type) {
+      function selectionnerTypeQuestion(type) {
         document.getElementById('type-selection-screen').style.display = 'none';
         const screenMap = {
           'VraiFaux': 'form-screen-vraifaux',
@@ -580,7 +580,7 @@ html
         }
       }
 
-      function backToTypeSelection() {
+      function retournerSelectionTypeQuestion() {
         ['vraifaux','choixmultiple','numerique','reponsecourte','miseencorrespondance','essai']
           .forEach(id => {
             const el = document.getElementById(`form-screen-${id}`);
@@ -591,10 +591,10 @@ html
       }
 
       // IMPORTANT: rendre les fonctions accessibles pour les onclick=""
-      window.selectQuestionType = selectQuestionType;
-      window.backToTypeSelection = backToTypeSelection;
+      window.selectionnerTypeQuestion = selectionnerTypeQuestion;
+      window.retournerSelectionTypeQuestion = retournerSelectionTypeQuestion;
 
-      function formDataToJson(formData) {
+      function convertirFormDataEnJson(formData) {
         const json = {};
         formData.forEach((value, key) => {
           if (json[key]) {
@@ -607,11 +607,11 @@ html
         return json;
       }
 
-      async function handleFormSubmit(e, requiredFields) {
+      async function traiterSoumissionFormulaire(e, requiredFields) {
         e.preventDefault();
         try {
           const formData = new FormData(e.target);
-          const data = formDataToJson(formData);
+          const data = convertirFormDataEnJson(formData);
 
           const missing = requiredFields.filter(field => !data[field] || String(data[field]).trim() === '');
           if (missing.length > 0) {
@@ -636,33 +636,33 @@ html
 
           // cache-buster pour éviter le 304
           const msg = encodeURIComponent(result?.message || 'Question ajoutée avec succès');
-          window.location.href = `/cours/${groupId}/details-cours?succes=${msg}&ts=${Date.now()}`;
+          window.location.href = `/cours/${idGroupe}/details-cours?succes=${msg}&ts=${Date.now()}`;
         } catch (err) {
           alert('Erreur: ' + err.message);
         }
       }
 
-      const fVf = document.getElementById('form-vrai-faux');
-      if (fVf) fVf.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponse', 'tags']));
+      const formulaireVraiFaux = document.getElementById('form-vrai-faux');
+      if (formulaireVraiFaux) formulaireVraiFaux.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponse', 'tags']));
 
-      const fCm = document.getElementById('form-choix-multiple');
-      if (fCm) fCm.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponses', 'tags']));
+      const formulaireChoixMultiple = document.getElementById('form-choix-multiple');
+      if (formulaireChoixMultiple) formulaireChoixMultiple.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponses', 'tags']));
 
-      const fNum = document.getElementById('form-numerique');
-      if (fNum) fNum.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponse', 'tags']));
+      const formulaireNumerique = document.getElementById('form-numerique');
+      if (formulaireNumerique) formulaireNumerique.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponse', 'tags']));
 
-      const fRc = document.getElementById('form-reponse-courte');
-      if (fRc) fRc.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'reponse', 'tags']));
+      const formulaireReponseCourte = document.getElementById('form-reponse-courte');
+      if (formulaireReponseCourte) formulaireReponseCourte.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'reponse', 'tags']));
 
-      const fMec = document.getElementById('form-mise-correspondance');
-      if (fMec) fMec.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'paires', 'tags']));
+      const formulaireMiseEnCorrespondance = document.getElementById('form-mise-correspondance');
+      if (formulaireMiseEnCorrespondance) formulaireMiseEnCorrespondance.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'paires', 'tags']));
 
-      const fEss = document.getElementById('form-essai');
-      if (fEss) fEss.addEventListener('submit', e => handleFormSubmit(e, ['nom', 'énoncé', 'tags']));
+      const formulaireEssai = document.getElementById('form-essai');
+      if (formulaireEssai) formulaireEssai.addEventListener('submit', e => traiterSoumissionFormulaire(e, ['nom', 'énoncé', 'tags']));
 
-      const detailsModal = document.getElementById('question-details-modal');
-      const editModal = document.getElementById('question-edit-modal');
-      const deleteModal = document.getElementById('question-delete-modal');
+      const modalDetailsQuestion = document.getElementById('question-details-modal');
+      const modalModificationQuestion = document.getElementById('question-edit-modal');
+      const modalSuppressionQuestion = document.getElementById('question-delete-modal');
 
       let questionEnCoursModification = null;
       let questionEnCoursSuppression = null;
@@ -679,8 +679,8 @@ html
         }
       }
 
-      async function fetchQuestionParNom(nomQuestion) {
-        const url = `/questions/${groupId}/questions/${encodeURIComponent(nomQuestion)}`;
+      async function recupererQuestionParNomApi(nomQuestion) {
+        const url = `/questions/${idGroupe}/questions/${encodeURIComponent(nomQuestion)}`;
         const response = await fetch(url, { method: 'GET' });
         if (!response.ok) {
           let errPayload = null;
@@ -891,9 +891,9 @@ html
         btn.addEventListener('click', async function() {
           try {
             const nom = this.dataset.questionNom;
-            const question = await fetchQuestionParNom(nom);
+            const question = await recupererQuestionParNomApi(nom);
             afficherDetailsQuestion(question);
-            ouvrirModal(detailsModal);
+            ouvrirModal(modalDetailsQuestion);
           } catch (err) {
             alert('Erreur: ' + err.message);
           }
@@ -904,10 +904,10 @@ html
         btn.addEventListener('click', async function() {
           try {
             const nom = this.dataset.questionNom;
-            const question = await fetchQuestionParNom(nom);
+            const question = await recupererQuestionParNomApi(nom);
             questionEnCoursModification = question.nom;
             preRemplirFormulaireModification(question);
-            ouvrirModal(editModal);
+            ouvrirModal(modalModificationQuestion);
           } catch (err) {
             alert('Erreur: ' + err.message);
           }
@@ -918,7 +918,7 @@ html
         btn.addEventListener('click', async function() {
           try {
             const nom = this.dataset.questionNom;
-            const url = `/questions/${groupId}/questions/${encodeURIComponent(nom)}/suppression`;
+            const url = `/questions/${idGroupe}/questions/${encodeURIComponent(nom)}/suppression`;
             const response = await fetch(url, { method: 'GET' });
             if (!response.ok) {
               let errPayload = null;
@@ -929,7 +929,7 @@ html
             const payload = await response.json();
             questionEnCoursSuppression = payload?.question?.nom || nom;
             document.getElementById('delete-question-name').textContent = questionEnCoursSuppression;
-            ouvrirModal(deleteModal);
+            ouvrirModal(modalSuppressionQuestion);
           } catch (err) {
             alert('Erreur: ' + err.message);
           }
@@ -980,7 +980,7 @@ html
               }
             }
 
-            const url = `/questions/${groupId}/questions/${encodeURIComponent(questionEnCoursModification)}/modifier`;
+            const url = `/questions/${idGroupe}/questions/${encodeURIComponent(questionEnCoursModification)}/modifier`;
             const response = await fetch(url, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -993,7 +993,7 @@ html
               throw new Error(errPayload?.error || response.statusText || 'Erreur lors de la modification');
             }
 
-            window.location.href = `/cours/${groupId}/details-cours?ts=${Date.now()}`;
+            window.location.href = `/cours/${idGroupe}/details-cours?ts=${Date.now()}`;
           } catch (err) {
             alert('Erreur: ' + err.message);
           }
@@ -1009,7 +1009,7 @@ html
           }
 
           try {
-            const url = `/questions/${groupId}/questions/${encodeURIComponent(questionEnCoursSuppression)}/suppression`;
+            const url = `/questions/${idGroupe}/questions/${encodeURIComponent(questionEnCoursSuppression)}/suppression`;
             const response = await fetch(url, { method: 'POST' });
             if (!response.ok) {
               let errPayload = null;
@@ -1017,7 +1017,7 @@ html
               throw new Error(errPayload?.error || response.statusText || 'Erreur lors de la suppression');
             }
 
-            window.location.href = `/cours/${groupId}/details-cours?ts=${Date.now()}`;
+            window.location.href = `/cours/${idGroupe}/details-cours?ts=${Date.now()}`;
           } catch (err) {
             alert('Erreur: ' + err.message);
           }
@@ -1025,26 +1025,26 @@ html
       }
 
       document.querySelectorAll('.js-close-details').forEach(btn => {
-        btn.addEventListener('click', () => fermerModal(detailsModal));
+        btn.addEventListener('click', () => fermerModal(modalDetailsQuestion));
       });
 
       document.querySelectorAll('.js-close-edit').forEach(btn => {
         btn.addEventListener('click', () => {
           questionEnCoursModification = null;
-          fermerModal(editModal);
+          fermerModal(modalModificationQuestion);
         });
       });
 
       document.querySelectorAll('.js-close-delete').forEach(btn => {
         btn.addEventListener('click', () => {
           questionEnCoursSuppression = null;
-          fermerModal(deleteModal);
+          fermerModal(modalSuppressionQuestion);
         });
       });
 
       // ---- Format affichage (minimal) : Jeu->Jeudi, P/D -> Présentiel/Distance ----
       // On modifie juste le texte déjà rendu, sans toucher au backend.
-      (function normalizeCourseInfo() {
+      (function normaliserInfosCoursAffichage() {
         const blocks = document.querySelectorAll('.container .text-muted.fs-5');
         blocks.forEach(b => {
           b.innerHTML = b.innerHTML

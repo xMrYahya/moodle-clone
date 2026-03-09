@@ -64,7 +64,7 @@ html
                       small.text-muted #{g.idGroupe}
 
                     form(method="post" action="/cours/selectionner-groupe-cours" class="m-0")
-                      input(type="hidden" name="groupId" value=g.idGroupe)
+                      input(type="hidden" name="idGroupe" value=g.idGroupe)
                       input(type="hidden" name="courseId" value=g.idCours)
                       input(type="hidden" name="courseTitre" value=g.titreCours)
                       button.btn.btn-sm.btn-outline-primary(type="submit") Créer

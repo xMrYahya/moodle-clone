@@ -11,24 +11,24 @@ function exigerAuthentification(req: any, res: any, next: any) {
   next();
 }
 
-router.get("/:groupId", exigerAuthentification, QuestionsController.consulterQuestionsCours);
-router.get("/:groupId/:nom", exigerAuthentification, QuestionsController.selectionnerQuestion);
-router.post("/:groupId/:nom/modifier", exigerAuthentification, QuestionsController.modifierQuestion);
-router.get("/:groupId/:nom/supprimer", exigerAuthentification, QuestionsController.supprimerQuestion);
-router.post("/:groupId/:nom/confirmer-suppression", exigerAuthentification, QuestionsController.confirmerSuppressionQuestion);
+router.get("/:idGroupe", exigerAuthentification, QuestionsController.consulterQuestionsCours);
+router.get("/:idGroupe/:nom", exigerAuthentification, QuestionsController.selectionnerQuestion);
+router.post("/:idGroupe/:nom/modifier", exigerAuthentification, QuestionsController.modifierQuestion);
+router.get("/:idGroupe/:nom/supprimer", exigerAuthentification, QuestionsController.supprimerQuestion);
+router.post("/:idGroupe/:nom/confirmer-suppression", exigerAuthentification, QuestionsController.confirmerSuppressionQuestion);
 
-router.get("/:groupId/questions", exigerAuthentification, QuestionsController.consulterQuestionsCours);
-router.get("/:groupId/questions/:nom", exigerAuthentification, QuestionsController.selectionnerQuestion);
-router.post("/:groupId/questions/:nom/modifier", exigerAuthentification, QuestionsController.modifierQuestion);
-router.get("/:groupId/questions/:nom/suppression", exigerAuthentification, QuestionsController.supprimerQuestion);
-router.post("/:groupId/questions/:nom/suppression", exigerAuthentification, QuestionsController.confirmerSuppressionQuestion);
+router.get("/:idGroupe/questions", exigerAuthentification, QuestionsController.consulterQuestionsCours);
+router.get("/:idGroupe/questions/:nom", exigerAuthentification, QuestionsController.selectionnerQuestion);
+router.post("/:idGroupe/questions/:nom/modifier", exigerAuthentification, QuestionsController.modifierQuestion);
+router.get("/:idGroupe/questions/:nom/suppression", exigerAuthentification, QuestionsController.supprimerQuestion);
+router.post("/:idGroupe/questions/:nom/suppression", exigerAuthentification, QuestionsController.confirmerSuppressionQuestion);
 
-router.post("/:groupId/ajouter-vrai-faux", exigerAuthentification, QuestionsController.ajouterQuestionVraiFaux);
+router.post("/:idGroupe/ajouter-vrai-faux", exigerAuthentification, QuestionsController.ajouterQuestionVraiFaux);
 
-  router.post("/:groupId/ajouter-choix-multiple", exigerAuthentification, QuestionsController.ajouterQuestionChoixMultiple);
-  router.post("/:groupId/ajouter-numerique", exigerAuthentification, QuestionsController.ajouterQuestionNumerique);
-  router.post("/:groupId/ajouter-reponse-courte", exigerAuthentification, QuestionsController.ajouterQuestionReponseCourte);
-  router.post("/:groupId/ajouter-mise-en-correspondance", exigerAuthentification, QuestionsController.ajouterQuestionMiseEnCorrespondance);
-  router.post("/:groupId/ajouter-essai", exigerAuthentification, QuestionsController.ajouterQuestionEssai);
+  router.post("/:idGroupe/ajouter-choix-multiple", exigerAuthentification, QuestionsController.ajouterQuestionChoixMultiple);
+  router.post("/:idGroupe/ajouter-numerique", exigerAuthentification, QuestionsController.ajouterQuestionNumerique);
+  router.post("/:idGroupe/ajouter-reponse-courte", exigerAuthentification, QuestionsController.ajouterQuestionReponseCourte);
+  router.post("/:idGroupe/ajouter-mise-en-correspondance", exigerAuthentification, QuestionsController.ajouterQuestionMiseEnCorrespondance);
+  router.post("/:idGroupe/ajouter-essai", exigerAuthentification, QuestionsController.ajouterQuestionEssai);
 
 export default router;

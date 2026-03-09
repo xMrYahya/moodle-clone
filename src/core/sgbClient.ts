@@ -108,7 +108,7 @@ export class SgbClient {
     return (await res.json()) as AllStudentsResponse;
   }
 
-  async getEtudiantsParGroupe(token: string, groupId: string): Promise<StudentInfo[]> {
+  async getEtudiantsParGroupe(token: string, idGroupe: string): Promise<StudentInfo[]> {
 
     const [linksResp, studentsResp] = await Promise.all([
       this.getGroupStudentLinks(token),
@@ -120,7 +120,7 @@ export class SgbClient {
 
     const idsForGroup = new Set(
       links
-        .filter(l => String(l.group_id) === String(groupId))
+        .filter(l => String(l.group_id) === String(idGroupe))
         .map(l => String(l.student_id))
     );
 
@@ -143,17 +143,17 @@ export class SgbClient {
     return result;
   }
 
-  async getStudentsForGroup(token: string, groupId: string): Promise<StudentInfo[]> {
-    return this.getEtudiantsParGroupe(token, groupId);
+  async getStudentsForGroup(token: string, idGroupe: string): Promise<StudentInfo[]> {
+    return this.getEtudiantsParGroupe(token, idGroupe);
   }
 
-  private async construireGroupesCours(token: string, teacherId?: string): Promise<GroupeCoursSGA[]> {
+  private async construireGroupesCours(token: string, idEnseignant?: string): Promise<GroupeCoursSGA[]> {
     const [scheduleResult, coursesResult] = await Promise.all([
       this.getSchedules(token) as Promise<{ data: { group_id: string; day: string; hours: string; activity: string; mode: string; local: string; teacher_id: string }[] }>,
       this.getCourses(token),
     ]);
     const schedules = (scheduleResult.data ?? []).filter((s) =>
-      teacherId === undefined ? true : String(s.teacher_id) === String(teacherId)
+      idEnseignant === undefined ? true : String(s.teacher_id) === String(idEnseignant)
     );
 
     const coursesById = new Map<string, { id: string; titre: string }>();
@@ -164,10 +164,10 @@ export class SgbClient {
     const groupes = new Map<string, GroupeCoursSGA>();
 
     for (const s of schedules) {
-      const groupId = String(s.group_id);
-      if (groupes.has(groupId)) continue;
+      const idGroupe = String(s.group_id);
+      if (groupes.has(idGroupe)) continue;
 
-      const parts = groupId.split("-");
+      const parts = idGroupe.split("-");
       const code = parts.length >= 2 ? parts[1] : null;
       const direct = code ? coursesById.get(code) : undefined;
       const fallback =
@@ -176,12 +176,12 @@ export class SgbClient {
           : undefined;
       const course = direct ?? fallback;
 
-      groupes.set(groupId, {
-        idGroupe: groupId,
+      groupes.set(idGroupe, {
+        idGroupe: idGroupe,
         jour: String(s.day),
         heure: String(s.hours),
         idCours: course ? String(course.id) : (code ?? ""),
-        titreCours: course ? String(course.titre) : (code ?? groupId),
+        titreCours: course ? String(course.titre) : (code ?? idGroupe),
         activite: String(s.activity),
         mode: String(s.mode),
         local: String(s.local),
@@ -192,22 +192,22 @@ export class SgbClient {
     return Array.from(groupes.values());
   }
 
-  async getCours(teacherId: string, token: string): Promise<GroupeCoursSGA[]> {
-    return this.construireGroupesCours(token, teacherId);
+  async getCours(idEnseignant: string, token: string): Promise<GroupeCoursSGA[]> {
+    return this.construireGroupesCours(token, idEnseignant);
   }
 
   async getCoursParGroupe(
-    groupId: string,
+    idGroupe: string,
     token: string,
-    teacherId?: string
+    idEnseignant?: string
   ): Promise<GroupeCoursSGA | undefined> {
-    const groupes = teacherId
-      ? await this.construireGroupesCours(token, teacherId)
+    const groupes = idEnseignant
+      ? await this.construireGroupesCours(token, idEnseignant)
       : await this.construireGroupesCours(token);
-    return groupes.find((g) => String(g.idGroupe) === String(groupId));
+    return groupes.find((g) => String(g.idGroupe) === String(idGroupe));
   }
 
-  async getListeCours(teacherId: string, token: string): Promise<GroupeCoursSGA[]> {
-    return this.getCours(teacherId, token);
+  async getListeCours(idEnseignant: string, token: string): Promise<GroupeCoursSGA[]> {
+    return this.getCours(idEnseignant, token);
   }
 }

@@ -50,7 +50,7 @@ function viderTempSession(req: any, idGroupe: string): void {
 export class QuestionnairesController {
   static async gererQuestionnaires(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const enseignant = req.session?.user;
       if (!idGroupe || !enseignant?.id) {
         res.status(400).send("idGroupe ou infos utilisateur manquant");
@@ -108,7 +108,7 @@ export class QuestionnairesController {
 
   static async ajouterQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const nom = lireTexte(req.body?.nom);
       const description = lireTexte(req.body?.description);
       const actif = lireBool(req.body?.actif);
@@ -142,7 +142,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?addQuestionnaire=1&erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?addQuestionnaire=1&erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de l'ajout du questionnaire"
         )}`
       );
@@ -151,7 +151,7 @@ export class QuestionnairesController {
   }
 
   static async selectionnerTag(req: any, res: Response): Promise<void> {
-    const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+    const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
     const nomTag = lireTexte(req.query?.nomTag ?? req.body?.nomTag);
     res.redirect(
       `/cours/${encodeURIComponent(idGroupe)}/questionnaires?nomTag=${encodeURIComponent(nomTag)}`
@@ -160,7 +160,7 @@ export class QuestionnairesController {
 
   static async ajouterQuestion(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const nomQuestion = lireTexte(req.body?.nomQuestion);
       const nomsQuestions = Array.isArray(req.body?.nomQuestions)
         ? req.body.nomQuestions.map((q: unknown) => lireTexte(q)).filter((q: string) => q.length > 0)
@@ -199,7 +199,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de l'ajout de la question"
         )}`
       );
@@ -209,7 +209,7 @@ export class QuestionnairesController {
 
   static async sauvegarderQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const temp = obtenirTempSession(req, idGroupe);
       if (!temp) {
         res.redirect(
@@ -238,7 +238,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la sauvegarde du questionnaire"
         )}`
       );
@@ -248,7 +248,7 @@ export class QuestionnairesController {
 
   static async retirerQuestion(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const nomQuestion = lireTexte(req.body?.nomQuestion);
       const nomTag = lireTexte(req.body?.nomTag);
       const temp = obtenirTempSession(req, idGroupe);
@@ -269,7 +269,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors du retrait de la question"
         )}`
       );
@@ -279,7 +279,7 @@ export class QuestionnairesController {
 
   static async selectionModifierQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const nomQuestionnaire = lireTexte(req.body?.nomQuestionnaire ?? req.query?.nomQuestionnaire);
       const questionnaire = await obtenirQuestionnaireParNom(idGroupe, nomQuestionnaire);
       if (!questionnaire) {
@@ -309,7 +309,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la preparation de modification"
         )}`
       );
@@ -319,7 +319,7 @@ export class QuestionnairesController {
 
   static async modifierOrdreQuestion(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const nomQuestion = lireTexte(req.body?.nomQuestion);
       const nouvellePosition = Number.parseInt(lireTexte(req.body?.nouvellePosition), 10);
       const nomTag = lireTexte(req.body?.nomTag);
@@ -351,7 +351,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la modification de l'ordre"
         )}`
       );
@@ -361,7 +361,7 @@ export class QuestionnairesController {
 
   static async modifierQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const temp = obtenirTempSession(req, idGroupe);
       if (!temp) {
         res.redirect(
@@ -413,7 +413,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la sauvegarde des modifications"
         )}`
       );
@@ -423,7 +423,7 @@ export class QuestionnairesController {
 
   static async verifierSupprimerQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const nomQuestionnaire = lireTexte(req.body?.nomQuestionnaire ?? req.query?.nomQuestionnaire);
 
       if (!idGroupe || !nomQuestionnaire) {
@@ -447,7 +447,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la verification de suppression"
         )}`
       );
@@ -457,7 +457,7 @@ export class QuestionnairesController {
 
   static async confirmerSuppression(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
       const nomQuestionnaire = lireTexte(req.body?.nomQuestionnaire ?? req.query?.nomQuestionnaire);
 
       const supprime = await supprimerQuestionnaire(idGroupe, nomQuestionnaire);
@@ -479,7 +479,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la suppression du questionnaire"
         )}`
       );

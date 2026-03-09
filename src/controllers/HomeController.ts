@@ -6,8 +6,8 @@ const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
 const accesSGA = new SgbClient(sgbBaseUrl);
 
 export class HomeController {
-  static async demarrerAjoutCours(teacherId: string, token: string): Promise<any[]> {
-    return accesSGA.getCours(String(teacherId), token);
+  static async demarrerAjoutCours(idEnseignant: string, token: string): Promise<any[]> {
+    return accesSGA.getCours(String(idEnseignant), token);
   }
 
   static async afficherListeCours(req: any, res: Response): Promise<void> {

@@ -39,7 +39,7 @@ export class CoursController {
   static async selectionnerGroupeCours(req: any, res: Response): Promise<void> {
     try {
       const teacher = req.session.user;
-      const idGroupe = req.body?.idGroupe ?? req.body?.groupId;
+      const idGroupe = req.body?.idGroupe ?? req.body?.idGroupe;
 
       if (!teacher?.id || !idGroupe) {
         res.status(400).send("Enseignant ou idGroupe manquant");
@@ -90,7 +90,7 @@ export class CoursController {
   }
 
   static async retirerCours(req: any, res: Response): Promise<void> {
-    const idCours = req.query?.idCours ?? req.query?.groupId;
+    const idCours = req.query?.idCours ?? req.query?.idGroupe;
     if (!idCours) {
       res.redirect("/index");
       return;
@@ -99,7 +99,7 @@ export class CoursController {
   }
 
   static async confirmerSuppressionCours(req: any, res: Response): Promise<void> {
-    const idCours = req.query?.idCours ?? req.query?.groupId;
+    const idCours = req.query?.idCours ?? req.query?.idGroupe;
     if (!idCours) {
       res.redirect("/index");
       return;
@@ -109,7 +109,7 @@ export class CoursController {
 
   static async suppressionCours(req: any, res: Response): Promise<void> {
     try {
-      const idCours = req.body?.idCours ?? req.body?.groupId;
+      const idCours = req.body?.idCours ?? req.body?.idGroupe;
       if (!idCours) {
         res.redirect("/index");
         return;
@@ -127,7 +127,7 @@ export class CoursController {
 
   static async afficherDetailsCours(req: any, res: Response): Promise<void> {
     try {
-      const idCours = req.params?.idCours ?? req.params?.groupId;
+      const idCours = req.params?.idCours ?? req.params?.idGroupe;
       const teacher = req.session.user;
 
       if (!idCours || !teacher?.id) {
@@ -154,7 +154,7 @@ export class CoursController {
       res.render("questions", {
         title: "Questions",
         displayName,
-        groupId: idCours,
+        idGroupe: idCours,
         idCours,
         coursId: cours.idCours,
         coursTitre: cours.titreCours || cours.activite,
