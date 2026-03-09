@@ -1,18 +1,13 @@
 @startuml
-title RDCU – Demarrer Ajout Cours
+title RDCU - Demarrer Ajout Cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
-participant ":Enseignant"  as enseignant
-participant "sga:accesSGA" as sga
+participant ":CoursController" as coursController
 
- -> enseignant : demarrerAjoutCours()
-activate enseignant
-enseignant -> sga : getCours(teacher_id:string, token:string): Groupe-Cours[]
-activate sga
-sga -->> enseignant :  listeGC:Groupe-Cours[]
-
-deactivate sga
-
-deactivate enseignant
+-> coursController : demarrerAjoutCours()
+activate coursController
+coursController -->> coursController : appel service SGB (boite noire)
+<<-- coursController : listeGC:Groupe-Cours[]
+deactivate coursController
 @enduml

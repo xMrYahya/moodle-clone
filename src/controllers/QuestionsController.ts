@@ -1,13 +1,13 @@
 import { Response } from "express";
 import { 
   ajouterQuestionAuCours,
-  recupererQuestionParNom,
-  recupererQuestionsDuCours,
-  existeNomQuestion,
-  existeNomQuestionEnExcluant,
-  supprimerQuestionDuCours,
+  obtenirQuestionParNom,
+  obtenirQuestionsDuCours,
+  nomQuestionExiste,
+  nomQuestionExisteSauf,
+  retirerQuestionDuCours,
   modifierQuestionDuCours,
-} from "../core/coursStore";
+} from "../core/CoursModele";
 import {
   PairDeCorrespondance,
   Question,
@@ -104,8 +104,8 @@ export class QuestionsController {
     const nomExcluNettoye = QuestionsController.lireTexte(nomAExclure);
 
     const existe = nomExcluNettoye
-      ? await existeNomQuestionEnExcluant(idGroupe, nomNettoye, nomExcluNettoye)
-      : await existeNomQuestion(idGroupe, nomNettoye);
+      ? await nomQuestionExisteSauf(idGroupe, nomNettoye, nomExcluNettoye)
+      : await nomQuestionExiste(idGroupe, nomNettoye);
 
     if (existe) {
       throw new AlreadyExistsError(`Une question avec le nom "${nomNettoye}" existe déjà`);
@@ -123,7 +123,7 @@ export class QuestionsController {
   static async consulterQuestionsCours(req: any, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
-      const questions = await recupererQuestionsDuCours(idGroupe);
+      const questions = await obtenirQuestionsDuCours(idGroupe);
 
       res.status(200).json({
         success: true,
@@ -149,7 +149,7 @@ export class QuestionsController {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await recupererQuestionParNom(idGroupe, nom);
+      const question = await obtenirQuestionParNom(idGroupe, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
@@ -180,7 +180,7 @@ export class QuestionsController {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const questionExistante = await recupererQuestionParNom(idGroupe, nomOriginal);
+      const questionExistante = await obtenirQuestionParNom(idGroupe, nomOriginal);
       if (!questionExistante) {
         throw new NotFoundError(`Question introuvable avec le nom "${nomOriginal}"`);
       }
@@ -361,7 +361,7 @@ export class QuestionsController {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await recupererQuestionParNom(idGroupe, nom);
+      const question = await obtenirQuestionParNom(idGroupe, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
@@ -393,13 +393,13 @@ export class QuestionsController {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await recupererQuestionParNom(idGroupe, nom);
+      const question = await obtenirQuestionParNom(idGroupe, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
 
-      await supprimerQuestionDuCours(idGroupe, nom);
-      const questions = await recupererQuestionsDuCours(idGroupe);
+      await retirerQuestionDuCours(idGroupe, nom);
+      const questions = await obtenirQuestionsDuCours(idGroupe);
 
       res.status(200).json({
         success: true,
@@ -681,5 +681,6 @@ export class QuestionsController {
     await QuestionsController.ajouterQuestionParType(req, res, "Essai");
   }
 }
+
 
 
