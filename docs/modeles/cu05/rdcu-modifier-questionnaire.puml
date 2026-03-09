@@ -4,7 +4,6 @@ title RDCU - Modifier un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
-participant "q:Questionnaire" as questionnaire
 participant "questionnaireTemp:Questionnaire" as temp
 
 -> controller ++:modifierQuestionnaire(nom:String, description:String, actif:boolean):boolean
@@ -22,9 +21,9 @@ note right: GRASP: Expert
 deactivate temp
 questionnaireModele -> questionnaireModele ++: sauvegarderQuestionnaire():boolean
 note right: GRASP: Expert
-questionnaireModele -> questionnaire ++: mettreAJourAvec(questionnaireTemp:Questionnaire)
+questionnaireModele -> "questionnaireSelectionne:Questionnaire" ++: mettreAJourAvec(questionnaireTemp:Questionnaire)
 note right: GRASP: Expert
-deactivate questionnaire
+deactivate "questionnaireSelectionne:Questionnaire"
 deactivate questionnaireModele
 questionnaireModele --> controller --: confirmerSauvegarde:boolean
 <-- controller --: confirmerSauvegarde:boolean

@@ -69,7 +69,7 @@
 
 ## Contrats
 
-### Contrat C010 - Afficher la liste de question d'un cours
+### Contrat CO10 - Afficher la liste de question d'un cours
 ---
 **Opération: consulterQuestionsCours(groupId : String)**  
 **Références croisées:**
@@ -77,37 +77,38 @@
 - MDD - Enseignant, Cours, Question
 - DSS - Récuperer Question
 **Préconditions:**
-- Un cours a été sélectionné
+- Un cours est sélectionné
 
 **PostConditions:**
+- Aucune postcondition
 
-### Contrat C011 - Afficher une question de la liste de question d'un cours
+### Contrat CO11 - Afficher une question de la liste de question d'un cours
 ---
-**Opération: selectionnerQuestionnaire(nom : String)**  
+**Opération: selectionnerQuestion(nom : String)**  
 **Références croisées:**
 - CU02b - Récuperer une question
 - MDD - Enseignant, Cours, Question
 - DSS - Récuperer Question
 **Préconditions:**
-- La liste de question d'un cours a été récupéré
+- La liste de question d'un cours est récupéré
 
 **PostConditions:**
-- Aucune post condition
+- Aucune postcondition
 
-### Contrat C012 - Demande de suppression de question
+### Contrat CO12 - Demande de suppression de question
 ---
-**Opération: supprimerQuestion(nom : String)**  
+**Opération: supprimerQuestion(groupid : String, nom : String)**  
 **Références croisées:**
 - CU02d - Supprimer une question
 - MDD - Enseignant, Cours, Question
 - DSS - Supprimer question
 **Préconditions:**
-- Une liste de cours a été selectionné
+- Une liste de cours est selectionné
 
 **PostConditions:**
 - Aucune post condition
 
-### Contrat C013 - Confirmation de suppression de question
+### Contrat CO13 - Confirmation de suppression de question
 ---
 **Opération: confirmerSuppression()**  
 **Références croisées:**
@@ -115,12 +116,13 @@
 - MDD - Enseignant, Cours, Question
 - DSS - Supprimer question
 **Préconditions:**
-- Une demande de suppression a été débuté pour un cours
+- Une demande de suppression est débuté pour un cours
 
 **PostConditions:**
-- La question de la selectionné a été dissocié du QuestionStore de la question selectionné
+- La question selectionné a été dissocié du QuestionStore de la question selectionné
+- La question selectionné a été supprimée
 
-### Contrat C014 - Modification de question
+### Contrat CO14 - Modification de question
 ---
 **Opération: modifierQuestion(nom, enonce, type,retroactionValide, retroactionInvalide, tags)**  
 **Références croisées:**
@@ -138,7 +140,7 @@
 - retroactionValide a été associé dans Question.retroactionValide de la question sélectionné
 - retroactionInvalide a été associé dans Question.retroactionInvalide de la question sélectionné
 
-### Contrat C015 - Gerer les questionnaires
+### Contrat CO15 - Gerer les questionnaires
 ---
 **Opération: gererQuestionnaires()**  
 **Références croisées:**
@@ -151,7 +153,7 @@
 **PostConditions:**
 - Aucune postCondition (les questionnaires sont seulement retourné par le controlleur)
 
-### Contrat C016 - Ajouter un questionnaire
+### Contrat CO16 - Ajouter un questionnaire
 ---
 **Opération: ajouterQuestionnaire(nom:String, description:String, actif:boolean)**  
 **Références croisées:**
@@ -160,7 +162,7 @@
 - DSS -Ajouter un questionnaire
 **Préconditions:**
 - Un cours est sélectionné
-- L'option ajouter Questionnaire a été selectionné
+- L'option ajouter Questionnaire est selectionné
 
 **PostConditions:**
 - une instance q de questionnaire a été créé
@@ -169,7 +171,7 @@
 - description a été associé a q.description
 - actif a été associé a q.actif
 
-### Contrat C017 - Selectionner un tag
+### Contrat CO17 - Selectionner un tag
 ---
 **Opération: selectionnerTag(nomTag:String)**  
 **Références croisées:**
@@ -177,12 +179,12 @@
 - MDD - Enseignant, Cours, Question
 - DSS -Ajouter un questionnaire
 **Préconditions:**
-- Un tag a été selectionné
+- Un tag est selectionné
 
 **PostConditions:**
 - Une instance questionnaireTemp de Questionnaire a été crée
 
-### Contrat C018 - Ajouter une question
+### Contrat CO18 - Ajouter une question
 ---
 **Opération: ajouterQuestion(nomQuestion:String)**  
 **Références croisées:**
@@ -190,12 +192,12 @@
 - MDD - Enseignant, Cours, Question
 - DSS -Ajouter un questionnaire
 **Préconditions:**
-- Un questionnaire a été sélectionné
+- Un questionnaire est sélectionné
 
 **PostConditions:**
 - une question a été ajouté au questionnaireTemp avec la correspondance du nomQuestion
 
-### Contrat C019 - Sauvegarder un questionnaire
+### Contrat CO19 - Sauvegarder un questionnaire
 ---
 **Opération: sauvegarderQuestionnaire()**  
 **Références croisées:**
@@ -203,22 +205,91 @@
 - MDD - Enseignant, Cours, Question
 - DSS -Ajouter un questionnaire
 **Préconditions:**
-- Un questionnaire temporaire a été selectionné
+- Un questionnaire temporaire est selectionné
 
 **PostConditions:**
 - une question a été ajouté au questionnaireTemp avec la correspondance du nomQuestion
 
+### Contrat CO20 - Gérer les questionnaires
+---
+
+**Opération: gererQuestionnaires()**
+**Références croisées:**
+- CU05b - afficher un questionnaire
+- DSS - Afficher un questionnaire
+**Préconditions:**
+- L'enseignant est authentifié
+- Un cours est sélectionné
+
+**Postconditions:**
+- Aucune postcondition (La liste des questionnaire est affiché)
+
+### Contrat CO21 - Sélectionner un questionnaire
+---
+
+**Opération: selectionnerQuestionnaire(nom : String)**
+**Références croisées:**
+- CU05b - Afficher un questionnaire
+- DSS - Afficher un questionnaire
+- CO20 - Gérer les questionnaires
+
+**Préconditions:**
+- Aucune précondition
+
+**PostConditions:**
+- Aucune postcondition (les détails du questionnaire sélectionné sont affiché)
+
+### Contrat CO22 - Sélectionner un questionnaire a modifier
+---
+
+**Opération: selectionModifierQuestionnaire(nom : String)**
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+- CO20 - Gérer les questionnaires
+
+**Préconditions:**
+- L'enseignant est authentifié
+- L'enseignant appuie sur gérer les questionnaires
+
+**Postconditions:**
+- 
+
+### Contrat CO23 - Obtenir les tags
+---
+
+**Opération: obtenirTags()**
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+- CO22 Sélectionner un questionnaire a modifier
+
+**Préconditions:**
+- Un questionnaire est sélectionné avec selectionModifierQuestionnaire(nom : String)
+
+**Postconditions:**
+- Aucun postcondition (la liste des tags a été affiché)
+
+### Contrat CO24 - dissocier une question
+---
+
+**Opération: dissocierQuestion(nomQuestion : String)**
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
+**Préconditions:**
+- Un questionnaire est sélectionné avec selectionModifierQuestionnaire(nom : String)
+
+**Postconditions:**
+- 
+
 ## Réalisation de cas d'utilisation (RDCU)
 
-> Chaque cas d'utilisation nécessite une RDCU.
-> Vos RDCU doivent être des diagrammes de séquences d'opérations tel que vu dans le cours de LOG121.
-> Vos diagrammes doivent inclurent: 
-> - La création des instances nécessaires pour réaliser cette séquence
-> - Toutes les objets et classes nécessaires pour réaliser cette séquences, incluant les structures de données comme des objets Map, List, Set, etc.
-> - Les appels de méthodes avec leurs paramètres et les types (paramètres et méthodes)
-> - Les valeurs de retour avec leur type
-> - L'ordre chronologique précis des messages
-> - Les barres d'activation des instances pour montrer quand chaque objet est actif
+![RDCU  ](../../docs/modeles/exports/ "RDCU ")
+
+![RDCU  ](../../docs/modeles/exports/rdc "RDCU ")
+
 
 ## Diagramme de classe logicielle (DCL)
 
@@ -229,7 +300,7 @@
 - Générer un diagramme de classe avec l'outil TPLANT et commenter celui-ci par rapport à votre MDD.
 - https://www.npmjs.com/package/tplant
   
-## Retour sur la correction du rapport précédent
+## Retour sur la correction du rapport psrécédent
 
 ## DSS Mis à Jour
 Les dss suivant ont été mis a jout afin de corriger les erreurs qui avait été trouvé durant l'itération précédente. (Titres de cu manquants dans le titre et types de questions différents pas pris en compte dans le dss)

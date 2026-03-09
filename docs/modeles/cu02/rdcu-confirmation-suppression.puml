@@ -5,7 +5,7 @@ title RDCU – Supprimer une question (Confirmation)
 participant "qc:QuestionsController" as QC
 participant "cs:CoursStore" as CS
 
--> QC : confirmerSuppression(groupId : String, nom : String)
+-> QC : confirmerSuppression()
 note right: GRASP: Controller
 activate QC
 

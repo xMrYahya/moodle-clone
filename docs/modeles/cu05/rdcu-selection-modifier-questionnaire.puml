@@ -1,10 +1,9 @@
 @startuml
 hide footbox
-title RDCU - Modifier un questionnaire
+title RDCU - Selectionner modifier un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
-participant "q:Questionnaire" as q
 participant "questionnaireTemp:Questionnaire" as temp
 
 -> controller ++: selectionModifierQuestionnaire(nom:String):Questionnaire

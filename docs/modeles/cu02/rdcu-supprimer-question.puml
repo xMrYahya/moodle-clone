@@ -14,7 +14,7 @@ activate CS
 CS --> QC : question : Question
 deactivate CS
 
-<-- QC : demanderConfirmationSuppression():String
+<-- QC : void
 
 deactivate QC
 
