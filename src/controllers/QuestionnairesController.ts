@@ -1,18 +1,6 @@
 import { Response } from "express";
-import { recupererQuestionsDuCours, recupererCoursStockeParIdGroupe } from "../core/coursStore";
-import {
-  ajouterQuestionnaire,
-  creerQuestionnaire,
-  obtenirListeTagsDesQuestions,
-  obtenirQuestionParNom,
-  obtenirQuestionnaireParNom,
-  obtenirQuestionnairesAssocies,
-  obtenirQuestionsParTag,
-  modifierQuestionnaire as modifierQuestionnaireStore,
-  sauvegarderQuestionsQuestionnaire,
-  supprimerQuestionnaire,
-  verifierSupprimerQuestionnaire,
-} from "../core/questionnairesStore";
+import { obtenirQuestionsDuCours, obtenirCoursStockeParIdGroupe } from "../core/CoursModele";
+import { QuestionnaireModele } from "../core/QuestionnaireModele";
 import { QuestionnaireTemp } from "../types/questionnaireTypes";
 
 type SessionAvecTemp = {
@@ -50,36 +38,38 @@ function viderTempSession(req: any, idGroupe: string): void {
 export class QuestionnairesController {
   static async gererQuestionnaires(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const enseignant = req.session?.user;
       if (!idGroupe || !enseignant?.id) {
-        res.status(400).send("idGroupe ou infos utilisateur manquant");
+        res.status(400).send("idGroupe ou informations utilisateur manquantes");
         return;
       }
 
-      const cours = await recupererCoursStockeParIdGroupe(idGroupe);
+      const cours = await obtenirCoursStockeParIdGroupe(idGroupe);
       if (!cours) {
         res.status(404).send("Cours introuvable");
         return;
       }
 
       const nomTag = lireTexte(req.query?.nomTag);
-      const questionnaires = await obtenirQuestionnairesAssocies(idGroupe);
-      const tags = await obtenirListeTagsDesQuestions(idGroupe);
-      const questionsCours = await recupererQuestionsDuCours(idGroupe);
+      const questionnaires = await QuestionnaireModele.obtenirQuestionnairesAssocies(idGroupe);
+      const tags = await QuestionnaireModele.obtenirListeTagsDesQuestions(idGroupe);
+      const questionsCours = await obtenirQuestionsDuCours(idGroupe);
       const aucuneQuestionAssocieeAuCours = questionsCours.length === 0;
       const questionnaireTemp = obtenirTempSession(req, idGroupe);
       const messageSucces = lireTexte(req.query?.succes);
       const messageErreur = lireTexte(req.query?.erreur);
       const showAddQuestionnaireModal = req.query?.addQuestionnaire === "1";
-      const questionsDuTagBrutes = nomTag ? await obtenirQuestionsParTag(idGroupe, nomTag) : [];
+      const questionsDuTagBrutes = nomTag
+        ? await QuestionnaireModele.obtenirQuestionsParTag(idGroupe, nomTag)
+        : [];
       const nomsDejaAjoutes = new Set((questionnaireTemp?.questions ?? []).map((q) => String(q)));
       const questionsDuTag = questionsDuTagBrutes.filter(
         (question) => !nomsDejaAjoutes.has(String(question.nom))
       );
       const nomQuestionnaireSuppression = lireTexte(req.query?.confirmerSuppression);
       const questionnaireSuppression = nomQuestionnaireSuppression
-        ? await obtenirQuestionnaireParNom(idGroupe, nomQuestionnaireSuppression)
+        ? await QuestionnaireModele.obtenirQuestionnaireParNom(idGroupe, nomQuestionnaireSuppression)
         : undefined;
 
       res.render("questionnaires", {
@@ -108,7 +98,7 @@ export class QuestionnairesController {
 
   static async ajouterQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const nom = lireTexte(req.body?.nom);
       const description = lireTexte(req.body?.description);
       const actif = lireBool(req.body?.actif);
@@ -120,9 +110,14 @@ export class QuestionnairesController {
         return;
       }
 
-      const questionnaire = await creerQuestionnaire(idGroupe, nom, description, actif);
-      await ajouterQuestionnaire(idGroupe, questionnaire);
-      const questionsCours = await recupererQuestionsDuCours(idGroupe);
+      const questionnaire = await QuestionnaireModele.creerQuestionnaire(
+        idGroupe,
+        nom,
+        description,
+        actif
+      );
+      await QuestionnaireModele.ajouterQuestionnaire(idGroupe, questionnaire);
+      const questionsCours = await obtenirQuestionsDuCours(idGroupe);
       const messageCreation = questionsCours.length === 0
         ? "Questionnaire cree avec succes. Aucune question n'est associee a ce cours pour le moment."
         : "Questionnaire ajoute. Selectionnez un tag pour ajouter des questions.";
@@ -142,7 +137,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?addQuestionnaire=1&erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?addQuestionnaire=1&erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de l'ajout du questionnaire"
         )}`
       );
@@ -151,7 +146,7 @@ export class QuestionnairesController {
   }
 
   static async selectionnerTag(req: any, res: Response): Promise<void> {
-    const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+    const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
     const nomTag = lireTexte(req.query?.nomTag ?? req.body?.nomTag);
     res.redirect(
       `/cours/${encodeURIComponent(idGroupe)}/questionnaires?nomTag=${encodeURIComponent(nomTag)}`
@@ -160,7 +155,7 @@ export class QuestionnairesController {
 
   static async ajouterQuestion(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const nomQuestion = lireTexte(req.body?.nomQuestion);
       const nomsQuestions = Array.isArray(req.body?.nomQuestions)
         ? req.body.nomQuestions.map((q: unknown) => lireTexte(q)).filter((q: string) => q.length > 0)
@@ -178,7 +173,7 @@ export class QuestionnairesController {
       const aAjouter = nomsQuestions.length > 0 ? nomsQuestions : [nomQuestion];
 
       for (const nom of aAjouter) {
-        const question = await obtenirQuestionParNom(idGroupe, nom);
+        const question = await QuestionnaireModele.obtenirQuestionParNom(idGroupe, nom);
         if (!question) {
           res.redirect(
             `/cours/${encodeURIComponent(idGroupe)}/questionnaires?nomTag=${encodeURIComponent(nomTag)}&erreur=${encodeURIComponent("Question introuvable")}`
@@ -187,9 +182,7 @@ export class QuestionnairesController {
         }
 
         const nomQuestionModele = String((question as any).nom);
-        if (!temp.questions.includes(nomQuestionModele)) {
-          temp.questions.push(nomQuestionModele);
-        }
+        QuestionnaireModele.ajouterQuestion(temp, nomQuestionModele);
       }
       definirTempSession(req, idGroupe, temp);
 
@@ -199,7 +192,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de l'ajout de la question"
         )}`
       );
@@ -209,7 +202,7 @@ export class QuestionnairesController {
 
   static async sauvegarderQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const temp = obtenirTempSession(req, idGroupe);
       if (!temp) {
         res.redirect(
@@ -218,7 +211,7 @@ export class QuestionnairesController {
         return;
       }
 
-      const ok = await sauvegarderQuestionsQuestionnaire(
+      const ok = await QuestionnaireModele.sauvegarderQuestionnaire(
         idGroupe,
         temp.nomQuestionnaire,
         temp.questions
@@ -238,7 +231,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la sauvegarde du questionnaire"
         )}`
       );
@@ -248,7 +241,7 @@ export class QuestionnairesController {
 
   static async retirerQuestion(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const nomQuestion = lireTexte(req.body?.nomQuestion);
       const nomTag = lireTexte(req.body?.nomTag);
       const temp = obtenirTempSession(req, idGroupe);
@@ -260,7 +253,7 @@ export class QuestionnairesController {
         return;
       }
 
-      temp.questions = temp.questions.filter((q) => String(q) !== String(nomQuestion));
+      QuestionnaireModele.dissocierQuestion(temp, nomQuestion);
       definirTempSession(req, idGroupe, temp);
 
       res.redirect(
@@ -269,7 +262,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors du retrait de la question"
         )}`
       );
@@ -279,9 +272,12 @@ export class QuestionnairesController {
 
   static async selectionModifierQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const nomQuestionnaire = lireTexte(req.body?.nomQuestionnaire ?? req.query?.nomQuestionnaire);
-      const questionnaire = await obtenirQuestionnaireParNom(idGroupe, nomQuestionnaire);
+      const questionnaire = await QuestionnaireModele.obtenirQuestionnaireParNom(
+        idGroupe,
+        nomQuestionnaire
+      );
       if (!questionnaire) {
         res.redirect(
           `/cours/${encodeURIComponent(idGroupe)}/questionnaires?erreur=${encodeURIComponent("Questionnaire introuvable")}`
@@ -291,7 +287,7 @@ export class QuestionnairesController {
 
       if ((questionnaire.resultatsEtudiants ?? []).length > 0) {
         res.redirect(
-          `/cours/${encodeURIComponent(idGroupe)}/questionnaires?erreur=${encodeURIComponent("Modification impossible: ce questionnaire a ete realise par au moins un etudiant.")}`
+          `/cours/${encodeURIComponent(idGroupe)}/questionnaires?erreur=${encodeURIComponent("Modification impossible : ce questionnaire a ete realise par au moins un etudiant.")}`
         );
         return;
       }
@@ -309,7 +305,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la preparation de modification"
         )}`
       );
@@ -319,7 +315,7 @@ export class QuestionnairesController {
 
   static async modifierOrdreQuestion(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const nomQuestion = lireTexte(req.body?.nomQuestion);
       const nouvellePosition = Number.parseInt(lireTexte(req.body?.nouvellePosition), 10);
       const nomTag = lireTexte(req.body?.nomTag);
@@ -339,10 +335,7 @@ export class QuestionnairesController {
         return;
       }
 
-      const [question] = temp.questions.splice(indexActuel, 1);
-      const pos = Number.isFinite(nouvellePosition) ? nouvellePosition - 1 : indexActuel;
-      const borne = Math.max(0, Math.min(temp.questions.length, pos));
-      temp.questions.splice(borne, 0, question);
+      QuestionnaireModele.modifierOrdreQuestion(temp, nomQuestion, nouvellePosition);
       definirTempSession(req, idGroupe, temp);
 
       res.redirect(
@@ -351,7 +344,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la modification de l'ordre"
         )}`
       );
@@ -361,7 +354,7 @@ export class QuestionnairesController {
 
   static async modifierQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const temp = obtenirTempSession(req, idGroupe);
       if (!temp) {
         res.redirect(
@@ -383,7 +376,7 @@ export class QuestionnairesController {
       }
 
       if (temp.mode === "modification") {
-        await modifierQuestionnaireStore(
+        await QuestionnaireModele.modifierQuestionnaire(
           idGroupe,
           nomOriginal,
           nom,
@@ -398,8 +391,11 @@ export class QuestionnairesController {
         return;
       }
 
-      // Mode ajout: conserve le flux CU05a existant.
-      const ok = await sauvegarderQuestionsQuestionnaire(idGroupe, temp.nomQuestionnaire, temp.questions);
+      const ok = await QuestionnaireModele.sauvegarderQuestionnaire(
+        idGroupe,
+        temp.nomQuestionnaire,
+        temp.questions
+      );
       if (!ok) {
         res.redirect(
           `/cours/${encodeURIComponent(idGroupe)}/questionnaires?erreur=${encodeURIComponent("Questionnaire introuvable pour sauvegarde")}`
@@ -413,7 +409,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la sauvegarde des modifications"
         )}`
       );
@@ -423,7 +419,7 @@ export class QuestionnairesController {
 
   static async verifierSupprimerQuestionnaire(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const nomQuestionnaire = lireTexte(req.body?.nomQuestionnaire ?? req.query?.nomQuestionnaire);
 
       if (!idGroupe || !nomQuestionnaire) {
@@ -433,10 +429,13 @@ export class QuestionnairesController {
         return;
       }
 
-      const verification = await verifierSupprimerQuestionnaire(idGroupe, nomQuestionnaire);
+      const verification = await QuestionnaireModele.verifierSupprimerQuestionnaire(
+        idGroupe,
+        nomQuestionnaire
+      );
       if (!verification.confirmation) {
         res.redirect(
-          `/cours/${encodeURIComponent(idGroupe)}/questionnaires?erreur=${encodeURIComponent("Suppression impossible: ce questionnaire a ete realise par au moins un etudiant.")}`
+          `/cours/${encodeURIComponent(idGroupe)}/questionnaires?erreur=${encodeURIComponent("Suppression impossible : ce questionnaire a ete realise par au moins un etudiant.")}`
         );
         return;
       }
@@ -447,7 +446,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la verification de suppression"
         )}`
       );
@@ -457,10 +456,10 @@ export class QuestionnairesController {
 
   static async confirmerSuppression(req: any, res: Response): Promise<void> {
     try {
-      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.idGroupe);
+      const idGroupe = lireTexte(req.params?.idCours ?? req.params?.groupId);
       const nomQuestionnaire = lireTexte(req.body?.nomQuestionnaire ?? req.query?.nomQuestionnaire);
 
-      const supprime = await supprimerQuestionnaire(idGroupe, nomQuestionnaire);
+      const supprime = await QuestionnaireModele.supprimerQuestionnaire(idGroupe, nomQuestionnaire);
       if (!supprime) {
         res.redirect(
           `/cours/${encodeURIComponent(idGroupe)}/questionnaires?erreur=${encodeURIComponent("Questionnaire introuvable ou deja supprime")}`
@@ -479,7 +478,7 @@ export class QuestionnairesController {
       return;
     } catch (e: any) {
       res.redirect(
-        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.idGroupe ?? "")}/questionnaires?erreur=${encodeURIComponent(
+        `/cours/${encodeURIComponent(req.params?.idCours ?? req.params?.groupId ?? "")}/questionnaires?erreur=${encodeURIComponent(
           e?.message ?? "Erreur lors de la suppression du questionnaire"
         )}`
       );

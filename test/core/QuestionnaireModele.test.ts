@@ -2,17 +2,17 @@ import { promises as fs } from "fs";
 import os from "os";
 import path from "path";
 
-describe("questionnairesStore - exigences CU05", () => {
+describe("QuestionnaireModele - exigences CU05", () => {
   let tmpDir: string;
   let store: any;
 
   beforeEach(async () => {
     jest.resetModules();
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "questionnaires-store-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "questionnaire-modele-"));
     jest.spyOn(process, "cwd").mockReturnValue(tmpDir);
 
-    jest.doMock("../../src/core/coursStore", () => ({
-      recupererQuestionsDuCours: jest.fn(async (idGroupe: string) => {
+    jest.doMock("../../src/core/CoursModele", () => ({
+      obtenirQuestionsDuCours: jest.fn(async (idGroupe: string) => {
         if (idGroupe === "g-1") {
           return [
             { nom: "Q1", tags: ["exam"] },
@@ -27,7 +27,7 @@ describe("questionnairesStore - exigences CU05", () => {
       }),
     }));
 
-    store = require("../../src/core/questionnairesStore");
+    store = require("../../src/core/QuestionnaireModele");
     await store.viderQuestionnairesAuDemarrage();
   });
 
@@ -64,7 +64,7 @@ describe("questionnairesStore - exigences CU05", () => {
   test("un questionnaire cree peut etre associe a plusieurs questions", async () => {
     const q = await store.creerQuestionnaire("g-1", "Quiz multi", "Desc", true);
     await store.ajouterQuestionnaire("g-1", q);
-    const ok = await store.sauvegarderQuestionsQuestionnaire("g-1", "Quiz multi", ["Q1", "Q2"]);
+    const ok = await store.sauvegarderQuestionnaire("g-1", "Quiz multi", ["Q1", "Q2"]);
     expect(ok).toBe(true);
     const questionnaires = await store.obtenirQuestionnairesAssocies("g-1");
     const quiz = questionnaires.find((x: any) => x.nom === "Quiz multi");
@@ -95,8 +95,8 @@ describe("questionnairesStore - exigences CU05", () => {
     const qb = await store.creerQuestionnaire("g-1", "QB", "", true);
     await store.ajouterQuestionnaire("g-1", qa);
     await store.ajouterQuestionnaire("g-1", qb);
-    await store.sauvegarderQuestionsQuestionnaire("g-1", "QA", ["Q1", "Q2"]);
-    await store.sauvegarderQuestionsQuestionnaire("g-1", "QB", ["Q1"]);
+    await store.sauvegarderQuestionnaire("g-1", "QA", ["Q1", "Q2"]);
+    await store.sauvegarderQuestionnaire("g-1", "QB", ["Q1"]);
 
     const questionsExam = await store.obtenirQuestionsParTag("g-1", "exam");
     const q1 = questionsExam.find((q: any) => q.nom === "Q1");
@@ -181,7 +181,7 @@ describe("questionnairesStore - exigences CU05", () => {
   test("les questions associees avant suppression existent encore dans la banque", async () => {
     const q = await store.creerQuestionnaire("g-1", "Quiz banque", "", true);
     await store.ajouterQuestionnaire("g-1", q);
-    await store.sauvegarderQuestionsQuestionnaire("g-1", "Quiz banque", ["Q1", "Q2"]);
+    await store.sauvegarderQuestionnaire("g-1", "Quiz banque", ["Q1", "Q2"]);
     await store.supprimerQuestionnaire("g-1", "Quiz banque");
     const q1 = await store.obtenirQuestionParNom("g-1", "Q1");
     const q2 = await store.obtenirQuestionParNom("g-1", "Q2");
@@ -197,4 +197,6 @@ describe("questionnairesStore - exigences CU05", () => {
     expect(verification.confirmation).toBe(false);
   });
 });
+
+
 

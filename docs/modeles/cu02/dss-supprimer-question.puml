@@ -6,10 +6,10 @@ participant ":Systeme" as s
 e->s : consulterQuestionsCours(groupId : String)
 s-->>e : Liste des questions associees au cours
 
-e->s : supprimerQuestion(nom : String)
+e->s : supprimerQuestion(groupId :String, nom : String)
 alt Question existante
 	s-->>e : Valeurs actuelles de la question et demande de confirmation
-	e->s : confirmerSuppression(nom : String)
+	e->s : confirmerSuppression()
 	alt Suppression reussie
 		s-->>e : Message confirmant la suppression et nouvelle liste de questions
 	else Erreur de suppression

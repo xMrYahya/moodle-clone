@@ -1,16 +1,13 @@
 @startuml
 hide footbox
-title RDCU – Retirer un cours
+title RDCU - Retirer un cours
 
-participant "cc:coursController" as cc
+participant ":CoursController" as ctrl
 
-activate cc
--> cc : retirerCours(idCours : String)
-note right: GRASP: Controller
-
-cc -> cc : idCours = idCours
-note right: GRASP: Expert
-
-<-- cc : confirmerLaSuppression()
+-> ctrl : retirerCours(idCours:String)
+activate ctrl
+ctrl -> ctrl : redirigerVersConfirmerSuppression(idCours)
+<<-- ctrl : demandeConfirmation
+deactivate ctrl
 
 @enduml

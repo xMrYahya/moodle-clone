@@ -1,23 +1,16 @@
 @startuml
 hide footbox
-title RDCU –  Confirmation de retrait d'un cours
+title RDCU - Confirmation de retrait d'un cours
 
-participant "cc:controlleurCours" as cc
-participant "cs:coursStore" as cs
+participant ":CoursController" as ctrl
+participant ":CoursModele" as modele
 
-activate cc
- -> cc : confirmerSuppressionCours()
-note right: GRASP: Controller
-
-cc -> cc : suppressionCours(idCours : String)
-note right: GRASP: Expert
-
-cc -> cs : retirerCoursStocke(idCours : String)
-note right: GRASP: Expert
-activate cs
-cs --> cc : coursRestant()
-deactivate cs
-
-<-- cc: messageSuppressionConfirmer()
-
+-> ctrl : suppressionCours(idCours:String)
+activate ctrl
+ctrl -> modele : retirerCoursStocke(idCours:String)
+activate modele
+modele -->> ctrl : suppressionOK
+deactivate modele
+<<-- ctrl : listeCours + messageSuppressionConfirmee
+deactivate ctrl
 @enduml

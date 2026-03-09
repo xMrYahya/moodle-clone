@@ -2,20 +2,15 @@
 hide footbox
 title RDCU - selectionnerGroupeCours(idGroupe : String)
 
-participant "cc:coursController" as cc
-participant "sga : accesSga" as S
-participant "c : Cours" as C
+participant ":CoursController" as ctrl
+participant ":CoursModele" as modele
 
--> cc : selectionnerGroupeCours(idGroupe : String)
-note right: GRASP: Controller
-activate cc
-
-cc -> S : getCours(idGroupe : String, token:string)
-note right: GRASP: Expert
-activate S
-S -> C ** : <<create>> Cours\n(idGroupe:String, token:string)
-note right: GRASP: Creator
-
-S -->> cc : c : Cours
-deactivate S
+-> ctrl : selectionnerGroupeCours(idGroupe:String)
+activate ctrl
+ctrl -> modele : ajouterCoursStocke(cours:Cours)
+activate modele
+modele -->> ctrl : confirmationAjout
+deactivate modele
+<<-- ctrl : confirmationAjout
+deactivate ctrl
 @enduml

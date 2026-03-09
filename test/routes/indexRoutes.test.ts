@@ -10,8 +10,8 @@ jest.mock("../../src/controllers/AuthController", () => ({
   },
 }));
 
-jest.mock("../../src/controllers/HomeController", () => ({
-  HomeController: {
+jest.mock("../../src/controllers/CoursController", () => ({
+  CoursController: {
     index: jest.fn((req: any, res: any) => res.status(200).send("accueil-index-ok-fr")),
   },
 }));
@@ -42,7 +42,7 @@ const makeAppNoSession = () => {
 
 describe("indexRoutes", () => {
   const AuthController = require("../../src/controllers/AuthController").AuthController;
-  const HomeController = require("../../src/controllers/HomeController").HomeController;
+  const CoursController = require("../../src/controllers/CoursController").CoursController;
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -94,7 +94,7 @@ describe("indexRoutes", () => {
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("/signin");
-    expect(HomeController.index).not.toHaveBeenCalled();
+    expect(CoursController.index).not.toHaveBeenCalled();
   });
 
   test("GET /index sans session redirige vers /signin", async () => {
@@ -104,18 +104,19 @@ describe("indexRoutes", () => {
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("/signin");
-    expect(HomeController.index).not.toHaveBeenCalled();
+    expect(CoursController.index).not.toHaveBeenCalled();
   });
 
-  test("GET /index avec auth appelle HomeController.index", async () => {
+  test("GET /index avec auth appelle CoursController.index", async () => {
     const app = makeApp();
 
     const res = await request(app).get("/index").set("x-test-auth", "1");
 
     expect(res.status).toBe(200);
     expect(res.text).toBe("accueil-index-ok-fr");
-    expect(HomeController.index).toHaveBeenCalledTimes(1);
+    expect(CoursController.index).toHaveBeenCalledTimes(1);
   });
 });
+
 
 

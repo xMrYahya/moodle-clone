@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 
-describe("HomeController.index", () => {
+describe("CoursController.index", () => {
   const makeRes = () => {
     const res: any = {};
     res.render = jest.fn().mockReturnValue(res);
@@ -18,11 +18,11 @@ describe("HomeController.index", () => {
 
   test("addCourse=1 but no teacher.id -> showAddCourseModal true, no fetch, empty groups", async () => {
     jest.resetModules();
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { email: "a@b.c" }, query: { addCourse: "1" } };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
       showAddCourseModal: true,
@@ -33,14 +33,14 @@ describe("HomeController.index", () => {
 
   test("addCourse!=1 -> no fetch, uses email fallback displayName and confirmRemove null when not string", async () => {
     jest.resetModules();
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
       session: { email: "teacher@school.edu" },
       query: { addCourse: "0", confirmRemove: 123 },
     };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
       showAddCourseModal: false,
@@ -53,20 +53,20 @@ describe("HomeController.index", () => {
 
   test("addCourse!=1 with teacher -> renders createdGroups for that teacher", async () => {
     jest.resetModules();
-    const store = require("../../src/core/coursStore");
+    const store = require("../../src/core/CoursModele");
     const getStoredSpy = jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([
       { idGroupe: "g-1" },
       { idGroupe: "g-2" },
     ] as any);
 
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
       session: { user: { id: 7, first_name: "T", last_name: "L" } },
       query: { addCourse: "0" },
     };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(getStoredSpy).toHaveBeenCalledWith("7");
     expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
@@ -77,20 +77,20 @@ describe("HomeController.index", () => {
 
   test("addCourse!=1 with teacher -> createdGroups contains only teacher courses", async () => {
     jest.resetModules();
-    const store = require("../../src/core/coursStore");
+    const store = require("../../src/core/CoursModele");
     const getStoredSpy = jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([
       { idGroupe: "g-10", idEnseignant: "7" },
       { idGroupe: "g-11", idEnseignant: "7" },
     ] as any);
 
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
       session: { user: { id: 7, first_name: "T", last_name: "L" } },
       query: { addCourse: "0" },
     };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(getStoredSpy).toHaveBeenCalledWith("7");
     const renderArg = (res.render.mock.calls[0][1] as any);
@@ -102,14 +102,14 @@ describe("HomeController.index", () => {
 
   test("confirmRemove string is passed through", async () => {
     jest.resetModules();
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
       session: { email: "teacher@school.edu" },
       query: { confirmRemove: "g-1" },
     };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
       confirmRemoveGroupId: "g-1",
@@ -118,11 +118,11 @@ describe("HomeController.index", () => {
 
   test("no teacher and no email -> displayName defaults to 'Enseignant'", async () => {
     jest.resetModules();
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: {}, query: {} };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
       displayName: "Enseignant",
@@ -138,14 +138,14 @@ describe("HomeController.index", () => {
     jest.spyOn(SgbModule.SgbClient.prototype, "getSchedules").mockResolvedValueOnce({ data: [] } as any);
     jest.spyOn(SgbModule.SgbClient.prototype, "getCourses").mockResolvedValueOnce({ data: [] } as any);
 
-    const store = require("../../src/core/coursStore");
+    const store = require("../../src/core/CoursModele");
     jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([{ idGroupe: "g-1" }] as any);
 
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 5, first_name: "F", last_name: "L" }, token: "t" }, query: { addCourse: "1" } };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.render).toHaveBeenCalledWith("index", expect.objectContaining({
       showAddCourseModal: true,
@@ -172,14 +172,14 @@ describe("HomeController.index", () => {
     jest.spyOn(SgbModule.SgbClient.prototype, "getSchedules").mockResolvedValueOnce({ data: schedules } as any);
     jest.spyOn(SgbModule.SgbClient.prototype, "getCourses").mockResolvedValueOnce({ data: courses } as any);
 
-    const store = require("../../src/core/coursStore");
+    const store = require("../../src/core/CoursModele");
     jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([{ idGroupe: "g-123" }] as any);
 
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 10, first_name: "John", last_name: "Doe" }, token: "t" }, query: { addCourse: "1" } };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.render).toHaveBeenCalled();
     const renderArg = (res.render.mock.calls[0][1] as any);
@@ -227,14 +227,14 @@ describe("HomeController.index", () => {
     jest.resetModules();
     const SgbModule = require("../../src/core/sgbClient");
     jest.spyOn(SgbModule.SgbClient.prototype, "getSchedules").mockRejectedValueOnce(new Error("sgb-fail"));
-    const store = require("../../src/core/coursStore");
+    const store = require("../../src/core/CoursModele");
     jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([] as any);
 
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 1, first_name: "A", last_name: "B" }, token: "t" }, query: { addCourse: "1" } };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith("sgb-fail");
@@ -243,17 +243,18 @@ describe("HomeController.index", () => {
 
   test("erreur sans message -> retourne 500 avec message de repli", async () => {
     jest.resetModules();
-    const store = require("../../src/core/coursStore");
+    const store = require("../../src/core/CoursModele");
     jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockRejectedValueOnce(undefined);
 
-    const HomeController = require("../../src/controllers/HomeController").HomeController;
+    const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { session: { user: { id: 1, first_name: "A", last_name: "B" } }, query: {} };
     const res = makeRes();
 
-    await HomeController.index(req, res);
+    await CoursController.index(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.send).toHaveBeenCalledWith("Echec du chargement de l'accueil");
   });
 });
+
 
