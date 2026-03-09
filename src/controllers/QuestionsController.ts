@@ -23,6 +23,7 @@ import { AlreadyExistsError } from "../core/errors/alreadyExistsError";
 import { InvalidParameterError } from "../core/errors/invalidParameterError";
 import { NotFoundError } from "../core/errors/notFoundError";
 import { convertirQuestionModeleEnDonnees } from "../core/questionsFactory";
+import { QuestionnaireModele } from "../core/QuestionnaireModele";
 
 export class QuestionsController {
   private static lireValeurSimple(valeur: unknown): unknown {
@@ -396,6 +397,21 @@ export class QuestionsController {
       const question = await obtenirQuestionParNom(idGroupe, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
+      }
+
+      const questionnaires = await QuestionnaireModele.obtenirQuestionnairesAssocies(idGroupe);
+      const nomRecherche = String(nom).trim().toLowerCase();
+      const estAssociee = questionnaires.some((questionnaire) =>
+        Array.isArray(questionnaire.questions) &&
+        questionnaire.questions.some(
+          (nomQuestion) => String(nomQuestion).trim().toLowerCase() === nomRecherche
+        )
+      );
+      if (estAssociee) {
+        res.status(409).json({
+          error: "Suppression impossible : cette question est associee a un questionnaire.",
+        });
+        return;
       }
 
       await retirerQuestionDuCours(idGroupe, nom);
