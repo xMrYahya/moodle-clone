@@ -8,6 +8,15 @@ html
     .container.mt-4
       h1 Accueil
 
+      if messageSucces
+        .alert.alert-success.mt-3.alert-fermeture
+          span #{messageSucces}
+          button.btn-fermer-alerte(type="button" aria-label="Fermer" onclick="fermerAlerte(this)") x
+      if messageErreur
+        .alert.alert-danger.mt-3.alert-fermeture
+          span #{messageErreur}
+          button.btn-fermer-alerte(type="button" aria-label="Fermer" onclick="fermerAlerte(this)") x
+
       a.btn.btn-primary(href="/index?addCourse=1") Ajouter cours
 
       hr
@@ -82,3 +91,46 @@ html
             form(method="post" action="/cours/suppression-cours" class="m-0")
               input(type="hidden" name="idCours" value=confirmRemoveGroupId)
               button.btn.btn-danger(type="submit") Oui, retirer
+
+    style.
+      .alert-fermeture {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-fermer-alerte {
+        border: none;
+        background: transparent;
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.75;
+      }
+      .btn-fermer-alerte:hover {
+        opacity: 1;
+      }
+
+    script.
+      function nettoyerParametresFlashUrl() {
+        const url = new URL(window.location.href);
+        const hadSucces = url.searchParams.has("succes");
+        const hadErreur = url.searchParams.has("erreur");
+        if (!hadSucces && !hadErreur) {
+          return;
+        }
+        url.searchParams.delete("succes");
+        url.searchParams.delete("erreur");
+        const nouvelleUrl = `${url.pathname}${url.searchParams.toString() ? `?${url.searchParams.toString()}` : ""}${url.hash || ""}`;
+        window.history.replaceState({}, "", nouvelleUrl);
+      }
+      function fermerAlerte(btn) {
+        const alerte = btn && btn.closest('.alert');
+        if (alerte) {
+          alerte.remove();
+        }
+        nettoyerParametresFlashUrl();
+      }
+      window.fermerAlerte = fermerAlerte;
+      nettoyerParametresFlashUrl();

@@ -125,7 +125,7 @@ describe("CoursController", () => {
     const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
     expect(arg.idCours).toBe("999");
     expect(arg.titreCours).toBe("Cours-XYZ-special");
-    expect(res.redirect).toHaveBeenCalledWith("/index");
+    expect(res.redirect).toHaveBeenCalledWith(expect.stringContaining("/index?succes="));
   });
 
   test("creer: no dash in groupId -> idCours undefined and redirect", async () => {
@@ -163,7 +163,7 @@ describe("CoursController", () => {
     const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
     expect(arg.idCours).toBeUndefined();
     expect(arg.titreCours).toBeUndefined();
-    expect(res.redirect).toHaveBeenCalledWith("/index");
+    expect(res.redirect).toHaveBeenCalledWith(expect.stringContaining("/index?succes="));
   });
 
   test("creer: code present but no course match -> idCours is code", async () => {
@@ -201,7 +201,7 @@ describe("CoursController", () => {
     const arg = (ajouterCoursStockeSpy.mock.calls[0][0] as any);
     expect(arg.idCours).toBe("777");
     expect(arg.titreCours).toBeUndefined();
-    expect(res.redirect).toHaveBeenCalledWith("/index");
+    expect(res.redirect).toHaveBeenCalledWith(expect.stringContaining("/index?succes="));
   });
 
   test("creer: ajouterCoursStocke throws -> 500 with message", async () => {
@@ -338,7 +338,7 @@ describe("CoursController", () => {
 
     await CoursController.suppressionCours(req, res);
 
-    expect(res.redirect).toHaveBeenCalledWith("/index");
+    expect(res.redirect).toHaveBeenCalledWith(expect.stringContaining("/index?succes="));
   });
 
   test("suppressionCours: success calls retirerCoursStocke and redirects", async () => {

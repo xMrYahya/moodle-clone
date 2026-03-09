@@ -1,0 +1,312 @@
+html
+  include includes/head.pug
+
+  body
+    include includes/navbar.pug
+    +navbar(displayName)
+
+    .container.mt-4
+      .d-flex.justify-content-between.align-items-start.flex-wrap.gap-2
+        .mb-2
+          h1.mb-1 #{coursTitre}
+          .text-muted.fs-5
+            strong #{cours.idCours}
+            |  · Groupe: #{idCours}
+        .d-flex.gap-2
+          a.btn.btn-outline-secondary(href=`/cours/${idCours}/details-cours`) Retour au cours
+
+      if messageSucces
+        .alert.alert-success.mt-3.alert-fermeture
+          span #{messageSucces}
+          button.btn-fermer-alerte(type="button" aria-label="Fermer" onclick="fermerAlerte(this)") x
+      if messageErreur
+        .alert.alert-danger.mt-3.alert-fermeture
+          span #{messageErreur}
+          button.btn-fermer-alerte(type="button" aria-label="Fermer" onclick="fermerAlerte(this)") x
+      if aucuneQuestionAssocieeAuCours
+        .alert.alert-warning.mt-3.alert-fermeture
+          span
+            | Aucune question n'est associee a ce cours.
+            |  Vous pouvez creer un questionnaire, mais il sera sauvegarde sans question tant qu'aucune question n'est creee.
+          button.btn-fermer-alerte(type="button" aria-label="Fermer" onclick="fermerAlerte(this)") x
+
+      hr
+
+      .card.mb-4
+        .card-body
+          .d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
+            h4.mb-0 Liste des questionnaires associes au cours
+            a.btn.btn-primary(href=`/cours/${idCours}/questionnaires?addQuestionnaire=1`) Ajouter un questionnaire
+
+          if questionnaires && questionnaires.length
+            .row.mt-3
+              each q in questionnaires
+                .col-12.col-md-6.col-lg-4.mb-3
+                  .card.h-100
+                    .card-body
+                      .d-flex.justify-content-between.align-items-start
+                        h5.card-title.mb-1 #{q.nom}
+                        if q.actif
+                          span.badge.bg-success Actif
+                        else
+                          span.badge.bg-secondary Inactif
+                      p.card-text.text-muted.mb-2 #{q.description || "Sans description"}
+                      p.card-text.mb-0
+                        small.text-muted Questions associees: #{(q.questions && q.questions.length) || 0}
+                      .mt-3.d-flex.flex-wrap.pt-1
+                        form(method="post" action=`/cours/${idCours}/questionnaires/selection-modifier` class="m-0 mr-2 mb-2")
+                          input(type="hidden" name="nomQuestionnaire" value=q.nom)
+                          button.btn.btn-sm.btn-outline-primary(type="submit") Modifier questionnaire
+                        form(method="post" action=`/cours/${idCours}/questionnaires/verifier-suppression` class="m-0 mb-2")
+                          input(type="hidden" name="nomQuestionnaire" value=q.nom)
+                          button.btn.btn-sm.btn-outline-danger(type="submit") Supprimer questionnaire
+          else
+            p.text-muted.mt-3 Aucun questionnaire disponible.
+
+      if questionnaireTemp
+        .card.mb-4
+          .card-body
+            h4.mb-3
+              if questionnaireTemp.mode === "modification"
+                | Modifier le questionnaire
+              else
+                | Ajouter des questions au questionnaire
+            p.mb-1
+              strong Questionnaire:
+              |  #{questionnaireTemp.nomQuestionnaire}
+            p.text-muted.mb-3
+              if questionnaireTemp.mode === "modification"
+                | Ce questionnaire est en cours de modification.
+
+            if questionnaireTemp.mode === "modification"
+              form(method="post" action=`/cours/${idCours}/questionnaires/modifier` class="mb-3")
+                .row.g-2
+                  .col-md-4
+                    label.form-label(for="nom-questionnaire") Nom
+                    input.form-control(type="text" id="nom-questionnaire" name="nom" required value=questionnaireTemp.nomQuestionnaire)
+                  .col-md-5
+                    label.form-label(for="desc-questionnaire") Description
+                    input.form-control(type="text" id="desc-questionnaire" name="description" value=(questionnaireTemp.description || ""))
+                  .col-md-3.d-flex.align-items-end
+                    .form-check
+                      input.form-check-input(type="checkbox" id="actif-questionnaire" name="actif" value="true" checked=questionnaireTemp.actif)
+                      label.form-check-label(for="actif-questionnaire") Actif
+                .mt-3
+                  button.btn.btn-success(type="submit") Sauvegarder modifications
+            else
+              .mb-3
+                p.text-muted.mb-2
+                  | Questionnaire cree. Vous pouvez maintenant ajouter des questions par tag, puis sauvegarder.
+                form(method="post" action=`/cours/${idCours}/questionnaires/modifier` class="m-0")
+                  button.btn.btn-success(type="submit") Sauvegarder questionnaire
+
+            if tags && tags.length
+              form(method="get" action=`/cours/${idCours}/questionnaires/selectionner-tag` class="row g-2 align-items-end")
+                .col-md-8
+                  label.form-label(for="nomTag") Selectionner un tag
+                  select.form-control(name="nomTag" id="nomTag")
+                    each tag in tags
+                      option(value=tag selected=(nomTagSelectionne === tag)) #{tag}
+                .col-md-4
+                  button.btn.btn-outline-primary.w-100(type="submit") Afficher les questions du tag
+            else
+              p.text-muted Aucun tag disponible pour ce cours.
+
+            if nomTagSelectionne
+              h5.mt-4 Questions du tag "#{nomTagSelectionne}"
+              if questionsDuTag && questionsDuTag.length
+                .list-group
+                  each questionTag in questionsDuTag
+                    .list-group-item.d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
+                      div
+                        strong #{questionTag.nom}
+                        br
+                        small.text-muted Deja ajoutee dans #{questionTag.utilisationQuestionnaires} questionnaire(s)
+                      form(method="post" action=`/cours/${idCours}/questionnaires/ajouter-question`)
+                        input(type="hidden" name="nomQuestion" value=questionTag.nom)
+                        input(type="hidden" name="nomTag" value=nomTagSelectionne)
+                        button.btn.btn-sm.btn-outline-success(type="submit") Ajouter question
+              else
+                p.text-muted Aucune question pour ce tag.
+
+            h5.mt-4 Questions dans le questionnaire
+            if questionnaireTemp.questions && questionnaireTemp.questions.length
+              .list-group
+                each nomQuestion, idx in questionnaireTemp.questions
+                  .list-group-item.d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
+                    .d-flex.flex-column
+                      strong #{idx + 1}. #{nomQuestion}
+                    .question-actions
+                      form(method="post" action=`/cours/${idCours}/questionnaires/retirer-question` class="m-0 action-principale")
+                        input(type="hidden" name="nomQuestion" value=nomQuestion)
+                        input(type="hidden" name="nomTag" value=nomTagSelectionne)
+                        button.btn.btn-sm.btn-outline-danger(type="submit") Dissocier question
+                      form(method="post" action=`/cours/${idCours}/questionnaires/modifier-ordre-question` class="m-0 ordre-form")
+                        input(type="hidden" name="nomQuestion" value=nomQuestion)
+                        input(type="hidden" name="nomTag" value=nomTagSelectionne)
+                        select.form-control.form-control-sm(name="nouvellePosition" aria-label="Position de la question")
+                          each _, positionIndex in questionnaireTemp.questions
+                            option(value=(positionIndex + 1) selected=((positionIndex + 1) === (idx + 1))) Position #{positionIndex + 1}
+                        button.btn.btn-sm.btn-outline-secondary(type="submit") Deplacer
+            else
+              p.text-muted Aucune question ajoutee pour le moment.
+
+    if questionnaireSuppression
+      .modal-overlay
+        .modal-card
+          .modal-header
+            h5.mb-0 Confirmer la suppression du questionnaire
+            a.close(href=`/cours/${idCours}/questionnaires` aria-label="Fermer") x
+          .modal-body
+            p.mb-2
+              strong Nom:
+              |  #{questionnaireSuppression.nom}
+            p.mb-2
+              strong Description:
+              |  #{questionnaireSuppression.description || "Sans description"}
+            p.mb-2
+              strong Actif:
+              |  #{questionnaireSuppression.actif ? "Oui" : "Non"}
+            h6.mt-3 Etudiants ayant repondu et notes
+            if questionnaireSuppression.resultatsEtudiants && questionnaireSuppression.resultatsEtudiants.length
+              ul.list-group
+                each resultat in questionnaireSuppression.resultatsEtudiants
+                  li.list-group-item
+                    | #{resultat.courrielEtudiant} - Note: #{resultat.note}
+            else
+              p.text-muted.mb-0 Aucun etudiant n'a repondu.
+          .modal-footer
+            a.btn.btn-secondary(href=`/cours/${idCours}/questionnaires`) Annuler
+            form(method="post" action=`/cours/${idCours}/questionnaires/confirmer-suppression` class="m-0")
+              input(type="hidden" name="nomQuestionnaire" value=questionnaireSuppression.nom)
+              button.btn.btn-danger(type="submit") Confirmer suppression
+
+    if showAddQuestionnaireModal
+      .modal-overlay
+        .modal-card
+          .modal-header
+            h5.mb-0 Ajouter un questionnaire
+            a.close(href=`/cours/${idCours}/questionnaires` aria-label="Fermer") x
+          .modal-body
+            form(method="post" action=`/cours/${idCours}/questionnaires/ajouter`)
+              .form-group
+                label(for="nom") Nom du questionnaire
+                input.form-control(type="text" id="nom" name="nom" required)
+              .form-group.mt-3
+                label(for="description") Description
+                textarea.form-control(id="description" name="description" rows="3")
+              .form-group.mt-3
+                .form-check
+                  input.form-check-input(type="checkbox" id="actif" name="actif" value="true")
+                  label.form-check-label(for="actif") Questionnaire actif
+              .mt-3
+                button.btn.btn-primary(type="submit") Ajouter questionnaire
+          .modal-footer
+            a.btn.btn-secondary(href=`/cours/${idCours}/questionnaires`) Fermer
+
+    style.
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 16px;
+      }
+      .modal-card {
+        width: 100%;
+        max-width: 700px;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .modal-header, .modal-footer {
+        padding: 12px 16px;
+        border-bottom: 1px solid #eee;
+      }
+      .modal-footer {
+        border-top: 1px solid #eee;
+        border-bottom: none;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+      }
+      .modal-body {
+        padding: 16px;
+      }
+      .close {
+        border: none;
+        background: transparent;
+        color: #6c757d;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1;
+        text-decoration: none;
+        cursor: pointer;
+        padding: 0 4px;
+      }
+      .close:hover {
+        color: #343a40;
+      }
+      .question-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .question-actions .action-principale {
+        margin-right: 12px;
+        margin-bottom: 8px;
+      }
+      .question-actions .ordre-form {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .question-actions .ordre-form select {
+        width: 130px;
+        margin-right: 8px;
+      }
+      .alert-fermeture {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-fermer-alerte {
+        border: none;
+        background: transparent;
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.75;
+      }
+      .btn-fermer-alerte:hover {
+        opacity: 1;
+      }
+
+    script.
+      function fermerAlerte(btn) {
+        const alerte = btn && btn.closest('.alert');
+        if (alerte) {
+          alerte.remove();
+        }
+      }
+      window.fermerAlerte = fermerAlerte;
+      (function nettoyerParametresFlash() {
+        const url = new URL(window.location.href);
+        const hadSucces = url.searchParams.has("succes");
+        const hadErreur = url.searchParams.has("erreur");
+        if (!hadSucces && !hadErreur) {
+          return;
+        }
+        url.searchParams.delete("succes");
+        url.searchParams.delete("erreur");
+        const nouvelleUrl = `${url.pathname}${url.searchParams.toString() ? `?${url.searchParams.toString()}` : ""}${url.hash || ""}`;
+        window.history.replaceState({}, "", nouvelleUrl);
+      })();
+
+

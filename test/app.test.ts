@@ -9,11 +9,22 @@ const loadApp = (routerFactory: () => express.Router) => {
     jest.doMock("../src/core/coursStore", () => ({
       viderStoreAuDemarrage: jest.fn().mockResolvedValue(undefined),
     }));
+    jest.doMock("../src/core/questionnairesStore", () => ({
+      viderQuestionnairesAuDemarrage: jest.fn().mockResolvedValue(undefined),
+    }));
     jest.doMock("../src/routes/indexRoutes", () => ({
       __esModule: true,
       default: routerFactory(),
     }));
     jest.doMock("../src/routes/coursRoutes", () => ({
+      __esModule: true,
+      default: express.Router(),
+    }));
+    jest.doMock("../src/routes/questionsRoutes", () => ({
+      __esModule: true,
+      default: express.Router(),
+    }));
+    jest.doMock("../src/routes/questionnairesRoutes", () => ({
       __esModule: true,
       default: express.Router(),
     }));
