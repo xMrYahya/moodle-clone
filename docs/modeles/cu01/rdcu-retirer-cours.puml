@@ -5,6 +5,7 @@ title RDCU - Retirer un cours
 participant ":CoursController" as ctrl
 
 -> ctrl : retirerCours(idCours:String)
+note right: GRASP: Controller
 activate ctrl
 ctrl -> ctrl : redirigerVersConfirmerSuppression(idCours)
 <<-- ctrl : demandeConfirmation

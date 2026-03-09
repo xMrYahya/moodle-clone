@@ -1019,7 +1019,8 @@ html
 
             window.location.href = `/cours/${idGroupe}/details-cours?ts=${Date.now()}`;
           } catch (err) {
-            alert('Erreur: ' + err.message);
+            const messageErreur = encodeURIComponent(err?.message || 'Erreur lors de la suppression');
+            window.location.href = `/cours/${idGroupe}/details-cours?erreur=${messageErreur}&ts=${Date.now()}`;
           }
         });
       }

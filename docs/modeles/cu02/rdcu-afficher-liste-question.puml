@@ -10,6 +10,7 @@ note right: GRASP: Controller
 activate QC
 
 QC -> CS : recupererQuestionsDuCours(groupId : String)
+note right: GRASP: Expert
 activate CS
 CS --> QC : questions : List<Question>
 deactivate CS

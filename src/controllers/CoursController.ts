@@ -213,6 +213,7 @@ export class CoursController {
         coursId: cours.idCours,
         coursTitre: cours.titreCours || cours.activite,
         cours,
+        etudiants: cours.etudiants ?? [],
         students: cours.etudiants ?? [],
         questions,
         afficherModalAjoutQuestion: showAddQuestionModal,
