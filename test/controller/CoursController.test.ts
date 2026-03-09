@@ -74,7 +74,7 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -112,7 +112,7 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -150,7 +150,7 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -188,7 +188,7 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -226,7 +226,7 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     jest.spyOn(coursStore, "ajouterCoursStocke").mockRejectedValueOnce(new Error("store-fail"));
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -285,7 +285,7 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce(students as any);
 
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -316,7 +316,7 @@ describe("CoursController", () => {
       .spyOn(SgbModule.SgbClient.prototype, "getEtudiantsParGroupe")
       .mockResolvedValueOnce([]);
 
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     const ajouterCoursStockeSpy = jest.spyOn(coursStore, "ajouterCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -343,7 +343,7 @@ describe("CoursController", () => {
 
   test("suppressionCours: success calls retirerCoursStocke and redirects", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     const removeSpy = jest.spyOn(coursStore, "retirerCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -358,7 +358,7 @@ describe("CoursController", () => {
 
   test("suppressionCours: retirerCoursStocke throws -> 500 with message", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     jest.spyOn(coursStore, "retirerCoursStocke").mockRejectedValueOnce(new Error("remove-fail"));
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -373,7 +373,7 @@ describe("CoursController", () => {
 
   test("suppressionCours: retirerCoursStocke throws undefined -> 500 with fallback message", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
+    const coursStore = require("../../src/core/CoursModele");
     jest.spyOn(coursStore, "retirerCoursStocke").mockRejectedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
@@ -410,8 +410,8 @@ describe("CoursController", () => {
 
   test("afficherDetailsCours: course not found -> 404", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "recupererCoursStockeParIdGroupe").mockResolvedValueOnce(undefined);
+    const coursStore = require("../../src/core/CoursModele");
+    jest.spyOn(coursStore, "obtenirCoursStockeParIdGroupe").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = { params: { idGroupe: "g-1" }, session: { user: { id: 1 } } };
@@ -425,9 +425,9 @@ describe("CoursController", () => {
 
   test("afficherDetailsCours: success renders with questions and modal flag", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
-    const questionsStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "recupererCoursStockeParIdGroupe").mockResolvedValueOnce({
+    const coursStore = require("../../src/core/CoursModele");
+    const questionsStore = require("../../src/core/CoursModele");
+    jest.spyOn(coursStore, "obtenirCoursStockeParIdGroupe").mockResolvedValueOnce({
       idGroupe: "g-2",
       activite: "Lab",
       idCours: "C-1",
@@ -439,7 +439,7 @@ describe("CoursController", () => {
       idEnseignant: "1",
       etudiants: [],
     });
-    jest.spyOn(questionsStore, "recupererQuestionsDuCours").mockResolvedValueOnce([
+    jest.spyOn(questionsStore, "obtenirQuestionsDuCours").mockResolvedValueOnce([
       { nom: "Q1", type: "VraiFaux" },
     ] as any);
 
@@ -467,9 +467,9 @@ describe("CoursController", () => {
 
   test("afficherDetailsCours: returns all questions for course", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
-    const questionsStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "recupererCoursStockeParIdGroupe").mockResolvedValueOnce({
+    const coursStore = require("../../src/core/CoursModele");
+    const questionsStore = require("../../src/core/CoursModele");
+    jest.spyOn(coursStore, "obtenirCoursStockeParIdGroupe").mockResolvedValueOnce({
       idGroupe: "g-10",
       activite: "Cours",
       idCours: "C-10",
@@ -485,7 +485,7 @@ describe("CoursController", () => {
       { nom: "Q1", type: "VraiFaux" },
       { nom: "Q2", type: "ChoixMultiple" },
     ];
-    jest.spyOn(questionsStore, "recupererQuestionsDuCours").mockResolvedValueOnce(questions as any);
+    jest.spyOn(questionsStore, "obtenirQuestionsDuCours").mockResolvedValueOnce(questions as any);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
@@ -508,9 +508,9 @@ describe("CoursController", () => {
 
   test("afficherDetailsCours: course title missing -> uses activity", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
-    const questionsStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "recupererCoursStockeParIdGroupe").mockResolvedValueOnce({
+    const coursStore = require("../../src/core/CoursModele");
+    const questionsStore = require("../../src/core/CoursModele");
+    jest.spyOn(coursStore, "obtenirCoursStockeParIdGroupe").mockResolvedValueOnce({
       idGroupe: "g-4",
       activite: "ActivityTitle",
       idCours: "C-4",
@@ -522,7 +522,7 @@ describe("CoursController", () => {
       idEnseignant: "1",
       etudiants: [],
     });
-    jest.spyOn(questionsStore, "recupererQuestionsDuCours").mockResolvedValueOnce([]);
+    jest.spyOn(questionsStore, "obtenirQuestionsDuCours").mockResolvedValueOnce([]);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
@@ -541,9 +541,9 @@ describe("CoursController", () => {
 
   test("afficherDetailsCours: questions store throws -> 500 fallback", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
-    const questionsStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "recupererCoursStockeParIdGroupe").mockResolvedValueOnce({
+    const coursStore = require("../../src/core/CoursModele");
+    const questionsStore = require("../../src/core/CoursModele");
+    jest.spyOn(coursStore, "obtenirCoursStockeParIdGroupe").mockResolvedValueOnce({
       idGroupe: "g-3",
       activite: "Lab",
       idCours: "C-2",
@@ -555,7 +555,7 @@ describe("CoursController", () => {
       idEnseignant: "1",
       etudiants: [],
     });
-    jest.spyOn(questionsStore, "recupererQuestionsDuCours").mockRejectedValueOnce(undefined);
+    jest.spyOn(questionsStore, "obtenirQuestionsDuCours").mockRejectedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
@@ -572,8 +572,8 @@ describe("CoursController", () => {
 
   test("afficherDetailsCours: coursStore throws -> 500 with message", async () => {
     jest.resetModules();
-    const coursStore = require("../../src/core/coursStore");
-    jest.spyOn(coursStore, "recupererCoursStockeParIdGroupe").mockRejectedValueOnce(new Error("cours-fail"));
+    const coursStore = require("../../src/core/CoursModele");
+    jest.spyOn(coursStore, "obtenirCoursStockeParIdGroupe").mockRejectedValueOnce(new Error("cours-fail"));
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
@@ -588,4 +588,5 @@ describe("CoursController", () => {
     expect(res.send).toHaveBeenCalledWith("cours-fail");
   });
 });
+
 

@@ -10,15 +10,18 @@ note right: GRASP: Controller
 activate QC
 
 QC -> CS : recupererQuestionParNom(groupId : String, nom : String)
+note right: GRASP: Expert
 activate CS
 CS --> QC : question : Question
 deactivate CS
 
 QC -> CS : supprimerQuestionDuCours(groupId : String, nom : String)
+note right: GRASP: Expert
 activate CS
 deactivate CS
 
 QC -> CS : recupererQuestionsDuCours(groupId: string)
+note right: GRASP: Expert
 activate CS
 CS --> QC : questions : List<Question>
 deactivate CS

@@ -11,8 +11,10 @@ note right: GRASP: Controller
 activate QC
 
 QC -> QC : validerDonnees(nom, enonce, tags)
+note right: GRASP: Expert
 
 QC -> CS : existeNomQuestion(groupId : String, nom : String)
+note right: GRASP: Expert
 activate CS
 CS --> QC : nomExiste : boolean
 deactivate CS
@@ -20,10 +22,12 @@ deactivate CS
 alt Donnees valides et nom unique
   create Q
   QC -> Q : <<create>> QuestionEssai(nom, enonce,\n retroactionValide, retroactionInvalide, tags)
+  note right: GRASP: Creator
   activate Q
   deactivate Q
 
   QC -> CS : ajouterQuestionAuCours(groupId : String, q)
+  note right: GRASP: Expert
   activate CS
   deactivate CS
 

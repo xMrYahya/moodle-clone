@@ -1,16 +1,20 @@
 @startuml
-title Afficher - Détails d'un cours
+title RDCU - Afficher details d'un cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
-participant ":CoursController"  as CoursController
-participant "sga:accesSGA" as sga
+participant ":CoursController" as coursController
+participant ":CoursModele" as coursModele
 
- -> CoursController : afficherDetailsCours(idGroupe: String) : cours
-note right: controlleur
-activate CoursController
-CoursController -> sga : getEtudiantsParGroupe(idGroupe: String) : Étudiant[]
-sga -->> CoursController : ListeEtudiants : Étudiant[]
-
-deactivate CoursController
+-> coursController : afficherDetailsCours(idCours:String) : Cours
+note right: GRASP: Controller
+activate coursController
+coursController -> coursModele : obtenirCoursStockeParIdGroupe(idCours:String) : Cours
+note right: GRASP: Expert
+coursModele -->> coursController : cours:Cours
+coursController -> coursModele : obtenirQuestionsDuCours(idCours:String) : Question[]
+note right: GRASP: Expert
+coursModele -->> coursController : questions:Question[]
+<<-- coursController : detailsCours + etudiants + questions
+deactivate coursController
 @enduml

@@ -8,8 +8,8 @@ import coursRoutes from "./routes/coursRoutes";
 import questionsRoutes from "./routes/questionsRoutes";
 import questionnairesRoutes from "./routes/questionnairesRoutes";
 
-import { viderStoreAuDemarrage } from "./core/coursStore";
-import { viderQuestionnairesAuDemarrage } from "./core/questionnairesStore";
+import { viderStoreAuDemarrage } from "./core/CoursModele";
+import { viderQuestionnairesAuDemarrage } from "./core/QuestionnaireModele";
 
 class App {
   public expressApp: express.Application;
@@ -21,7 +21,7 @@ class App {
     viderQuestionnairesAuDemarrage().catch(console.error);
 
     this.middleware();
-    
+
     this.expressApp.set("view engine", "pug");
     this.expressApp.use(express.static(__dirname + "/public") as express.RequestHandler);
 
@@ -59,7 +59,7 @@ class App {
 
     try {
       req.flash?.("error", error?.message ?? String(error));
-    } catch { }
+    } catch {}
 
     res.status(status).json({ error: String(error?.message ?? error) });
   }

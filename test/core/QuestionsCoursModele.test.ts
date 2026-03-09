@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import os from "os";
 
-describe("coursStore - questions", () => {
+describe("Questions du CoursModele", () => {
   let tmpDir: string;
   let store: any;
 
@@ -20,9 +20,9 @@ describe("coursStore - questions", () => {
 
   beforeEach(async () => {
     jest.resetModules();
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "questionsstore-"));
+    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "questions-cours-modele-"));
     jest.spyOn(process, "cwd").mockReturnValue(tmpDir);
-    store = require("../../src/core/coursStore");
+    store = require("../../src/core/CoursModele");
     await store.viderStoreAuDemarrage();
     await store.ajouterCoursStocke(coursBase);
   });
@@ -45,7 +45,7 @@ describe("coursStore - questions", () => {
       type: "VraiFaux",
     });
 
-    const questions = await store.recupererQuestionsDuCours("LOG210-A01");
+    const questions = await store.obtenirQuestionsDuCours("LOG210-A01");
     expect(questions).toHaveLength(1);
     expect(questions[0].nom).toBe("Q1");
     expect(questions[0].type).toBe("VraiFaux");
@@ -66,7 +66,7 @@ describe("coursStore - questions", () => {
     await expect(store.ajouterQuestionAuCours("LOG210-A01", question)).rejects.toThrow("existe");
   });
 
-  test("existeNomQuestion est insensible a la casse", async () => {
+  test("nomQuestionExiste est insensible a la casse", async () => {
     await store.ajouterQuestionAuCours("LOG210-A01", {
       nom: "TestQ",
       enonce: "Test",
@@ -77,13 +77,13 @@ describe("coursStore - questions", () => {
       type: "VraiFaux",
     });
 
-    expect(await store.existeNomQuestion("LOG210-A01", "TestQ")).toBe(true);
-    expect(await store.existeNomQuestion("LOG210-A01", "testq")).toBe(true);
-    expect(await store.existeNomQuestion("LOG210-A01", "absent")).toBe(false);
+    expect(await store.nomQuestionExiste("LOG210-A01", "TestQ")).toBe(true);
+    expect(await store.nomQuestionExiste("LOG210-A01", "testq")).toBe(true);
+    expect(await store.nomQuestionExiste("LOG210-A01", "absent")).toBe(false);
   });
 
-  test("recupererQuestionsDuCours retourne [] pour un cours absent", async () => {
-    const questions = await store.recupererQuestionsDuCours("INEXISTANT");
+  test("obtenirQuestionsDuCours retourne [] pour un cours absent", async () => {
+    const questions = await store.obtenirQuestionsDuCours("INEXISTANT");
     expect(questions).toEqual([]);
   });
 
@@ -101,7 +101,7 @@ describe("coursStore - questions", () => {
     ).rejects.toThrow("Cours introuvable");
   });
 
-  test("supprimerQuestionDuCours retire la question cible", async () => {
+  test("retirerQuestionDuCours retire la question cible", async () => {
     await store.ajouterQuestionAuCours("LOG210-A01", {
       nom: "Q1",
       enonce: "Question 1",
@@ -112,12 +112,12 @@ describe("coursStore - questions", () => {
       type: "VraiFaux",
     });
 
-    await store.supprimerQuestionDuCours("LOG210-A01", "Q1");
-    const questions = await store.recupererQuestionsDuCours("LOG210-A01");
+    await store.retirerQuestionDuCours("LOG210-A01", "Q1");
+    const questions = await store.obtenirQuestionsDuCours("LOG210-A01");
     expect(questions).toEqual([]);
   });
 
-  test("recupererQuestionParNom retrouve une question sans sensibilite a la casse", async () => {
+  test("obtenirQuestionParNom retrouve une question sans sensibilite a la casse", async () => {
     await store.ajouterQuestionAuCours("LOG210-A01", {
       nom: "QCase",
       enonce: "Question Case",
@@ -128,12 +128,12 @@ describe("coursStore - questions", () => {
       type: "VraiFaux",
     });
 
-    const trouvee = await store.recupererQuestionParNom("LOG210-A01", "qcase");
+    const trouvee = await store.obtenirQuestionParNom("LOG210-A01", "qcase");
     expect(trouvee).toBeDefined();
     expect(trouvee.nom).toBe("QCase");
   });
 
-  test("existeNomQuestionEnExcluant ignore le nom exclu", async () => {
+  test("nomQuestionExisteSauf ignore le nom exclu", async () => {
     await store.ajouterQuestionAuCours("LOG210-A01", {
       nom: "Q1",
       enonce: "Question 1",
@@ -144,8 +144,8 @@ describe("coursStore - questions", () => {
       type: "VraiFaux",
     });
 
-    expect(await store.existeNomQuestionEnExcluant("LOG210-A01", "Q1", "Q1")).toBe(false);
-    expect(await store.existeNomQuestionEnExcluant("LOG210-A01", "Q1", "AUTRE")).toBe(true);
+    expect(await store.nomQuestionExisteSauf("LOG210-A01", "Q1", "Q1")).toBe(false);
+    expect(await store.nomQuestionExisteSauf("LOG210-A01", "Q1", "AUTRE")).toBe(true);
   });
 
   test("modifierQuestionDuCours met a jour la question cible", async () => {
@@ -169,7 +169,7 @@ describe("coursStore - questions", () => {
       type: "VraiFaux",
     });
 
-    const question = await store.recupererQuestionParNom("LOG210-A01", "QMod");
+    const question = await store.obtenirQuestionParNom("LOG210-A01", "QMod");
     expect(question.enonce).toBe("Nouvel enonce");
     expect(question.reponse).toBe(false);
     expect(question.tags).toEqual(["y"]);
@@ -208,9 +208,11 @@ describe("coursStore - questions", () => {
     ).rejects.toThrow("existe déjà");
   });
 
-  test("supprimerQuestionDuCours echoue si la question n'existe pas", async () => {
-    await expect(store.supprimerQuestionDuCours("LOG210-A01", "INEXISTANTE")).rejects.toThrow(
+  test("retirerQuestionDuCours echoue si la question n'existe pas", async () => {
+    await expect(store.retirerQuestionDuCours("LOG210-A01", "INEXISTANTE")).rejects.toThrow(
       "Question introuvable"
     );
   });
 });
+
+

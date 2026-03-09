@@ -11,6 +11,7 @@ note right: GRASP: Controller
 activate QC
 
 QC -> CS : recupererQuestionParNom(groupId : String, nomOriginal : String)
+note right: GRASP: Expert
 activate CS
 CS --> QC : questionExistante : Question
 deactivate CS
@@ -18,10 +19,12 @@ deactivate CS
 alt Nom unique et donnees valides
   create Q
   QC -> Q : <<create>> Question(type, nom, enonce, retroactions, tags, donneesType)
+  note right: GRASP: Creator
   activate Q
   deactivate Q
 
   QC -> CS : modifierQuestionDuCours(groupId : String, nomOriginal : String, q)
+  note right: GRASP: Expert
   activate CS
   deactivate CS
 

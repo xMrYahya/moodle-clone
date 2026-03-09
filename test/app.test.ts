@@ -6,10 +6,10 @@ const loadApp = (routerFactory: () => express.Router) => {
   let app: any;
   jest.isolateModules(() => {
     jest.doMock("morgan", () => () => (_req: any, _res: any, next: any) => next());
-    jest.doMock("../src/core/coursStore", () => ({
+    jest.doMock("../src/core/CoursModele", () => ({
       viderStoreAuDemarrage: jest.fn().mockResolvedValue(undefined),
     }));
-    jest.doMock("../src/core/questionnairesStore", () => ({
+    jest.doMock("../src/core/QuestionnaireModele", () => ({
       viderQuestionnairesAuDemarrage: jest.fn().mockResolvedValue(undefined),
     }));
     jest.doMock("../src/routes/indexRoutes", () => ({
@@ -168,4 +168,5 @@ describe("app", () => {
     expect(res.json).toHaveBeenCalledWith({ error: "undefined" });
   });
 });
+
 

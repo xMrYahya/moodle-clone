@@ -1,12 +1,67 @@
 import { Response } from "express";
 import { SgbClient } from "../core/sgbClient";
-import { ajouterCoursStocke, retirerCoursStocke, recupererCoursStockeParIdGroupe } from "../core/coursStore";
-import { recupererQuestionsDuCours } from "../core/coursStore";
+import {
+  ajouterCoursStocke,
+  retirerCoursStocke,
+  obtenirCoursStockeParIdGroupe,
+  obtenirCoursStockesPourProf,
+  obtenirQuestionsDuCours,
+} from "../core/CoursModele";
 
 const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
-const accesSGA = new SgbClient(sgbBaseUrl);
+const sgbClient = new SgbClient(sgbBaseUrl);
 
 export class CoursController {
+  static async demarrerAjoutCours(teacherId: string, token: string): Promise<any[]> {
+    return sgbClient.getCours(String(teacherId), token);
+  }
+
+  static async afficherListeCours(req: any, res: Response): Promise<void> {
+    try {
+      const teacher = req.session.user;
+      const displayName = teacher
+        ? `${teacher.first_name} ${teacher.last_name}`
+        : req.session.email ?? "Enseignant";
+
+      const showAddCourseModal = req.query.addCourse === "1";
+      const messageSucces = typeof req.query.succes === "string" ? req.query.succes : "";
+      const messageErreur = typeof req.query.erreur === "string" ? req.query.erreur : "";
+      const confirmRemoveGroupId =
+        typeof req.query.confirmRemove === "string" ? req.query.confirmRemove : null;
+
+      const createdGroups = teacher?.id ? await obtenirCoursStockesPourProf(String(teacher.id)) : [];
+      let groups: any[] = [];
+
+      if (showAddCourseModal && teacher?.id) {
+        const listeCours = await CoursController.demarrerAjoutCours(
+          String(teacher.id),
+          req.session.token
+        );
+        const createdIds = new Set(createdGroups.map((g: any) => String(g.idGroupe)));
+        groups = listeCours.filter((g) => !createdIds.has(String(g.idGroupe)));
+      }
+
+      res.render("index", {
+        title: "Moodle",
+        displayName,
+        messageSucces,
+        messageErreur,
+        showAddCourseModal,
+        confirmRemoveGroupId,
+        groups,
+        createdGroups,
+      });
+      return;
+    } catch (e: any) {
+      res.status(500).send(e?.message ?? "Echec du chargement de l'accueil");
+      return;
+    }
+  }
+
+  static async index(req: any, res: Response): Promise<void> {
+    return this.afficherListeCours(req, res);
+  }
+
   private static obtenirTypeQuestionPourAffichage(question: any): string {
     if (question && (question.reponses !== undefined || question.seulementUnChoix !== undefined)) {
       return "ChoixMultiple";
@@ -38,20 +93,20 @@ export class CoursController {
 
   static async selectionnerGroupeCours(req: any, res: Response): Promise<void> {
     try {
-      const enseignantConnecte = req.session.user;
-      const idGroupe = req.body?.idGroupe ?? req.body?.idGroupe;
+      const teacher = req.session.user;
+      const idGroupe = req.body?.idGroupe ?? req.body?.groupId;
 
-      if (!enseignantConnecte?.id || !idGroupe) {
+      if (!teacher?.id || !idGroupe) {
         res.status(400).send("Enseignant ou idGroupe manquant");
         return;
       }
 
-      const coursSelectionne = await accesSGA.getCoursParGroupe(
+      const coursSelectionne = await sgbClient.getCoursParGroupe(
         String(idGroupe),
         req.session.token,
-        String(enseignantConnecte.id)
+        String(teacher.id)
       );
-      const etudiantsDuGroupe = await accesSGA.getEtudiantsParGroupe(req.session.token, String(idGroupe));
+      const students = await sgbClient.getEtudiantsParGroupe(req.session.token, String(idGroupe));
 
       if (!coursSelectionne) {
         res.status(404).send("Horaire introuvable pour ce groupe");
@@ -61,7 +116,9 @@ export class CoursController {
       const idCoursFinal = coursSelectionne.idCours ? String(coursSelectionne.idCours) : undefined;
       const titreCoursBrut = coursSelectionne.titreCours ? String(coursSelectionne.titreCours) : "";
       const titreCoursFinal =
-        titreCoursBrut && titreCoursBrut !== String(coursSelectionne.idGroupe) && titreCoursBrut !== String(idCoursFinal)
+        titreCoursBrut &&
+        titreCoursBrut !== String(coursSelectionne.idGroupe) &&
+        titreCoursBrut !== String(idCoursFinal)
           ? titreCoursBrut
           : undefined;
 
@@ -75,22 +132,20 @@ export class CoursController {
         idEnseignant: String(coursSelectionne.idEnseignant),
         idCours: idCoursFinal,
         titreCours: titreCoursFinal,
-        etudiants: etudiantsDuGroupe,
+        etudiants: students,
         questions: [],
       });
 
-      res.redirect(
-        `/index?succes=${encodeURIComponent("Cours ajoute avec succes.")}`
-      );
+      res.redirect(`/index?succes=${encodeURIComponent("Cours ajoute avec succes.")}`);
       return;
-    } catch (erreur: any) {
-      res.status(500).send(erreur?.message ?? "Echec de creation");
+    } catch (e: any) {
+      res.status(500).send(e?.message ?? "Echec de creation");
       return;
     }
   }
 
   static async retirerCours(req: any, res: Response): Promise<void> {
-    const idCours = req.query?.idCours ?? req.query?.idGroupe;
+    const idCours = req.query?.idCours ?? req.query?.groupId;
     if (!idCours) {
       res.redirect("/index");
       return;
@@ -99,7 +154,7 @@ export class CoursController {
   }
 
   static async confirmerSuppressionCours(req: any, res: Response): Promise<void> {
-    const idCours = req.query?.idCours ?? req.query?.idGroupe;
+    const idCours = req.query?.idCours ?? req.query?.groupId;
     if (!idCours) {
       res.redirect("/index");
       return;
@@ -109,64 +164,65 @@ export class CoursController {
 
   static async suppressionCours(req: any, res: Response): Promise<void> {
     try {
-      const idCours = req.body?.idCours ?? req.body?.idGroupe;
+      const idCours = req.body?.idCours ?? req.body?.groupId;
       if (!idCours) {
         res.redirect("/index");
         return;
       }
       await retirerCoursStocke(String(idCours));
-      res.redirect(
-        `/index?succes=${encodeURIComponent("Cours retire avec succes.")}`
-      );
+      res.redirect(`/index?succes=${encodeURIComponent("Cours retire avec succes.")}`);
       return;
-    } catch (erreur: any) {
-      res.status(500).send(erreur?.message ?? "Echec de suppression");
+    } catch (e: any) {
+      res.status(500).send(e?.message ?? "Echec de suppression");
       return;
     }
   }
 
   static async afficherDetailsCours(req: any, res: Response): Promise<void> {
     try {
-      const idCours = req.params?.idCours ?? req.params?.idGroupe;
-      const enseignantConnecte = req.session.user;
+      const idCours = req.params?.idCours ?? req.params?.groupId;
+      const teacher = req.session.user;
 
-      if (!idCours || !enseignantConnecte?.id) {
-        res.status(400).send("idGroupe ou infos utilisateur manquant");
+      if (!idCours || !teacher?.id) {
+        res.status(400).send("idGroupe ou informations utilisateur manquantes");
         return;
       }
 
-      const cours = await recupererCoursStockeParIdGroupe(idCours);
+      const cours = await obtenirCoursStockeParIdGroupe(idCours);
       if (!cours) {
         res.status(404).send("Cours introuvable");
         return;
       }
 
-      const questionsBrutes = await recupererQuestionsDuCours(idCours);
+      const questionsBrutes = await obtenirQuestionsDuCours(idCours);
       const questions = questionsBrutes.map((question: any) => ({
         ...question,
         typeAffichage: CoursController.obtenirTypeQuestionPourAffichage(question),
       }));
-      const afficherModalAjoutQuestion = req.query.addQuestion === "1";
+      const showAddQuestionModal = req.query.addQuestion === "1";
       const messageSucces = typeof req.query.succes === "string" ? req.query.succes : "";
       const messageErreur = typeof req.query.erreur === "string" ? req.query.erreur : "";
-      const displayName = `${enseignantConnecte.first_name} ${enseignantConnecte.last_name}`;
+      const displayName = `${teacher.first_name} ${teacher.last_name}`;
 
       res.render("questions", {
         title: "Questions",
         displayName,
         idGroupe: idCours,
+        groupId: idCours,
         idCours,
         coursId: cours.idCours,
         coursTitre: cours.titreCours || cours.activite,
-        cours,                         
+        cours,
         etudiants: cours.etudiants ?? [],
+        students: cours.etudiants ?? [],
         questions,
-        afficherModalAjoutQuestion,
+        afficherModalAjoutQuestion: showAddQuestionModal,
+        showAddQuestionModal,
         messageSucces,
         messageErreur,
       });
-    } catch (erreur: any) {
-      res.status(500).send(erreur?.message ?? "Echec du chargement des questions");
+    } catch (e: any) {
+      res.status(500).send(e?.message ?? "Echec du chargement des questions");
     }
   }
 }
