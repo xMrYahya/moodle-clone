@@ -53,10 +53,6 @@
 
 ## Diagramme de séquence système (DSS)
 
-## DSS Mis à Jour
-
-
-## Nouveau DSS
 ![DSS recuperer question](../../docs/modeles/exports/cu02b-recuperer-question-dss.png "DSS recuperer question")
 
 ![DSS Modifier question](../../docs/modeles/exports/cu02c-modifier-une-question-dss.png "DSS Modifier une question")
@@ -71,169 +67,8 @@
 
 ![DSS supprimer un questionnaire](../../docs/modeles/exports/cu05d-supprimer-un-questionnaire-dss.png "DSS supprimer un questionnaire")
 
-
-
 ## Contrats
 
-## Contrats Mis à Jour
-
-### Contrat CO01 - Démarrer Ajout Cours
----
-**Opération:**
-demarrerAjoutCours()
-
-**Références croisées:**
-
-**Préconditions:**
-L'Enseignant doit être authentifié.
-Le service SGB est accessible.
-
-**PostConditions:**
-L'Enseignant a été récupéré depuis le SGA la liste des groupes-cours.
-
-
-### Contrat CO02 - Sélectionner Cours
----
-**Opération:**
-sélectionnerGroupeCours(idGroupe : String)
-
-**Références croisées:**
-Contrat CO01 - Démarrer Ajout Cours
-
-**Préconditions:**
-L'Enseignant est authentifié.
-Un jeton d'authentification valide est présent dans la session.
-La liste des groupes-cours assignés à l'Enseignant a été récupérée préalablement via demarrerAjoutCours()
-
-**PostConditions:**
-Une instance c : Cours a été créée.
-c a été associée à l'Enseignant authentifié.
-Les étudiants inscrit à ce groupe-cours étaient associés a c. 
-Les informations du groupe-cours(horaire, local, etc.) ont étés enregistrées dans c.
-
-
-### Contrat CO03 - Afficher la liste des cours
----
-**Opération:**
-afficherListeCours()
-
-**Références croisées:**
-
-**Préconditions:**
-Une instance ens d'Enseignant existe.
-
-**PostConditions:**
-
-
-### Contrat CO04 - Afficher les détails d'un cours
----
-**Opération:**
-afficherDetailsCours(idCours: String)
-
-**Références croisées:**
-
-**Préconditions:** 
-L'Enseignant a eu au moins un cours qui lui est assigné.
-
-**PostConditions:** 
-
-### Contrat CO05 - Retirer un cours
----
-**Opération:**
-retirerCours(idCours : String)
-
-**Références croisées:**
-Contrat CO03 - Afficher la liste des cours
-
-**Préconditions:**
-L'Enseignant est authentifié.
-L'Enseignant a récupéré un cours (Cu01b)
-
-**PostConditions:**
-Le cours c a été associcé à idCours
-
-
-### Contrat CO06 - Confirmation de la suppression d'un cours
----
-**Opération:**
-confirmerSuppressionCours()
-
-**Références croisées:**
-Contrat CO05 - Retirer un cours
-
-**Préconditions:**
-L'Enseignant est authentifié.
-L'Enseignant a récupéré un cours (Cu01b)
-
-**PostConditions:**
-Le cours (et seulement ce cours) a été supprimé du système SGA
-
-
-### Contrat CO07 - Gestion de Question
----
-**Opération:**
-gestionQuestions()
-
-**Références croisées:**
-
-**Préconditions:**
-- Le token de l'Enseignant e.token n'est pas vide
-- Un cours c est selectioné
-
-**PostConditions:**
-
-
-### Contrat CO08 - Ajouter une question vrai/faux
----
-**Opération:**
-ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Boolean, rétroactionVrai : String, rétroactionFaux : String) : void
-
-**Références croisées:**  
-CU02a – Ajouter question  
-DSS – Ajouter une question  
-MDD – Question, Cours  
-
-**Préconditions:**  
-- L’Enseignant.token n'est pas vide.  
-- Un cours c  est sélectionné.
-
-**PostConditions:**  
-- Une instance `qvf` de `Question` a été créée.  
-- `qvf.nom` est devenu `nom`.  
-- `qvf.énoncé` est devenu `énoncé`.  
-- `qvf.vérité` est devenu `vérité`.  
-- `qvf.rétroactionValide` est devenu `rétroactionVrai`.  
-- `qvf.rétroactionInvalide` est devenu `rétroactionFaux`.  
-- `qvf` a été associée au `Cours` courant via l’association *contient*.
-
-
-### Contrat CO09 - Ajouter une question d'autre type
----
-**Opération:**
-ajouterQuestionAutreType(nom: String, énoncé: String, type: String, rétroactionValide: String, rétroactionInvalide: String, tags: String[])
-
-**Références croisées:**
-CU02a - Ajouter question
-DSS - Ajoute une question
-MDD - Questions, Cours
-
-**Préconditions:**
-- L'Enseignant est authentifié
-- Un cours courant est sélectionné.  
-- Le nom de la question n’existe pas déjà dans la banque de questions du cours courant.
-
-**Postconditions:**
-- Une instance `q` de `Question` a été créée
-- `q.nom` est devenu `nom`
-- `q.énoncé` est devenu `énoncé`
-- `q.type` est devenu `type` (attribut indiquant le type de question)
-- `q.rétroactionValide` est devenu `rétroactionValide`
-- `q.rétroactionInvalide` est devenu `rétroactionInvalide`
-- `q` a été associée au `Cours` courant via l'association *contient*
-- Pour chaque élément `t` dans `tags`, une instance de `tags` a été créée ou récupérée et associée à `q` via l'association *catégorisé par*
-
-
-## Nouveau Contrats
 ### Contrat C010 - Afficher la liste de question d'un cours
 ---
 **Opération: consulterQuestionsCours(groupId : String)**  
@@ -395,6 +230,178 @@ MDD - Questions, Cours
 - https://www.npmjs.com/package/tplant
   
 ## Retour sur la correction du rapport précédent
+
+## DSS Mis à Jour
+Les dss suivant ont été mis a jout afin de corriger les erreurs qui avait été trouvé durant l'itération précédente. (Titres de cu manquants dans le titre et types de questions différents pas pris en compte dans le dss)
+
+![DSS ajouter un cours ](../../docs/modeles/exports/updt-cu01a-ajouter-cours.png "DSS ajouter un cours")
+
+![DSS recuperer un cours](../../docs/modeles/exports/updt-cu01b-recuperer-cours-dss.png "DSS recuperer un cours")
+
+![DSS retirer un cours ](../../docs/modeles/exports/updt-cu01c-retirer-cours-dss.png "DSS retirer un cours")
+
+![DSS ajouter une question ](../../docs/modeles/exports/dss-ajouter-question-updt-v1.png "DSS ajouter une question")
+
+
+## Contrats Mis à Jour
+
+
+### Contrat CO01 - Démarrer Ajout d'un Cours
+---
+Les références croisées ont été ajoutés, précisé la forme de la liste
+
+**Opération:**
+demarrerAjoutCours()
+
+**Références croisées:**
+- CU01a - Ajouter un cours
+- DSS - Ajouter un cours
+- MDD - Enseignant, Cours
+
+**Préconditions:**
+- L'Enseignant doit être authentifié.
+- Le service SGB est accessible.
+
+**PostConditions:**
+HomeController.listeCours contiens la liste des cours associé a l'enseignant authentifié (Array de GroupeCoursSGA) 
+
+
+### Contrat CO02 - Sélectionner un Cours
+---
+Les références croisées ont été ajoutés,
+
+**Opération:**
+sélectionnerGroupeCours(idGroupe : String)
+
+**Références croisées:**
+- Contrat CO01 - Démarrer Ajout Cours
+- CU01a - Ajouter un cours
+- DSS - Ajouter un cours
+- MDD - Enseignant, Cours
+
+**Préconditions:**
+- L'Enseignant est authentifié.
+- Un jeton d'authentification valide est présent dans la session.
+- La liste des groupes-cours assignés à l'Enseignant a été récupérée préalablement via demarrerAjoutCours()
+
+**PostConditions:**
+- Une instance c : Cours a été créée.
+- c a été associée à l'Enseignant authentifié.
+- Les étudiants inscrit à ce groupe-cours étaient associés a c. 
+- Les informations du groupe-cours(horaire, local, etc.) ont étés enregistrées dans c.
+
+
+### Contrat CO03 - Afficher la liste des cours
+---
+**Opération:**
+afficherListeCours()
+
+**Références croisées:**
+
+**Préconditions:**
+Une instance ens d'Enseignant existe.
+
+**PostConditions:**
+
+
+### Contrat CO04 - Afficher les détails d'un cours
+---
+**Opération:**
+afficherDetailsCours(idCours: String)
+
+**Références croisées:**
+
+**Préconditions:** 
+L'Enseignant a eu au moins un cours qui lui est assigné.
+
+**PostConditions:** 
+
+### Contrat CO05 - Retirer un cours
+---
+**Opération:**
+retirerCours(idCours : String)
+
+**Références croisées:**
+Contrat CO03 - Afficher la liste des cours
+
+**Préconditions:**
+L'Enseignant est authentifié.
+L'Enseignant a récupéré un cours (Cu01b)
+
+**PostConditions:**
+Le cours c a été associcé à idCours
+
+
+### Contrat CO06 - Confirmation de la suppression d'un cours
+---
+**Opération:**
+confirmerSuppressionCours()
+
+**Références croisées:**
+Contrat CO05 - Retirer un cours
+
+**Préconditions:**
+L'Enseignant est authentifié.
+L'Enseignant a récupéré un cours (Cu01b)
+
+**PostConditions:**
+Le cours (et seulement ce cours) a été supprimé du système SGA
+
+
+
+### Contrat CO07 - Gestion de Question
+Le contrat est suprimé puisque la fonction n'existe plus
+
+### Contrat CO08 - Ajouter une question vrai/faux
+---
+**Opération:**
+ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Boolean, rétroactionVrai : String, rétroactionFaux : String) : void
+
+**Références croisées:**  
+CU02a – Ajouter question  
+DSS – Ajouter une question  
+MDD – Question, Cours  
+
+**Préconditions:**  
+- L’Enseignant.token n'est pas vide.  
+- Un cours c  est sélectionné.
+
+**PostConditions:**  
+- Une instance `qvf` de `Question` a été créée.  
+- `qvf.nom` est devenu `nom`.  
+- `qvf.énoncé` est devenu `énoncé`.  
+- `qvf.vérité` est devenu `vérité`.  
+- `qvf.rétroactionValide` est devenu `rétroactionVrai`.  
+- `qvf.rétroactionInvalide` est devenu `rétroactionFaux`.  
+- `qvf` a été associée au `Cours` courant via l’association *contient*.
+
+
+### Contrat CO09 - Ajouter une question d'autre type
+---
+**Opération:**
+ajouterQuestionAutreType(nom: String, énoncé: String, type: String, rétroactionValide: String, rétroactionInvalide: String, tags: String[])
+
+**Références croisées:**
+CU02a - Ajouter question
+DSS - Ajoute une question
+MDD - Questions, Cours
+
+**Préconditions:**
+- L'Enseignant est authentifié
+- Un cours courant est sélectionné.  
+- Le nom de la question n’existe pas déjà dans la banque de questions du cours courant.
+
+**Postconditions:**
+- Une instance `q` de `Question` a été créée
+- `q.nom` est devenu `nom`
+- `q.énoncé` est devenu `énoncé`
+- `q.type` est devenu `type` (attribut indiquant le type de question)
+- `q.rétroactionValide` est devenu `rétroactionValide`
+- `q.rétroactionInvalide` est devenu `rétroactionInvalide`
+- `q` a été associée au `Cours` courant via l'association *contient*
+- Pour chaque élément `t` dans `tags`, une instance de `tags` a été créée ou récupérée et associée à `q` via l'association *catégorisé par*
+
+
 > Veuillez insérer ici les diagrammes à revalider de l'itération précédente avec les corrections apportées.
 > Démontrer que vous avez réglé les problèmes identifiés dans le rapport de l'itération précédente.
 

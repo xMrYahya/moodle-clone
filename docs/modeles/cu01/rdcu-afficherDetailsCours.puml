@@ -3,14 +3,14 @@ title Afficher - Détails d'un cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
-participant ":Enseignant"  as enseignant
+participant ":CoursController"  as CoursController
 participant "sga:accesSGA" as sga
 
- -> enseignant : afficherDetailsCours(idGroupe: String) : cours
+ -> CoursController : afficherDetailsCours(idGroupe: String) : cours
 note right: controlleur
-activate enseignant
-enseignant -> sga : getEtudiantsParGroupe(idGroupe: String) : Étudiant[]
-sga -->> enseignant : ListeEtudiants : Étudiant[]
+activate CoursController
+CoursController -> sga : getEtudiantsParGroupe(idGroupe: String) : Étudiant[]
+sga -->> CoursController : ListeEtudiants : Étudiant[]
 
-deactivate enseignant
+deactivate CoursController
 @enduml
