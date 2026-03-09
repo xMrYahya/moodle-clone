@@ -116,4 +116,101 @@ describe("coursStore - questions", () => {
     const questions = await store.recupererQuestionsDuCours("LOG210-A01");
     expect(questions).toEqual([]);
   });
+
+  test("recupererQuestionParNom retrouve une question sans sensibilite a la casse", async () => {
+    await store.ajouterQuestionAuCours("LOG210-A01", {
+      nom: "QCase",
+      enonce: "Question Case",
+      reponse: true,
+      retroactionValide: "OK",
+      retroactionInvalide: "Non",
+      tags: ["x"],
+      type: "VraiFaux",
+    });
+
+    const trouvee = await store.recupererQuestionParNom("LOG210-A01", "qcase");
+    expect(trouvee).toBeDefined();
+    expect(trouvee.nom).toBe("QCase");
+  });
+
+  test("existeNomQuestionEnExcluant ignore le nom exclu", async () => {
+    await store.ajouterQuestionAuCours("LOG210-A01", {
+      nom: "Q1",
+      enonce: "Question 1",
+      reponse: true,
+      retroactionValide: "OK",
+      retroactionInvalide: "Non",
+      tags: ["x"],
+      type: "VraiFaux",
+    });
+
+    expect(await store.existeNomQuestionEnExcluant("LOG210-A01", "Q1", "Q1")).toBe(false);
+    expect(await store.existeNomQuestionEnExcluant("LOG210-A01", "Q1", "AUTRE")).toBe(true);
+  });
+
+  test("modifierQuestionDuCours met a jour la question cible", async () => {
+    await store.ajouterQuestionAuCours("LOG210-A01", {
+      nom: "QMod",
+      enonce: "Ancien enonce",
+      reponse: true,
+      retroactionValide: "OK",
+      retroactionInvalide: "Non",
+      tags: ["x"],
+      type: "VraiFaux",
+    });
+
+    await store.modifierQuestionDuCours("LOG210-A01", "QMod", {
+      nom: "QMod",
+      enonce: "Nouvel enonce",
+      reponse: false,
+      retroactionValide: "Bien",
+      retroactionInvalide: "Oops",
+      tags: ["y"],
+      type: "VraiFaux",
+    });
+
+    const question = await store.recupererQuestionParNom("LOG210-A01", "QMod");
+    expect(question.enonce).toBe("Nouvel enonce");
+    expect(question.reponse).toBe(false);
+    expect(question.tags).toEqual(["y"]);
+  });
+
+  test("modifierQuestionDuCours rejette un nouveau nom deja existant", async () => {
+    await store.ajouterQuestionAuCours("LOG210-A01", {
+      nom: "Q1",
+      enonce: "Question 1",
+      reponse: true,
+      retroactionValide: "OK",
+      retroactionInvalide: "Non",
+      tags: ["x"],
+      type: "VraiFaux",
+    });
+    await store.ajouterQuestionAuCours("LOG210-A01", {
+      nom: "Q2",
+      enonce: "Question 2",
+      reponse: false,
+      retroactionValide: "OK",
+      retroactionInvalide: "Non",
+      tags: ["x"],
+      type: "VraiFaux",
+    });
+
+    await expect(
+      store.modifierQuestionDuCours("LOG210-A01", "Q2", {
+        nom: "Q1",
+        enonce: "Question 2 modifiee",
+        reponse: false,
+        retroactionValide: "OK",
+        retroactionInvalide: "Non",
+        tags: ["x"],
+        type: "VraiFaux",
+      })
+    ).rejects.toThrow("existe déjà");
+  });
+
+  test("supprimerQuestionDuCours echoue si la question n'existe pas", async () => {
+    await expect(store.supprimerQuestionDuCours("LOG210-A01", "INEXISTANTE")).rejects.toThrow(
+      "Question introuvable"
+    );
+  });
 });
