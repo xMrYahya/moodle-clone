@@ -8,55 +8,58 @@ title Modèle du domaine
 
 skinparam class {
   BackgroundColor<< SGB >> #ddffdd
+  backgroundColor<<Itération 1>> #ddffdd
+  backgroundColor<<Itération 2>> #ddf9ff
+  backgroundColor<<Itération 3>> BLUE
 }
 hide stereotype
 
 
   ' Le concept de "Cours" dans SGA n'est pas un groupe-cours
-  class "Question" as question {
+  class "Question" as question <<Itération 1>> {
   nom : String
   énoncé : String
   ' reponse a la question
   retroactionValide : String
   retroactionInvalide : String
   }
-  class "Tags" as tags {
+  class "Tags" as tags <<Itération 1>>{
     nom : String
   }
-  class "questionVraiFaux" as qvf extends question {
+  class "questionVraiFaux" as qvf <<Itération 1>> extends question {
     reponse : boolean
     retroaction : String
   }
-  class "questionChoixMultiple" as qcm extends question {
+  class "questionChoixMultiple" as qcm <<Itération 1>> extends question {
     seulementUnChoix : boolean
   }
-  class "reponseChoixMultiple" as rcm {
+  class "reponseChoixMultiple" as rcm <<Itération 1>> {
     retroaction : String
     text : String
     estBonneReponse : boolean
   }
-  class "questionMiseEnCorrespondance" as qmc extends question {
+  class "questionMiseEnCorrespondance" as qmc <<Itération 1>> extends question {
     
   }
-  class "pairDeCorrespondance" as pdc {
+  class "pairDeCorrespondance" as pdc <<Itération 1>> {
     question : String
     reponse : String
   }
-  class "questionReponseCourte" as qrc extends question {
+  class "questionReponseCourte" as qrc <<Itération 1>> extends question  {
     reponseAttendue : String
     retroaction : String
   }
-  class "questionNumerique" as qn extends question {
+  class "questionNumerique" as qn <<Itération 1>> extends question  {
     reponseAttendue : int
     retroaction : String
   }
-  class "questionEssai" as qe extends question {
+  class "questionEssai" as qe <<Itération 1>> extends question  {
     
   }
-  class "Enseignant" as ens {
+  class "Enseignant" as ens <<Itération 1>> {
     token : String
   }
-  class "Cours" as cours {
+  class "Cours" as cours <<Itération 1>> {
     idGroupe : String
     jour : String
     heure : String
@@ -67,18 +70,18 @@ hide stereotype
     idCours : String
     titreCours : String
   }
-  class "Etudiant" as etudiant {
+  class "Etudiant" as etudiant <<Itération 2>>{
     prenom : String
     nom : String
     courriel : String
     codePermanent : String
   }
-  class "Questionnaire" as questionnaire {
+  class "Questionnaire" as questionnaire <<Itération 2>>{
     nom : String
     description : String
     actif : boolean
   }
-  class "PositionQuestion" as position {
+  class "PositionQuestion" as position <<Itération 2>>{
     ordre : int
   }
 
@@ -91,6 +94,13 @@ hide stereotype
   cours "1" -- "*" questionnaire : contient >
   questionnaire "*" -- "*" question : contient >
   (questionnaire,question) .. position
+
+legend right
+    |Color| Type |
+    |<#ddffdd>| Itération 1 |
+    |<#ddf9ff>| Itération 2 |
+    |<#0000FF>| Itération 3 |
+endlegend
 
 
   'Selon le CU08 

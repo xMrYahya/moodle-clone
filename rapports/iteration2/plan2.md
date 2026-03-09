@@ -45,79 +45,96 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 - Une majorité des membres de l'équipe a approuvé chaque diagramme.
 - Un minimum de 90% des cas de test passent avec succès.
-- Corriger les erreurs mentionnés lors de la correction de l'itération 1.
+- Corriger les erreurs mentionnés lors de la correction de l'itération 2.
+
+
 
 ## Évaluation
 
 | Résumé | |
 | ------------------------------------- | ------------------------------------------------------------------------ |
-| Cible d'évaluation                    | Itération 1       |
-| Date d'évaluation  |   2026/02/09 |
-| Participants       | **Coéquipiers** : Alex Boulianne, Alexandre Gamache, Kassem Kandil,Raphael Hoffmann (Lucas Montion et Yahya Ardy avaient des absences justifiées),<br> **Auxiliaire d'enseignement** : Thierry Fokou Toukam |
+| Cible d'évaluation                    | Itération 3       |
+| Date d'évaluation  |   2026/03/09 |
+| Participants       | **Coéquipiers** : Alex Boulianne, Alexandre Gamache, Raphael Hoffmann, (Kassem Kandil et Yahya Ardy avaient des absences justifiées),<br> **Auxiliaire d'enseignement** : Thierry Fokou Toukam |
 | État du projet     | 🟢  |
 
+
 ### Questions d'évaluation
+
 1. Est-ce qu'il y a un décalage de représentation?
-    - Les noms des classes ne correspondent pas exactement avec le mdd
-    - Les noms des fonctions dans les RDCU ne correspondent pas exactement avec ceux du code
+      Oui, il y a encore un décalage entre notre code et les diagrammes, mais nous essayons de le réduire le plus possible.
+
+  - Est-ce que tous les noms de classe ont un rapport avec le domaine?
+      Oui, les noms que nous avons choisi sont en lien avec la situation ou la fonctionnalité qu'elle essaye d'accomplir
+
 2. Est-ce que l'architecture en couche est respectée?
-   - Chaque controlleur contiens controlleur dans son nom
-   - Toute les operations systême utilisent des types primitifs
-   - Nous avons un fichier de route par controlleur
+      Nous essayons le mieux possible de suivre une architecture MVC.
+
+   - Est-ce que les contrôleurs GRASP sont bien identifiés?
+      Oui, nous avons identifié chaque controlleur GRASP dans nos RDCU.
+
+   - Est-ce que les paramètres des opérations système sont tous de type primitif ou sont des objets de paramètres de type primitif?
+      Toute les opérations système utilisent des types primitifs.
+
+   - Est-ce que vous avez un fichier de route par contrôleur?
+      Oui, nous avons un fichier de route par contrôleur
+
 3. Évaluer votre conception par rapport aux GRASP "forte cohésion" et "faible couplage"
+
    - Avez-vous des classes qui sont couplées avec "beaucoup" d'autres classes?
-   - Certaines classes tels que coursControlleur doivent être grandement couplé. Réduire leurs coouplage serait possible mais complexe
-   - Chaque controlleur accomplis seulement les tâches nécessaire
+      Nos classes qui sont contrôleur ont un couplage fort. Il serait possible de le réduire, mais avec beaucoup de difficulté.
+
+   - Avez-vous des classes qui ont beaucoup de responsabilités (d'opérations)?
+      Oui, les contrôleurs ont plusieurs sont en charge de plusieurs opérations.
+
+   - Faite surtout attention aux responsabilités que vous avez données à vos contrôleurs.
+      Nous essayons de minimiser le plus possible les opérations des contrôleur pour qu'ils aille seulement ce qu'ils ont besoin.
+
 4. Y a-t-il des problèmes de [Code smell](https://refactoring.guru/fr/refactoring/smells) dans notre projet?
    1. Mysterious name relié au décalage des représentations ou pas
-      - Les noms des classes devront être renomées pour être en francais
+      1. Nous avons encore à nous assurer d'avoir tous changer les noms du MDD
+
    2. Large class (cohésion)
-      - Quelques classe sont plus grandes qu'elles devraient être telles que questionTypes pourraient être subdivisé en plusieurs classes
+      1. Nous avons seulement les contrôleurs qui sont de grande taille, les autres classes sont assez petites.
+
    3. Trop de paramètres (4+)
-      - Aucune fonction utilise trop de paramêtres
-   
+      1. Nous ne pensons pas que nos fonctions utilisent trop de paramètres.
+  
 ### Évaluation par rapport aux objectifs
-- Organiser l'espace de travail avec GitHub Project.
-   - Nous avons organisé l'espace de travail, mais nous avons décidé de ne pas utiliser GitHub Project.
-- Adapter le squelette du projet à nos exigences.
-   - Nous avons effacé les classes inutiles du projet et nous avons covertis les classes nécessaires.
-- Présenter une démonstration technique de CU01 avec tests (2,5 points).
-   - Nous avons présenté les tests et le fonctionnement du CU01 durant la démo
-- Présenter une démonstration technique de CU02a avec tests (5,75 points).
-   - Nous avons présenté les tests et le fonctionnement du CU02a durant la démo
+
+- Convertir le code pour utiliser la même langue partout 
+   - nous avons réussi a changer la langue de toutes les classes et les fonctions que nous avons créé
+- Réduire les décalages entre les diagrammes et le code final 
+   - Nous avons réussi a réduire le décalage entre les diagrammes et le code final mais il reste du décalage avec certains RDCUs et le MDD
+- Présenter une démonstration technique de CU02b, c et d avec leurs tests (3,75 points).
+   - La démonstration technique a fonctionné mais il faut ajouter un message de confirmation et réparer les cas de tests
+- Présenter une démonstration technique de CU05a, b, c et d avec leurs tests (4,5 points).
+   - La démonstration technique a fonctionné mais il faut réparer les cas de tests
 
 ### Éléments de travail: prévus vs réalisés
 
-- Tous les éléments ont été complétés, mais il faut réduire le décalage entre le code et les diagrammes
-- Tout les tests ont passés 
-- CU01ABC et CU02a sont complétés
+Tout les éléments de travail du plan on été réalisé sauf les tests
 
 ### Évaluation par rapport aux résultats selon les critères d'évaluation
 
-Les démos pour tout les cas d'utilisations ont réussi, mais il manque un message de confirmation à l'enseignant lorsqu'il efface un cours.
+Les démos pour touts les cas d'utilisation ont réussi mais il manque un message de confirmation lors de modification et suppression de question. Il faut aussi ajouter des cas de tests
 
 ## Autres préoccupations et écarts
 
-Nous avons vérifié le fonctionnement du language GIFT pour le CU02
+Nous avons communiqué avec les chargé de lab afin de mieux comprendre comment représenter les controlleurs et les modèles dans les diagrammes
 
 ## Évaluation du travail d'équipe
 
+- Alexandre a fait les DSS, les CO et a mis à jour le MDD
+- Alex a fait les RDCUs pour le CU02b,c,d
+- Raphael a fait les RDCUs pour le CU05  
+- Le code pour le CU02b,c,d a été fait par Yahya.
+- Le code pour le CU05 a été fait par Kassem
+- Les Diagramme de l'itération précédente ont été réparé par Alexandre, Alex et Raphael
+- Le rapport à été fait par Alexandre et Alex
 
-- Chaque membre de l'équipe a fait un ou deux RDCU .
-- Alexandre et Raphael on fait le MDD.
-- Alexandre a fait les DSS pour les CU.
-- Le code pour le CU01 a été fait par Kassem.
-- Le code pour le CU02a a été fait par Yahya
-- Les test ont été créé par Kassem
-- Le rapport a été fait par Alex et Alexandre
-- Chaque membre de l'équipe a apporté des modifications aux RDCU au moment du rapport
-- Raphael a ajouté le diagramme de classes
-
-Lucas Montion souffre d'une commotion cérébrale et a été forcé de réduire la contribution effectué
-Nous avons décidé de ne pas utiliser GitHub insigts puisque l'ajout du template du projet est compté et modifie les résultats
+Nous n'avons toujours pas voulu utiliser Github insights puisque la modifications des diagrammes et des pdf augmentent la quantité de lignes et commit et n'est pas représentatif
 
 ### Retrait d'un membre de l'équipe pour contribution non significative
-
-N/A
-
----
+ 
+   Lucas Montion s'est retiré de l'équipe (abandon de cours)
