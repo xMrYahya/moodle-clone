@@ -1,6 +1,6 @@
 @startuml
 hide footbox
-title RDCU pour Ajouter une question Vrai ou Faux
+title RDCU - Ajouter une question Vrai ou Faux
 
 participant "qc:QuestionsController" as QC
 participant "cs:CoursStore" as CS
@@ -10,24 +10,26 @@ participant "q:QuestionVraiFaux" as Q
 note right: GRASP: Controller
 activate QC
 
-QC -> CS : validerNomQuestionUnique(groupId: String, nom: String)
+QC -> QC : validerDonnees(nom, enonce, reponse, tags)
+
+QC -> CS : existeNomQuestion(groupId: String, nom: String)
 activate CS
 CS --> QC : nomExiste:boolean
 deactivate CS
 
-alt Nom de question unique
+alt Donnees valides et nom unique
     create Q
     QC -> Q : <<create>> QuestionVraiFaux(nom, enonce, reponse,\n retroactionValide, retroactionInvalide, tags)
     activate Q
     deactivate Q
 
-    QC -> CS : addQuestion(q)
+    QC -> CS : ajouterQuestionAuCours(groupId: String, q)
     activate CS
     deactivate CS
 
-    <-- QC : confirmationAjout(listeQuestions):String
-else Nom de question deja utilise
-    <-- QC : signalerErreurNomExistant():String
+    <-- QC : confirmationAjout(questionCreee)
+else Nom deja utilise ou donnees invalides
+    <-- QC : signalerErreurAjoutQuestion()
 end
 
 deactivate QC

@@ -1,0 +1,36 @@
+@startuml
+hide footbox
+title RDCU - Ajouter une question réponse courte
+
+participant "qc:QuestionsController" as QC
+participant "cs:CoursStore" as CS
+participant "q:QuestionReponseCourte" as Q
+
+-> QC : ajouterQuestionReponseCourte(nom : String, enonce : String,\n reponse : String, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
+note right: GRASP: Controller
+activate QC
+
+QC -> QC : validerDonnees(nom, enonce, reponse, tags)
+
+QC -> CS : existeNomQuestion(groupId : String, nom : String)
+activate CS
+CS --> QC : nomExiste : boolean
+deactivate CS
+
+alt Donnees valides et nom unique
+  create Q
+  QC -> Q : <<create>> QuestionReponseCourte(nom, enonce, reponse,\n retroactionValide, retroactionInvalide, tags)
+  activate Q
+  deactivate Q
+
+  QC -> CS : ajouterQuestionAuCours(groupId : String, q)
+  activate CS
+  deactivate CS
+
+  <-- QC : confirmationAjout(questionCreee)
+else Nom deja utilise ou donnees invalides
+  <-- QC : signalerErreurAjoutQuestion()
+end
+
+deactivate QC
+@enduml

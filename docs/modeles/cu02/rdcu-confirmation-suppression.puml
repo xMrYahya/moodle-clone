@@ -9,18 +9,22 @@ participant "cs:CoursStore" as CS
 note right: GRASP: Controller
 activate QC
 
-QC -> CS : supprimerQuestion(groupId : String, nom : String)
+QC -> CS : recupererQuestionParNom(groupId : String, nom : String)
+activate CS
+CS --> QC : question : Question
+deactivate CS
+
+QC -> CS : supprimerQuestionDuCours(groupId : String, nom : String)
 activate CS
 deactivate CS
 
-QC -> CS : getQuestionsForCours(groupId: string)
+QC -> CS : recupererQuestionsDuCours(groupId: string)
 activate CS
-'???'
 CS --> QC : questions : List<Question>
 deactivate CS
 
-'QC --> UI : afficherListeQuestions(questions):String'
-<-- QC : afficherConfirmationSuppression():String
+<-- QC : afficherConfirmationSuppression(questions):String
+
 deactivate QC
 
 @enduml

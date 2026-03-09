@@ -6,32 +6,30 @@ participant "qc:QuestionsController" as QC
 participant "cs:CoursStore" as CS
 participant "q:Question" as Q
 
--> QC : modifierQuestion(groupId, nom, enonce, type,\nretroactionValide, retroactionInvalide, tags)
+-> QC : modifierQuestion(groupId, nomOriginal, nom, enonce, type,\nretroactionValide, retroactionInvalide, tags, donneesType)
 note right: GRASP: Controller
 activate QC
 
-QC -> CS : questionExistante(groupId : String, nom : String)
+QC -> CS : recupererQuestionParNom(groupId : String, nomOriginal : String)
 activate CS
-CS --> QC : questionExistante : boolean
+CS --> QC : questionExistante : Question
 deactivate CS
 
-alt Nom de question existant (nomExiste == false)
-  QC -> Q : modifierQuestion(nom, enonce, type,\n retroactionValide, retroactionInvalide, tags)
+alt Nom unique et donnees valides
+  create Q
+  QC -> Q : <<create>> Question(type, nom, enonce, retroactions, tags, donneesType)
   activate Q
-  Q --> QC : confirmationModificationQuestion : boolean
   deactivate Q
 
-  QC -> CS : updateQuestion(Q)
+  QC -> CS : modifierQuestionDuCours(groupId : String, nomOriginal : String, q)
   activate CS
-  CS --> QC : confirmationModificationQuestionStore : boolean
   deactivate CS
 
-  <-- QC : afficherConfirmationModification(Q)
-  deactivate QC
-
-else Nom de question n'existe pas (nomExiste == true)
-  <-- QC : erreurNomNonExistant():String
-  deactivate QC
+  <-- QC : afficherConfirmationModification(questionMiseAJour)
+else Nom deja utilise ou donnees invalides
+  <-- QC : signalerErreurModification()
 end
+
+deactivate QC
 
 @enduml

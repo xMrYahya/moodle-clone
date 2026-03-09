@@ -9,13 +9,12 @@ participant "cs:CoursStore" as CS
 note right: GRASP: Controller
 activate QC
 
-QC -> CS : getQuestionsForCours(groupId : String)
+QC -> CS : recupererQuestionsDuCours(groupId : String)
 activate CS
-'???'
 CS --> QC : questions : List<Question>
 deactivate CS
 
-<-- QC : afficherListeQuestions(questions):String
+<-- QC : retournerListeQuestions(questions)
 deactivate QC
 
 @enduml

@@ -9,34 +9,13 @@ participant "cs:CoursStore" as CS
 note right: GRASP: Controller
 activate QC
 
-'???'
-QC -> CS : questionUtiliseeDansQuestionnaire(groupId : String, nom : String)
+QC -> CS : recupererQuestionParNom(groupId : String, nom : String)
 activate CS
-CS --> QC : utilisee : boolean
+CS --> QC : question : Question
 deactivate CS
 
-alt Question non utilisee dans un questionnaire
-'???'
-  QC -> CS : chercherInfoQuestion(groupId : String, nom : String)
-  activate CS
-  CS --> QC : question:String
-  deactivate CS
+<-- QC : demanderConfirmationSuppression():String
 
-  'QC --> UI : afficherInfoQuestionASupprimer(question):String'
-  <-- QC : demanderConfirmationSuppression():String
-
-else Question utilisee dans au moins un questionnaire
-'???'
-  QC -> CS : listerQuestionnairesUtilisantQuestion(groupId : String, nom : String)
-  activate CS
-  CS --> QC : questionnaires : List<Questionnaire>
-  deactivate CS
-
-  'QC --> UI : afficherQuestionnairesUtilisantQuestion(questionnaires):String'
-  'QC --> UI : desactiverSuppression():boolean'
-
-  <-- QC : suppressionImpossible():String
-  deactivate QC
-end
+deactivate QC
 
 @enduml

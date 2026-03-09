@@ -1,0 +1,36 @@
+@startuml
+hide footbox
+title RDCU - Ajouter une question essai
+
+participant "qc:QuestionsController" as QC
+participant "cs:CoursStore" as CS
+participant "q:QuestionEssai" as Q
+
+-> QC : ajouterQuestionEssai(nom : String, enonce : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+note right: GRASP: Controller
+activate QC
+
+QC -> QC : validerDonnees(nom, enonce, tags)
+
+QC -> CS : existeNomQuestion(groupId : String, nom : String)
+activate CS
+CS --> QC : nomExiste : boolean
+deactivate CS
+
+alt Donnees valides et nom unique
+  create Q
+  QC -> Q : <<create>> QuestionEssai(nom, enonce,\n retroactionValide, retroactionInvalide, tags)
+  activate Q
+  deactivate Q
+
+  QC -> CS : ajouterQuestionAuCours(groupId : String, q)
+  activate CS
+  deactivate CS
+
+  <-- QC : confirmationAjout(questionCreee)
+else Nom deja utilise ou donnees invalides
+  <-- QC : signalerErreurAjoutQuestion()
+end
+
+deactivate QC
+@enduml

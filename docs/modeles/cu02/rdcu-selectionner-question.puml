@@ -4,41 +4,18 @@ title RDCU – Sélectionner une question
 
 participant "qc:QuestionsController" as QC
 participant "cs:CoursStore" as CS
-participant "q:Question" as Q
 
 -> QC : selectionnerQuestion(groupId : String, nom : String)
 note right: GRASP: Controller
 activate QC
 
-QC -> CS : chercherInfoQuestion(groupId : String, nom : String)
+QC -> CS : recupererQuestionParNom(groupId : String, nom : String)
 activate CS
 CS --> QC : question : Question
 deactivate CS
 
-activate Q
-QC -> Q : getType()
-Q --> QC : type:String
+<-- QC : afficherInfoQuestion(question)
 
-QC -> Q : getNom()
-Q --> QC : nom:String
-
-QC -> Q : getEnonce()
-Q --> QC : enonce:String
-
-QC -> Q : getVerite()
-Q --> QC : verite:String
-
-QC -> Q : getRetroactionBonne()
-Q --> QC : retroBonne:String
-
-QC -> Q : getRetroactionMauvaise()
-Q --> QC : retroMauvaise:String
-
-QC -> Q : getTags()
-Q --> QC : tags : List<String>
-deactivate Q
-
-<-- QC : afficherInfoQuestion(type, nom, enonce, verite,\nretroBonne, retroMauvaise, tags)
 deactivate QC
 
 @enduml

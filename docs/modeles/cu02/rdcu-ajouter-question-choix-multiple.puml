@@ -1,0 +1,36 @@
+@startuml
+hide footbox
+title RDCU - Ajouter une question choix multiple
+
+participant "qc:QuestionsController" as QC
+participant "cs:CoursStore" as CS
+participant "q:QuestionChoixMultiple" as Q
+
+-> QC : ajouterQuestionChoixMultiple(nom : String, enonce : String,\n reponses : ReponseChoixMultiple[], seulementUnChoix : bool,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+note right: GRASP: Controller
+activate QC
+
+QC -> QC : validerDonnees(nom, enonce, reponses, tags)
+
+QC -> CS : existeNomQuestion(groupId : String, nom : String)
+activate CS
+CS --> QC : nomExiste : boolean
+deactivate CS
+
+alt Donnees valides et nom unique
+  create Q
+  QC -> Q : <<create>> QuestionChoixMultiple(nom, enonce,\n reponses, seulementUnChoix, retroactionValide, retroactionInvalide, tags)
+  activate Q
+  deactivate Q
+
+  QC -> CS : ajouterQuestionAuCours(groupId : String, q)
+  activate CS
+  deactivate CS
+
+  <-- QC : confirmationAjout(questionCreee)
+else Nom deja utilise ou donnees invalides
+  <-- QC : signalerErreurAjoutQuestion()
+end
+
+deactivate QC
+@enduml
