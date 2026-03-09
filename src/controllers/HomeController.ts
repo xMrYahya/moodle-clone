@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { SgbClient } from "../core/sgbClient";
-import { getStoredPourProf } from "../core/coursStore";
+import { recupererCoursStockesPourEnseignant } from "../core/coursStore";
 
 const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
 const accesSGA = new SgbClient(sgbBaseUrl);
@@ -25,7 +25,7 @@ export class HomeController {
         typeof req.query.confirmRemove === "string" ? req.query.confirmRemove : null;
 
       const createdGroups = teacher?.id
-        ? await getStoredPourProf(String(teacher.id))
+        ? await recupererCoursStockesPourEnseignant(String(teacher.id))
         : [];
 
       let groups: any[] = [];

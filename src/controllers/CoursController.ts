@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { SgbClient } from "../core/sgbClient";
-import { ajouterCoursStocke, retirerCoursStocke, getStoredParIdGroupe } from "../core/coursStore";
-import { getQuestionsForCours } from "../core/coursStore";
+import { ajouterCoursStocke, retirerCoursStocke, recupererCoursStockeParIdGroupe } from "../core/coursStore";
+import { recupererQuestionsDuCours } from "../core/coursStore";
 
 const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
 const accesSGA = new SgbClient(sgbBaseUrl);
@@ -135,13 +135,13 @@ export class CoursController {
         return;
       }
 
-      const cours = await getStoredParIdGroupe(idCours);
+      const cours = await recupererCoursStockeParIdGroupe(idCours);
       if (!cours) {
         res.status(404).send("Cours introuvable");
         return;
       }
 
-      const questionsBrutes = await getQuestionsForCours(idCours);
+      const questionsBrutes = await recupererQuestionsDuCours(idCours);
       const questions = questionsBrutes.map((question: any) => ({
         ...question,
         typeAffichage: CoursController.obtenirTypeQuestionPourAffichage(question),

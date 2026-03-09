@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { getQuestionsForCours, getStoredParIdGroupe } from "../core/coursStore";
+import { recupererQuestionsDuCours, recupererCoursStockeParIdGroupe } from "../core/coursStore";
 import {
   ajouterQuestionnaire,
   creerQuestionnaire,
@@ -57,7 +57,7 @@ export class QuestionnairesController {
         return;
       }
 
-      const cours = await getStoredParIdGroupe(idGroupe);
+      const cours = await recupererCoursStockeParIdGroupe(idGroupe);
       if (!cours) {
         res.status(404).send("Cours introuvable");
         return;
@@ -66,7 +66,7 @@ export class QuestionnairesController {
       const nomTag = lireTexte(req.query?.nomTag);
       const questionnaires = await obtenirQuestionnairesAssocies(idGroupe);
       const tags = await obtenirListeTagsDesQuestions(idGroupe);
-      const questionsCours = await getQuestionsForCours(idGroupe);
+      const questionsCours = await recupererQuestionsDuCours(idGroupe);
       const aucuneQuestionAssocieeAuCours = questionsCours.length === 0;
       const questionnaireTemp = obtenirTempSession(req, idGroupe);
       const messageSucces = lireTexte(req.query?.succes);
@@ -122,7 +122,7 @@ export class QuestionnairesController {
 
       const questionnaire = await creerQuestionnaire(idGroupe, nom, description, actif);
       await ajouterQuestionnaire(idGroupe, questionnaire);
-      const questionsCours = await getQuestionsForCours(idGroupe);
+      const questionsCours = await recupererQuestionsDuCours(idGroupe);
       const messageCreation = questionsCours.length === 0
         ? "Questionnaire cree avec succes. Aucune question n'est associee a ce cours pour le moment."
         : "Questionnaire ajoute. Selectionnez un tag pour ajouter des questions.";

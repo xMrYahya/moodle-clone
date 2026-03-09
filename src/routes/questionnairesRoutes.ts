@@ -3,7 +3,7 @@ import { QuestionnairesController } from "../controllers/QuestionnairesControlle
 
 const router = Router();
 
-function requireAuth(req: any, res: any, next: any) {
+function exigerAuthentification(req: any, res: any, next: any) {
   if (!req.session?.token) {
     res.redirect("/signin");
     return;
@@ -11,55 +11,55 @@ function requireAuth(req: any, res: any, next: any) {
   next();
 }
 
-router.get("/:idCours/questionnaires", requireAuth, QuestionnairesController.gererQuestionnaires);
+router.get("/:idCours/questionnaires", exigerAuthentification, QuestionnairesController.gererQuestionnaires);
 router.post(
   "/:idCours/questionnaires/ajouter",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.ajouterQuestionnaire
 );
 router.get(
   "/:idCours/questionnaires/selectionner-tag",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.selectionnerTag
 );
 router.post(
   "/:idCours/questionnaires/ajouter-question",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.ajouterQuestion
 );
 router.post(
   "/:idCours/questionnaires/selection-modifier",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.selectionModifierQuestionnaire
 );
 router.post(
   "/:idCours/questionnaires/retirer-question",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.retirerQuestion
 );
 router.post(
   "/:idCours/questionnaires/modifier-ordre-question",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.modifierOrdreQuestion
 );
 router.post(
   "/:idCours/questionnaires/modifier",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.modifierQuestionnaire
 );
 router.post(
   "/:idCours/questionnaires/verifier-suppression",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.verifierSupprimerQuestionnaire
 );
 router.post(
   "/:idCours/questionnaires/confirmer-suppression",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.confirmerSuppression
 );
 router.post(
   "/:idCours/questionnaires/sauvegarder",
-  requireAuth,
+  exigerAuthentification,
   QuestionnairesController.sauvegarderQuestionnaire
 );
 

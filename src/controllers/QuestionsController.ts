@@ -1,12 +1,12 @@
 import { Response } from "express";
 import { 
-  addQuestion, 
-  getQuestionByName,
-  getQuestionsForCours,
-  questionNameExists,
-  questionNameExistsExcept,
-  removeQuestion,
-  updateQuestion,
+  ajouterQuestionAuCours,
+  recupererQuestionParNom,
+  recupererQuestionsDuCours,
+  existeNomQuestion,
+  existeNomQuestionEnExcluant,
+  supprimerQuestionDuCours,
+  modifierQuestionDuCours,
 } from "../core/coursStore";
 import {
   PairDeCorrespondance,
@@ -70,7 +70,7 @@ export class QuestionsController {
     return nombre;
   }
 
-  private static lireContexteRequete(req: any): { teacherId: string; groupId: string } {
+  private static extraireContexteRequete(req: any): { teacherId: string; groupId: string } {
     const teacherId = QuestionsController.lireTexte(req?.session?.user?.id);
     const groupId = QuestionsController.lireTexte(req?.params?.groupId);
 
@@ -104,8 +104,8 @@ export class QuestionsController {
     const nomExcluNettoye = QuestionsController.lireTexte(nomAExclure);
 
     const existe = nomExcluNettoye
-      ? await questionNameExistsExcept(groupId, nomNettoye, nomExcluNettoye)
-      : await questionNameExists(groupId, nomNettoye);
+      ? await existeNomQuestionEnExcluant(groupId, nomNettoye, nomExcluNettoye)
+      : await existeNomQuestion(groupId, nomNettoye);
 
     if (existe) {
       throw new AlreadyExistsError(`Une question avec le nom "${nomNettoye}" existe déjà`);
@@ -122,8 +122,8 @@ export class QuestionsController {
 
   static async consulterQuestionsCours(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
-      const questions = await getQuestionsForCours(groupId);
+      const { groupId } = QuestionsController.extraireContexteRequete(req);
+      const questions = await recupererQuestionsDuCours(groupId);
 
       res.status(200).json({
         success: true,
@@ -142,14 +142,14 @@ export class QuestionsController {
 
   static async selectionnerQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { groupId } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nom) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await getQuestionByName(groupId, nom);
+      const question = await recupererQuestionParNom(groupId, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
@@ -173,14 +173,14 @@ export class QuestionsController {
 
   static async modifierQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { groupId } = QuestionsController.extraireContexteRequete(req);
       const nomOriginal = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nomOriginal) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const questionExistante = await getQuestionByName(groupId, nomOriginal);
+      const questionExistante = await recupererQuestionParNom(groupId, nomOriginal);
       if (!questionExistante) {
         throw new NotFoundError(`Question introuvable avec le nom "${nomOriginal}"`);
       }
@@ -246,7 +246,7 @@ export class QuestionsController {
           retroactionValideFinale
         );
 
-        await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+        await modifierQuestionDuCours(groupId, nomOriginal, questionMiseAJour);
 
         res.status(200).json({
           success: true,
@@ -330,7 +330,7 @@ export class QuestionsController {
         donneesComplementaires
       );
 
-      await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+      await modifierQuestionDuCours(groupId, nomOriginal, questionMiseAJour);
 
       res.status(200).json({
         success: true,
@@ -354,14 +354,14 @@ export class QuestionsController {
 
   static async supprimerQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { groupId } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nom) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await getQuestionByName(groupId, nom);
+      const question = await recupererQuestionParNom(groupId, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
@@ -386,20 +386,20 @@ export class QuestionsController {
 
   static async confirmerSuppressionQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { groupId } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nom) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await getQuestionByName(groupId, nom);
+      const question = await recupererQuestionParNom(groupId, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
 
-      await removeQuestion(groupId, nom);
-      const questions = await getQuestionsForCours(groupId);
+      await supprimerQuestionDuCours(groupId, nom);
+      const questions = await recupererQuestionsDuCours(groupId);
 
       res.status(200).json({
         success: true,
@@ -581,7 +581,7 @@ export class QuestionsController {
   
   static async ajouterQuestionVraiFaux(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { groupId } = QuestionsController.extraireContexteRequete(req);
       const { nom, énoncé, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
 
       QuestionsController.validerChampsObligatoires({ nom, énoncé, reponse }, ["nom", "énoncé", "reponse"]);
@@ -601,7 +601,7 @@ export class QuestionsController {
         String(retroactionValide || "").trim()
       );
 
-      await addQuestion(String(groupId), nouvelleQuestion);
+      await ajouterQuestionAuCours(String(groupId), nouvelleQuestion);
 
       res.status(201).json({
         success: true,
@@ -623,7 +623,7 @@ export class QuestionsController {
 
   private static async ajouterQuestionParType(req: any, res: Response, typeQuestion: string): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { groupId } = QuestionsController.extraireContexteRequete(req);
       const { nom, énoncé, retroactionValide, retroactionInvalide, tags, ...otherData } = req.body;
 
       QuestionsController.validerChampsObligatoires({ nom, énoncé }, ["nom", "énoncé"]);
@@ -641,7 +641,7 @@ export class QuestionsController {
         otherData
       );
 
-      await addQuestion(String(groupId), nouvelleQuestion);
+      await ajouterQuestionAuCours(String(groupId), nouvelleQuestion);
 
       res.status(201).json({
         success: true,

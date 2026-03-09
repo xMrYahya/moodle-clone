@@ -64,12 +64,12 @@ async function ecrireCoursStockes(courses: CoursStockage[]): Promise<void> {
   await fs.writeFile(STORE_PATH, JSON.stringify({ courses }, null, 2), "utf-8");
 }
 
-export async function getStoredPourProf(teacherId: string): Promise<Cours[]> {
+export async function recupererCoursStockesPourEnseignant(teacherId: string): Promise<Cours[]> {
   const all = await getCoursStockes();
   return all.filter(c => String(c.idEnseignant) === String(teacherId));
 }
 
-export async function getStoredParIdGroupe(groupId: string): Promise<Cours | undefined> {
+export async function recupererCoursStockeParIdGroupe(groupId: string): Promise<Cours | undefined> {
   const all = await getCoursStockes();
   return all.find(c => c.idGroupe === String(groupId));
 }
@@ -95,22 +95,22 @@ export async function retirerCoursStocke(groupId: string): Promise<void> {
   await ecrireCoursStockes(next);
 }
 
-export async function getQuestionsForCours(groupId: string): Promise<AnyQuestion[]> {
-  const cours = await getStoredParIdGroupe(groupId);
+export async function recupererQuestionsDuCours(groupId: string): Promise<AnyQuestion[]> {
+  const cours = await recupererCoursStockeParIdGroupe(groupId);
   return cours?.questions ?? [];
 }
 
-export async function questionNameExists(groupId: string, nom: string): Promise<boolean> {
-  const questions = await getQuestionsForCours(groupId);
+export async function existeNomQuestion(groupId: string, nom: string): Promise<boolean> {
+  const questions = await recupererQuestionsDuCours(groupId);
   return questions.some(q => String(q.nom).toLowerCase() === String(nom).toLowerCase());
 }
 
-export async function questionNameExistsExcept(
+export async function existeNomQuestionEnExcluant(
   groupId: string,
   nom: string,
   nomAExclure: string
 ): Promise<boolean> {
-  const questions = await getQuestionsForCours(groupId);
+  const questions = await recupererQuestionsDuCours(groupId);
   const nomRecherche = String(nom).toLowerCase();
   const nomExclu = String(nomAExclure).toLowerCase();
 
@@ -121,13 +121,13 @@ export async function questionNameExistsExcept(
   );
 }
 
-export async function getQuestionByName(groupId: string, nom: string): Promise<AnyQuestion | undefined> {
-  const questions = await getQuestionsForCours(groupId);
+export async function recupererQuestionParNom(groupId: string, nom: string): Promise<AnyQuestion | undefined> {
+  const questions = await recupererQuestionsDuCours(groupId);
   const nomRecherche = String(nom).toLowerCase();
   return questions.find((question) => String(question.nom).toLowerCase() === nomRecherche);
 }
 
-export async function addQuestion(groupId: string, question: AnyQuestion | Question): Promise<void> {
+export async function ajouterQuestionAuCours(groupId: string, question: AnyQuestion | Question): Promise<void> {
   const allCours = await getCoursStockes();
   const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
 
@@ -155,7 +155,7 @@ export async function addQuestion(groupId: string, question: AnyQuestion | Quest
   await ecrireCoursStockes(allCours);
 }
 
-export async function updateQuestion(
+export async function modifierQuestionDuCours(
   groupId: string,
   nomOriginal: string,
   questionMiseAJour: AnyQuestion | Question
@@ -201,7 +201,7 @@ export async function updateQuestion(
   await ecrireCoursStockes(allCours);
 }
 
-export async function removeQuestion(groupId: string, nom: string): Promise<void> {
+export async function supprimerQuestionDuCours(groupId: string, nom: string): Promise<void> {
   const allCours = await getCoursStockes();
   const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
 
