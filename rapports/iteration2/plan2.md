@@ -45,7 +45,7 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 - Une majorité des membres de l'équipe a approuvé chaque diagramme.
 - Un minimum de 90% des cas de test passent avec succès.
-- Corriger les erreurs mentionnés lors de la correction de l'itération 1.
+- Corriger les erreurs mentionnés lors de la correction de l'itération 2.
 
 
 
@@ -53,7 +53,7 @@ Les éléments de travail suivants seront abordés dans cette itération:
 
 | Résumé | |
 | ------------------------------------- | ------------------------------------------------------------------------ |
-| Cible d'évaluation                    | Itération 2       |
+| Cible d'évaluation                    | Itération 3       |
 | Date d'évaluation  |   2026/03/09 |
 | Participants       | **Coéquipiers** : Alex Boulianne, Alexandre Gamache, Raphael Hoffmann, (Kassem Kandil et Yahya Ardy avaient des absences justifiées),<br> **Auxiliaire d'enseignement** : Thierry Fokou Toukam |
 | État du projet     | 🟢  |
@@ -62,23 +62,43 @@ Les éléments de travail suivants seront abordés dans cette itération:
 ### Questions d'évaluation
 
 1. Est-ce qu'il y a un décalage de représentation?
+      Oui, il y a encore un décalage entre notre code et les diagrammes, mais nous essayons de le réduire le plus possible.
+
   - Est-ce que tous les noms de classe ont un rapport avec le domaine?
+      Oui, les noms que nous avons choisi sont en lien avec la situation ou la fonctionnalité qu'elle essaye d'accomplir
+
 2. Est-ce que l'architecture en couche est respectée?
+      Nous essayons le mieux possible de suivre une architecture MVC.
+
    - Est-ce que les contrôleurs GRASP sont bien identifiés?
+      Oui, nous avons identifié chaque controlleur GRASP dans nos RDCU.
+
    - Est-ce que les paramètres des opérations système sont tous de type primitif ou sont des objets de paramètres de type primitif?
+      Toute les opérations système utilisent des types primitifs.
+
    - Est-ce que vous avez un fichier de route par contrôleur?
+      Oui, nous avons un fichier de route par contrôleur
+
 3. Évaluer votre conception par rapport aux GRASP "forte cohésion" et "faible couplage"
+
    - Avez-vous des classes qui sont couplées avec "beaucoup" d'autres classes?
+      Nos classes qui sont contrôleur ont un couplage fort. Il serait possible de le réduire, mais avec beaucoup de difficulté.
+
    - Avez-vous des classes qui ont beaucoup de responsabilités (d'opérations)?
-     - Faite surtout attention aux responsabilités que vous avez données à vos contrôleurs.
+      Oui, les contrôleurs ont plusieurs sont en charge de plusieurs opérations.
+
+   - Faite surtout attention aux responsabilités que vous avez données à vos contrôleurs.
+      Nous essayons de minimiser le plus possible les opérations des contrôleur pour qu'ils aille seulement ce qu'ils ont besoin.
+
 4. Y a-t-il des problèmes de [Code smell](https://refactoring.guru/fr/refactoring/smells) dans notre projet?
    1. Mysterious name relié au décalage des représentations ou pas
-      1. Identifier le renommage (réusinage) éventuel de classe et/ou méthodes
+      1. Nous avons encore à nous assurer d'avoir tous changer les noms de l'anglais au français 
+
    2. Large class (cohésion)
-      1. Proposer d'appliquer le réusinage Extract class / GRAPS fabrication pure 
+      1. Nous avons seulement les contrôleurs qui sont de grande taille, les autres classes sont assez petites.
+
    3. Trop de paramètres (4+)
-      1. Proposer d'appliquer le réusinage Objet de paramètre
-   > Ajouter d'autres questions si nécessaire
+      1. Nous ne pensons pas que nos fonctions utilisent trop de paramètres.
    
 ### Évaluation par rapport aux objectifs
 
