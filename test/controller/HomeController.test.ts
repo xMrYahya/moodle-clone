@@ -54,7 +54,7 @@ describe("HomeController.index", () => {
   test("addCourse!=1 with teacher -> renders createdGroups for that teacher", async () => {
     jest.resetModules();
     const store = require("../../src/core/coursStore");
-    const getStoredSpy = jest.spyOn(store, "getStoredPourProf").mockResolvedValueOnce([
+    const getStoredSpy = jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([
       { idGroupe: "g-1" },
       { idGroupe: "g-2" },
     ] as any);
@@ -78,7 +78,7 @@ describe("HomeController.index", () => {
   test("addCourse!=1 with teacher -> createdGroups contains only teacher courses", async () => {
     jest.resetModules();
     const store = require("../../src/core/coursStore");
-    const getStoredSpy = jest.spyOn(store, "getStoredPourProf").mockResolvedValueOnce([
+    const getStoredSpy = jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([
       { idGroupe: "g-10", idEnseignant: "7" },
       { idGroupe: "g-11", idEnseignant: "7" },
     ] as any);
@@ -139,7 +139,7 @@ describe("HomeController.index", () => {
     jest.spyOn(SgbModule.SgbClient.prototype, "getCourses").mockResolvedValueOnce({ data: [] } as any);
 
     const store = require("../../src/core/coursStore");
-    jest.spyOn(store, "getStoredPourProf").mockResolvedValueOnce([{ idGroupe: "g-1" }] as any);
+    jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([{ idGroupe: "g-1" }] as any);
 
     const HomeController = require("../../src/controllers/HomeController").HomeController;
     const req: any = { session: { user: { id: 5, first_name: "F", last_name: "L" }, token: "t" }, query: { addCourse: "1" } };
@@ -173,7 +173,7 @@ describe("HomeController.index", () => {
     jest.spyOn(SgbModule.SgbClient.prototype, "getCourses").mockResolvedValueOnce({ data: courses } as any);
 
     const store = require("../../src/core/coursStore");
-    jest.spyOn(store, "getStoredPourProf").mockResolvedValueOnce([{ idGroupe: "g-123" }] as any);
+    jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([{ idGroupe: "g-123" }] as any);
 
     const HomeController = require("../../src/controllers/HomeController").HomeController;
     const req: any = { session: { user: { id: 10, first_name: "John", last_name: "Doe" }, token: "t" }, query: { addCourse: "1" } };
@@ -228,7 +228,7 @@ describe("HomeController.index", () => {
     const SgbModule = require("../../src/core/sgbClient");
     jest.spyOn(SgbModule.SgbClient.prototype, "getSchedules").mockRejectedValueOnce(new Error("sgb-fail"));
     const store = require("../../src/core/coursStore");
-    jest.spyOn(store, "getStoredPourProf").mockResolvedValueOnce([] as any);
+    jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockResolvedValueOnce([] as any);
 
     const HomeController = require("../../src/controllers/HomeController").HomeController;
     const req: any = { session: { user: { id: 1, first_name: "A", last_name: "B" }, token: "t" }, query: { addCourse: "1" } };
@@ -244,7 +244,7 @@ describe("HomeController.index", () => {
   test("erreur sans message -> retourne 500 avec message de repli", async () => {
     jest.resetModules();
     const store = require("../../src/core/coursStore");
-    jest.spyOn(store, "getStoredPourProf").mockRejectedValueOnce(undefined);
+    jest.spyOn(store, "recupererCoursStockesPourEnseignant").mockRejectedValueOnce(undefined);
 
     const HomeController = require("../../src/controllers/HomeController").HomeController;
     const req: any = { session: { user: { id: 1, first_name: "A", last_name: "B" } }, query: {} };
@@ -256,3 +256,4 @@ describe("HomeController.index", () => {
     expect(res.send).toHaveBeenCalledWith("Echec du chargement de l'accueil");
   });
 });
+

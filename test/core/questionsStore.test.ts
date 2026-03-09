@@ -1,18 +1,30 @@
-import { QuestionVraiFaux, QuestionChoixMultiple } from "../../src/types/questionTypes";
 import { promises as fs } from "fs";
 import path from "path";
 import os from "os";
 
-describe("QuestionsStore - CU02a", () => {
+describe("coursStore - questions", () => {
   let tmpDir: string;
   let store: any;
-  
+
+  const coursBase = {
+    idGroupe: "LOG210-A01",
+    jour: "Lun",
+    heure: "10:00",
+    activite: "Cours",
+    mode: "Presentiel",
+    local: "A-101",
+    idEnseignant: "teacher1",
+    etudiants: [],
+    questions: [],
+  };
+
   beforeEach(async () => {
     jest.resetModules();
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "questionsstore-"));
     jest.spyOn(process, "cwd").mockReturnValue(tmpDir);
-    store = require("../../src/core/questionsStore");
-    await store.clearQuestionsOnStartup();
+    store = require("../../src/core/coursStore");
+    await store.viderStoreAuDemarrage();
+    await store.ajouterCoursStocke(coursBase);
   });
 
   afterEach(async () => {
@@ -22,311 +34,86 @@ describe("QuestionsStore - CU02a", () => {
     } catch {}
   });
 
-  describe("CU02a - Ajouter Question", () => {
-    
-    test("CU02a-t1 : Ajouter une question vrai/faux avec succès", async () => {
-      const groupId = "LOG210-A01";
-      const question: QuestionVraiFaux = {
-        nom: "Q1",
-        énoncé: "TypeScript est un langage?",
-        reponse: true,
-        retroaction: "Oui!",
-        retroactionValide: "Oui!",
-        retroactionInvalide: "Non",
-        tags: ["typescript"],
-        type: "VraiFaux",
-      };
-
-      await store.addQuestion(groupId, question);
-
-      const allData = await store.getAllQuestions();
-      expect(allData).toHaveLength(1);
-      expect(allData[0].group_id).toBe(groupId);
-      expect(allData[0].questions).toHaveLength(1);
-      expect(allData[0].questions[0].nom).toBe("Q1");
-      expect(allData[0].questions[0].type).toBe("VraiFaux");
-    });
-
-    test("CU02a-t2 : Ajouter deux questions au même cours", async () => {
-      const groupId = "LOG210-A01";
-      
-      const q1: QuestionVraiFaux = {
-        nom: "Q1",
-        énoncé: "Question 1",
-        reponse: true,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      const q2: QuestionChoixMultiple = {
-        nom: "Q2",
-        énoncé: "Question 2",
-        seulementUnChoix: true,
-        reponses: [
-          { text: "A", estBonneReponse: true, retroaction: "Bon" },
-          { text: "B", estBonneReponse: false, retroaction: "Mauvais" },
-        ],
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "ChoixMultiple",
-      };
-
-      await store.addQuestion(groupId, q1);
-      await store.addQuestion(groupId, q2);
-
-      const allData = await store.getAllQuestions();
-      expect(allData[0].questions).toHaveLength(2);
-      expect(allData[0].questions[0].nom).toBe("Q1");
-      expect(allData[0].questions[1].nom).toBe("Q2");
-    });
-
-    test("CU02a-t2b : Associer la question au cours de l'enseignant", async () => {
-      const groupId = "LOG210-A01";
-      const question: QuestionVraiFaux = {
-        nom: "Q-COURSE",
-        énoncé: "Associer question au bon cours",
-        reponse: true,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      await store.addQuestion(groupId, question);
-
-      const allData = await store.getAllQuestions();
-      const entry = allData.find((e: any) => e.group_id === groupId);
-      expect(entry).toBeTruthy();
-      expect(entry.questions.map((q: any) => q.nom)).toContain("Q-COURSE");
-    });
-
-    test("CU02a-t2c : La question n'est pas associée à un autre cours", async () => {
-      const question: QuestionVraiFaux = {
-        nom: "Q-ONLY",
-        énoncé: "Ne pas associer au mauvais cours",
-        reponse: true,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      await store.addQuestion("COURSE-A", question);
-
-      const courseA = await store.getQuestionsForCours("COURSE-A");
-      const courseB = await store.getQuestionsForCours("COURSE-B");
-
-      expect(courseA.map((q: any) => q.nom)).toContain("Q-ONLY");
-      expect(courseB.map((q: any) => q.nom)).not.toContain("Q-ONLY");
-    });
-
-    test("CU02a-t2d : Ajouter une deuxième question associée au même cours", async () => {
-      const groupId = "LOG210-A02";
-      const q1: QuestionVraiFaux = {
-        nom: "Q1",
-        énoncé: "Q1",
-        reponse: true,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-      const q2: QuestionVraiFaux = {
-        nom: "Q2",
-        énoncé: "Q2",
-        reponse: false,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      await store.addQuestion(groupId, q1);
-      await store.addQuestion(groupId, q2);
-
-      const questions = await store.getQuestionsForCours(groupId);
-      expect(questions.map((q: any) => q.nom)).toEqual(["Q1", "Q2"]);
-    });
-
-    test("CU02a-t3 : Rejeter les doublons de nom (insensible à la casse)", async () => {
-      const groupId = "LOG210-A01";
-      const question: QuestionVraiFaux = {
-        nom: "Question1",
-        énoncé: "Test",
-        reponse: true,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      await store.addQuestion(groupId, question);
-
-      await expect(
-        store.addQuestion(groupId, {
-          ...question,
-          énoncé: "Question différente",
-        })
-      ).rejects.toThrow("existe déjà");
-    });
-
-    test("CU02a-t4 : Permettre le même nom dans des cours différents", async () => {
-      const question1: QuestionVraiFaux = {
-        nom: "Q1",
-        énoncé: "Enoncé cours 1",
-        reponse: true,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      const question2: QuestionVraiFaux = {
-        nom: "Q1",
-        énoncé: "Enoncé cours 2",
-        reponse: false,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      await store.addQuestion("COURS-01", question1);
-      await store.addQuestion("COURS-02", question2);
-
-      const allData = await store.getAllQuestions();
-      expect(allData).toHaveLength(2);
-      expect(allData[0].group_id).toBe("COURS-01");
-      expect(allData[1].group_id).toBe("COURS-02");
-      expect(allData[0].questions[0].nom).toBe("Q1");
-      expect(allData[1].questions[0].nom).toBe("Q1");
-    });
-
-    test("CU02a-t5 : Valider l'unicité du nom avec store.questionNameExists()", async () => {
-      const groupId = "LOG210-A01";
-      const question: QuestionVraiFaux = {
-        nom: "TestQ",
-        énoncé: "Test",
-        reponse: true,
-        retroaction: "OK",
-        retroactionValide: "OK",
-        retroactionInvalide: "Non",
-        tags: [],
-        type: "VraiFaux",
-      };
-
-      expect(await store.questionNameExists(groupId, "TestQ")).toBe(false);
-
-      await store.addQuestion(groupId, question);
-      expect(await store.questionNameExists(groupId, "TestQ")).toBe(true);
-
-      expect(await store.questionNameExists(groupId, "testq")).toBe(true);
-    });
-  });
-
-  test("getAllQuestions returns empty array when questionsStore is not an array", async () => {
-    const filePath = path.join(process.cwd(), "data", "questions.json");
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, JSON.stringify({ questionsStore: { bad: true } }), "utf-8");
-
-    const allData = await store.getAllQuestions();
-    expect(allData).toEqual([]);
-  });
-
-  test("getQuestionsForCours returns empty when group not found", async () => {
-    const groupId = "LOG210-A01";
-    const question: QuestionVraiFaux = {
+  test("ajouterQuestionAuCours ajoute une question vrai/faux", async () => {
+    await store.ajouterQuestionAuCours("LOG210-A01", {
       nom: "Q1",
-      ["\u00e9nonc\u00e9"]: "TypeScript est un langage?",
+      enonce: "TypeScript est un langage?",
       reponse: true,
-      retroaction: "Oui!",
-      retroactionValide: "Oui!",
+      retroactionValide: "Oui",
       retroactionInvalide: "Non",
       tags: ["typescript"],
       type: "VraiFaux",
-    };
+    });
 
-    await store.addQuestion(groupId, question);
-
-    const { getQuestionsForCours } = require("../../src/core/questionsStore");
-    const missing = await getQuestionsForCours("OTHER");
-    expect(missing).toEqual([]);
+    const questions = await store.recupererQuestionsDuCours("LOG210-A01");
+    expect(questions).toHaveLength(1);
+    expect(questions[0].nom).toBe("Q1");
+    expect(questions[0].type).toBe("VraiFaux");
   });
 
-  test("getQuestionsForCours returns all questions for a course only", async () => {
-    const q1: QuestionVraiFaux = {
-      nom: "Q1",
-      ["\u00e9nonc\u00e9"]: "Q1",
+  test("ajouterQuestionAuCours rejette les doublons de nom", async () => {
+    const question = {
+      nom: "Question1",
+      enonce: "Question 1",
       reponse: true,
-      retroaction: "OK",
       retroactionValide: "OK",
       retroactionInvalide: "Non",
-      tags: [],
+      tags: ["x"],
       type: "VraiFaux",
     };
-    const q2: QuestionVraiFaux = {
-      nom: "Q2",
-      ["\u00e9nonc\u00e9"]: "Q2",
-      reponse: false,
-      retroaction: "OK",
+
+    await store.ajouterQuestionAuCours("LOG210-A01", question);
+    await expect(store.ajouterQuestionAuCours("LOG210-A01", question)).rejects.toThrow("existe");
+  });
+
+  test("existeNomQuestion est insensible a la casse", async () => {
+    await store.ajouterQuestionAuCours("LOG210-A01", {
+      nom: "TestQ",
+      enonce: "Test",
+      reponse: true,
       retroactionValide: "OK",
       retroactionInvalide: "Non",
-      tags: [],
+      tags: ["x"],
       type: "VraiFaux",
-    };
+    });
 
-    await store.addQuestion("COURSE-1", q1);
-    await store.addQuestion("COURSE-1", q2);
-    await store.addQuestion("COURSE-2", q1);
-
-    const { getQuestionsForCours } = require("../../src/core/questionsStore");
-    const course1 = await getQuestionsForCours("COURSE-1");
-    const course2 = await getQuestionsForCours("COURSE-2");
-
-    expect(course1.map((q: any) => q.nom)).toEqual(["Q1", "Q2"]);
-    expect(course2.map((q: any) => q.nom)).toEqual(["Q1"]);
+    expect(await store.existeNomQuestion("LOG210-A01", "TestQ")).toBe(true);
+    expect(await store.existeNomQuestion("LOG210-A01", "testq")).toBe(true);
+    expect(await store.existeNomQuestion("LOG210-A01", "absent")).toBe(false);
   });
 
-  test("getAllQuestions creates file when missing", async () => {
-    const filePath = path.join(process.cwd(), "data", "questions.json");
-    try {
-      await fs.rm(filePath, { force: true });
-    } catch {}
-
-    const all = await store.getAllQuestions();
-    const exists = await fs.readFile(filePath, "utf-8");
-
-    expect(all).toEqual([]);
-    expect(JSON.parse(exists)).toEqual({ questionsStore: [] });
+  test("recupererQuestionsDuCours retourne [] pour un cours absent", async () => {
+    const questions = await store.recupererQuestionsDuCours("INEXISTANT");
+    expect(questions).toEqual([]);
   });
 
-  test("addQuestion throws when name already exists in same course", async () => {
-    const groupId = "LOG210-A01";
-    const question: QuestionVraiFaux = {
+  test("ajouterQuestionAuCours echoue si le cours n'existe pas", async () => {
+    await expect(
+      store.ajouterQuestionAuCours("INEXISTANT", {
+        nom: "QX",
+        enonce: "Question",
+        reponse: true,
+        retroactionValide: "OK",
+        retroactionInvalide: "Non",
+        tags: ["x"],
+        type: "VraiFaux",
+      })
+    ).rejects.toThrow("Cours introuvable");
+  });
+
+  test("supprimerQuestionDuCours retire la question cible", async () => {
+    await store.ajouterQuestionAuCours("LOG210-A01", {
       nom: "Q1",
-      ["\u00e9nonc\u00e9"]: "TypeScript est un langage?",
+      enonce: "Question 1",
       reponse: true,
-      retroaction: "Oui!",
-      retroactionValide: "Oui!",
+      retroactionValide: "OK",
       retroactionInvalide: "Non",
-      tags: ["typescript"],
+      tags: ["x"],
       type: "VraiFaux",
-    };
+    });
 
-    await store.addQuestion(groupId, question);
-
-    await expect(store.addQuestion(groupId, question)).rejects.toThrow("existe");
+    await store.supprimerQuestionDuCours("LOG210-A01", "Q1");
+    const questions = await store.recupererQuestionsDuCours("LOG210-A01");
+    expect(questions).toEqual([]);
   });
 });
-

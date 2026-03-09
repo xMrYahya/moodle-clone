@@ -26,19 +26,19 @@ describe("coursStore", () => {
     expect(JSON.parse(content)).toEqual({ courses: [] });
   });
 
-  test("getCoursStockes returns empty array when no courses", async () => {
+  test("recupererCoursStockes returns empty array when no courses", async () => {
     const store = require("../../src/core/coursStore");
-    const all = await store.getCoursStockes();
+    const all = await store.recupererCoursStockes();
     expect(all).toEqual([]);
   });
 
-  test("getCoursStockes returns empty array when courses is not an array", async () => {
+  test("recupererCoursStockes returns empty array when courses is not an array", async () => {
     const store = require("../../src/core/coursStore");
     const filePath = path.join(tmpDir, "data", "cours.json");
     await fs.mkdir(path.dirname(filePath), { recursive: true });
     await fs.writeFile(filePath, JSON.stringify({ courses: { bad: true } }), "utf-8");
 
-    const all = await store.getCoursStockes();
+    const all = await store.recupererCoursStockes();
     expect(all).toEqual([]);
   });
 
@@ -55,24 +55,24 @@ describe("coursStore", () => {
     } as any;
 
     await store.ajouterCoursStocke(course);
-    let all = await store.getCoursStockes();
+    let all = await store.recupererCoursStockes();
     expect(all).toHaveLength(1);
     expect(all[0].idGroupe).toBe("g1");
 
     // adding same idGroupe again shouldn't duplicate
     await store.ajouterCoursStocke(course);
-    all = await store.getCoursStockes();
+    all = await store.recupererCoursStockes();
     expect(all).toHaveLength(1);
   });
 
-  test("getStoredPourProf filters by idEnseignant", async () => {
+  test("recupererCoursStockesPourEnseignant filters by idEnseignant", async () => {
     const store = require("../../src/core/coursStore");
     const a = { idGroupe: "gA", jour: "", heure: "", activite: "", mode: "", local: "", idEnseignant: "tA" } as any;
     const b = { idGroupe: "gB", jour: "", heure: "", activite: "", mode: "", local: "", idEnseignant: "tB" } as any;
     await store.ajouterCoursStocke(a);
     await store.ajouterCoursStocke(b);
 
-    const tA = await store.getStoredPourProf("tA");
+    const tA = await store.recupererCoursStockesPourEnseignant("tA");
     expect(tA).toHaveLength(1);
     expect(tA[0].idGroupe).toBe("gA");
   });
@@ -87,18 +87,18 @@ describe("coursStore", () => {
     await store.ajouterCoursStocke(b);
     await store.ajouterCoursStocke(other);
 
-    const t1 = await store.getStoredPourProf("t1");
+    const t1 = await store.recupererCoursStockesPourEnseignant("t1");
     expect(t1).toHaveLength(2);
     expect(t1.map((x: any) => x.idGroupe).sort()).toEqual(["g1", "g2"]);
   });
 
-  test("getStoredParIdGroupe finds existing course or returns undefined", async () => {
+  test("recupererCoursStockeParIdGroupe finds existing course or returns undefined", async () => {
     const store = require("../../src/core/coursStore");
     const course = { idGroupe: "gX", jour: "", heure: "", activite: "Act", mode: "", local: "", idEnseignant: "t" } as any;
     await store.ajouterCoursStocke(course);
 
-    const found = await store.getStoredParIdGroupe("gX");
-    const notFound = await store.getStoredParIdGroupe("missing");
+    const found = await store.recupererCoursStockeParIdGroupe("gX");
+    const notFound = await store.recupererCoursStockeParIdGroupe("missing");
 
     expect(found?.idGroupe).toBe("gX");
     expect(notFound).toBeUndefined();
@@ -112,10 +112,12 @@ describe("coursStore", () => {
     await store.ajouterCoursStocke(b);
 
     await store.retirerCoursStocke("gR1");
-    const all = await store.getCoursStockes();
+    const all = await store.recupererCoursStockes();
     expect(all.map((c: any) => c.idGroupe)).toEqual(["gR2"]);
 
     // removing non-existing should not throw
     await expect(store.retirerCoursStocke("nope")).resolves.toBeUndefined();
   });
 });
+
+

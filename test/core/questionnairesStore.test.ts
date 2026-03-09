@@ -12,7 +12,7 @@ describe("questionnairesStore - exigences CU05", () => {
     jest.spyOn(process, "cwd").mockReturnValue(tmpDir);
 
     jest.doMock("../../src/core/coursStore", () => ({
-      getQuestionsForCours: jest.fn(async (idGroupe: string) => {
+      recupererQuestionsDuCours: jest.fn(async (idGroupe: string) => {
         if (idGroupe === "g-1") {
           return [
             { nom: "Q1", tags: ["exam"] },
@@ -197,3 +197,4 @@ describe("questionnairesStore - exigences CU05", () => {
     expect(verification.confirmation).toBe(false);
   });
 });
+

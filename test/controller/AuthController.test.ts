@@ -210,3 +210,4 @@ describe("AuthController (100% coverage)", () => {
     expect(res.redirect).toHaveBeenCalledWith("/");
   });
 });
+
