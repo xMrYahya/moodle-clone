@@ -3,16 +3,16 @@ title RDCU – Demarrer Ajout Cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
-participant ":Enseignant"  as enseignant
+participant "cc:homeController"  as hc
 participant "sga:accesSGA" as sga
 
- -> enseignant : demarrerAjoutCours()
-activate enseignant
-enseignant -> sga : getCours(teacher_id:string, token:string): Groupe-Cours[]
+ -> hc : demarrerAjoutCours(idEnseignant: string, token: string)
+ note right: GRASP: Controller
+activate hc
+hc -> sga : getCours(teacher_id:string, token:string): Groupe-Cours[]
+note right: GRASP: Expert
 activate sga
-sga -->> enseignant :  listeGC:Groupe-Cours[]
+sga -->> hc :  listeGC:Groupe-Cours[]
 
 deactivate sga
-
-deactivate enseignant
 @enduml

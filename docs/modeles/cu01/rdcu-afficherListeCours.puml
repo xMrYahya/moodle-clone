@@ -3,19 +3,19 @@ title RDCU - afficher liste des cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
-participant ":Enseignant"  as enseignant
+participant "hc:HomeController"  as hc
 participant "sga:accesSGA" as sga
 
- -> enseignant : afficherListeCours() : Cours[]
-note right: controlleur \n selon expert
-activate enseignant
-enseignant -> sga : getListeCours(teacher_id:string): Cours[]
-note right: selon expert
+ -> hc : afficherListeCours() : Cours[]
+note right: GRASP: Controller
+activate hc
+hc -> sga : getListeCours(teacher_id:string): Cours[]
+note right: GRASP: Expert
 activate sga
-sga -->> enseignant : ListeCours : cours[]
+sga -->> hc : ListeCours : cours[]
 
 deactivate sga
- <<-- enseignant : listeCours : cours[] 
+ <<-- hc : listeCours : cours[] 
 
-deactivate enseignant
+deactivate hc
 @enduml

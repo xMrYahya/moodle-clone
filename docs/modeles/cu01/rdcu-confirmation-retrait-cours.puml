@@ -2,25 +2,22 @@
 hide footbox
 title RDCU –  Confirmation de retrait d'un cours
 
-participant Enseignant as Ens
-participant controlleurCours as ctrl
-participant catalogueCours as cours
+participant "cc:controlleurCours" as cc
+participant "cs:coursStore" as cs
 
-activate Ens
- -> Ens : confirmerSuppressionCours()
+activate cc
+ -> cc : confirmerSuppressionCours()
+note right: GRASP: Controller
 
+cc -> cc : suppressionCours(idCours : String)
+note right: GRASP: Expert
 
-Ens -> ctrl : suppressionCours(idCours : String)
-activate  ctrl
+cc -> cs : retirerCoursStocke(idCours : String)
+note right: GRASP: Expert
+activate cs
+cs --> cc : coursRestant()
+deactivate cs
 
-ctrl -> cours : suppressionCours(idCours : String)
-activate cours
-cours --> ctrl : coursSupprimer()
-deactivate cours
-
-ctrl --> Ens : messageSuppressionConfirmer()
-
-Ens -> ctrl : getListeCours(teacher_id:string): Cours[]
-ctrl -->> Ens : listeCours : cours[]
+<-- cc: messageSuppressionConfirmer()
 
 @enduml

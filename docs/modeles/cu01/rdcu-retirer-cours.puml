@@ -2,14 +2,15 @@
 hide footbox
 title RDCU – Retirer un cours
 
-participant Enseignant as Ens
+participant "cc:coursController" as cc
 
-activate Ens
- -> Ens : retirerCours(idCours : String)
-Ens -> Ens : idCours = idCours
-activate Ens
-deactivate Ens
-deactivate Ens
+activate cc
+-> cc : retirerCours(idCours : String)
+note right: GRASP: Controller
 
+cc -> cc : idCours = idCours
+note right: GRASP: Expert
+
+<-- cc : confirmerLaSuppression()
 
 @enduml

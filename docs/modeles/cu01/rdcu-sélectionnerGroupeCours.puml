@@ -2,23 +2,20 @@
 hide footbox
 title RDCU - selectionnerGroupeCours(idGroupe : String)
 
-participant ": Enseignant" as E
+participant "cc:coursController" as cc
 participant "sga : accesSga" as S
 participant "c : Cours" as C
 
--> E : selectionnerGroupeCours(idGroupe : String)
-activate E
+-> cc : selectionnerGroupeCours(idGroupe : String)
+note right: GRASP: Controller
+activate cc
 
-E -> S : getCours(idGroupe : String, token:string)
+cc -> S : getCours(idGroupe : String, token:string)
+note right: GRASP: Expert
 activate S
 S -> C ** : <<create>> Cours\n(idGroupe:String, token:string)
+note right: GRASP: Creator
 
-
-S -->> E : c : Cours
+S -->> cc : c : Cours
 deactivate S
-
-E -> E : associerCoursAEnseignant(C)
-activate E
-deactivate E
-deactivate E
 @enduml
