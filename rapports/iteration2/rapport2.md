@@ -48,8 +48,7 @@
 
 ## Modèle du domaine (MDD)
 
-> Le MDD est cumulatif : vous devez y ajouter des éléments à chaque itération (ou corriger les erreurs), selon la portée (et votre meilleure compréhension du problème) visée par votre solution. 
-> Utilisez une légende dans le MDD pour indiquer la couleur de chaque itération afin de faire ressortir les changements (ce n'est pas toujours possible pour les associations et les attributs). Voir les stéréotypes personnalisés : <https://plantuml.com/fr/class-diagram> et [comment faire une légende avec couleurs en PlantUML](https://stackoverflow.com/questions/30999290/how-to-generate-a-legend-with-colors-in-plantuml).
+![MDD ](../../docs/modeles/exports/MDD_SGB_SGA.png "DSS")
 
 ## Diagramme de séquence système (DSS)
 
@@ -402,14 +401,13 @@
 
 ## Diagramme de classe logicielle (DCL)
 
-> Facultatif, mais fortement suggéré
-> Ce diagramme vous aidera à planifier l'ordre d'implémentation des classes.  Très utile lorsqu'on utilise TDD.
 
 ### Diagramme de classe TPLANT
-- Générer un diagramme de classe avec l'outil TPLANT et commenter celui-ci par rapport à votre MDD.
-- https://www.npmjs.com/package/tplant
+![Diagramme Tplant](../../docs/modeles/exports/diagramme-classe.png "Diagramme Tplant")
+
+On peut voir que les différences les plus grandes avec proviennent des distinctions dans les chouches MVC avec les modeles et les controlleurs. Il est aussi possible de voir que les noms des fonctions dans les objets correspondent avec les RDCU et les dss
   
-## Retour sur la correction du rapport psrécédent
+## Retour sur la correction du rapport précédent
 
 ## DSS Mis à Jour
 Les dss suivant ont été mis a jout afin de corriger les erreurs qui avait été trouvé durant l'itération précédente. (Titres de cu manquants dans le titre et types de questions différents pas pris en compte dans le dss)
@@ -599,9 +597,9 @@ MDD - Questions, Cours
 
 ## Vérification finale
 
-- [ ] Vous avez un seul MDD
-  - [ ] Vous avez mis un verbe à chaque association
-  - [ ] Chaque association a une multiplicité
+- [X] Vous avez un seul MDD
+  - [X] Vous avez mis un verbe à chaque association
+  - [X] Chaque association a une multiplicité
 - [X] Vous avez un DSS par cas d'utilisation
   - [X] Chaque DSS a un titre
   - [X] Chaque opération synchrone a un retour d'opération
