@@ -162,12 +162,18 @@ AuthController "1" --> "1" SgbClient
 CoursController "1" --> "1" SgbClient
 CoursController "1" ..> "1" CoursModele
 QuestionsController "1" ..> "1" CoursModele
-QuestionsController "1" ..> "*" Question
+QuestionsController "1" ..> "1" QuestionnaireModele
+QuestionsController "1" ..> "1" QuestionVraiFauxModele
+QuestionsController "1" ..> "1" QuestionChoixMultipleModele
+QuestionsController "1" ..> "1" QuestionNumeriqueModele
+QuestionsController "1" ..> "1" QuestionReponseCourteModele
+QuestionsController "1" ..> "1" QuestionMiseEnCorrespondanceModele
+QuestionsController "1" ..> "1" QuestionEssaiModele
 QuestionnaireModele "1" ..> "1" CoursModele
 QuestionnairesController "1" ..> "1" QuestionnaireModele
 QuestionnairesController "1" ..> "1" CoursModele
 CoursModele "1" ..> "*" Cours
-CoursModele "1" ..> "*" Question
+Cours "1" o-- "*" Question
 App "1" ..> "1" CoursModele
 App "1" ..> "1" QuestionnaireModele
 @enduml
