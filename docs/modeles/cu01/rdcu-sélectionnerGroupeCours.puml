@@ -6,8 +6,10 @@ participant ":CoursController" as ctrl
 participant ":CoursModele" as modele
 
 -> ctrl : selectionnerGroupeCours(idGroupe:String)
+note right: GRASP: Controller
 activate ctrl
 ctrl -> modele : ajouterCoursStocke(cours:Cours)
+note right: GRASP: Expert
 activate modele
 modele -->> ctrl : confirmationAjout
 deactivate modele

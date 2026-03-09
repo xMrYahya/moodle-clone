@@ -6,6 +6,7 @@ skinparam sequenceMessageAlign center
 participant ":CoursController" as coursController
 
 -> coursController : demarrerAjoutCours()
+note right: GRASP: Controller
 activate coursController
 coursController -->> coursController : appel service SGB (boite noire)
 <<-- coursController : listeGC:Groupe-Cours[]

@@ -1,5 +1,5 @@
 @startuml
-title RDCU - afficher liste des cours
+title RDCU - Afficher liste des cours
 skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
@@ -7,8 +7,10 @@ participant ":CoursController" as coursController
 participant ":CoursModele" as coursModele
 
 -> coursController : afficherListeCours() : Cours[]
+note right: GRASP: Controller
 activate coursController
 coursController -> coursModele : obtenirCoursStockesPourProf(idEnseignant:String): Cours[]
+note right: GRASP: Expert
 activate coursModele
 coursModele -->> coursController : createdGroups:Cours[]
 deactivate coursModele
