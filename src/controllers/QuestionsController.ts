@@ -1,12 +1,12 @@
 import { Response } from "express";
 import { 
-  addQuestion, 
-  getQuestionByName,
-  getQuestionsForCours,
-  questionNameExists,
-  questionNameExistsExcept,
-  removeQuestion,
-  updateQuestion,
+  ajouterQuestionAuCours,
+  recupererQuestionParNom,
+  recupererQuestionsDuCours,
+  existeNomQuestion,
+  existeNomQuestionEnExcluant,
+  supprimerQuestionDuCours,
+  modifierQuestionDuCours,
 } from "../core/coursStore";
 import {
   PairDeCorrespondance,
@@ -70,15 +70,15 @@ export class QuestionsController {
     return nombre;
   }
 
-  private static lireContexteRequete(req: any): { teacherId: string; groupId: string } {
-    const teacherId = QuestionsController.lireTexte(req?.session?.user?.id);
-    const groupId = QuestionsController.lireTexte(req?.params?.groupId);
+  private static extraireContexteRequete(req: any): { idEnseignant: string; idGroupe: string } {
+    const idEnseignant = QuestionsController.lireTexte(req?.session?.user?.id);
+    const idGroupe = QuestionsController.lireTexte(req?.params?.idGroupe);
 
-    if (!teacherId || !groupId) {
+    if (!idEnseignant || !idGroupe) {
       throw new InvalidParameterError("Enseignant ou cours manquant");
     }
 
-    return { teacherId, groupId };
+    return { idEnseignant, idGroupe };
   }
 
   private static validerChampsObligatoires(
@@ -96,7 +96,7 @@ export class QuestionsController {
   }
 
   private static async validerNomQuestionUnique(
-    groupId: string,
+    idGroupe: string,
     nom: string,
     nomAExclure?: string
   ): Promise<void> {
@@ -104,8 +104,8 @@ export class QuestionsController {
     const nomExcluNettoye = QuestionsController.lireTexte(nomAExclure);
 
     const existe = nomExcluNettoye
-      ? await questionNameExistsExcept(groupId, nomNettoye, nomExcluNettoye)
-      : await questionNameExists(groupId, nomNettoye);
+      ? await existeNomQuestionEnExcluant(idGroupe, nomNettoye, nomExcluNettoye)
+      : await existeNomQuestion(idGroupe, nomNettoye);
 
     if (existe) {
       throw new AlreadyExistsError(`Une question avec le nom "${nomNettoye}" existe déjà`);
@@ -122,19 +122,19 @@ export class QuestionsController {
 
   static async consulterQuestionsCours(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
-      const questions = await getQuestionsForCours(groupId);
+      const { idGroupe } = QuestionsController.extraireContexteRequete(req);
+      const questions = await recupererQuestionsDuCours(idGroupe);
 
       res.status(200).json({
         success: true,
         questions,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération des questions" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la récupération des questions" });
       }
       return;
     }
@@ -142,14 +142,14 @@ export class QuestionsController {
 
   static async selectionnerQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nom) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await getQuestionByName(groupId, nom);
+      const question = await recupererQuestionParNom(idGroupe, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
@@ -159,13 +159,13 @@ export class QuestionsController {
         question,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la récupération de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la récupération de la question" });
       }
       return;
     }
@@ -173,14 +173,14 @@ export class QuestionsController {
 
   static async modifierQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nomOriginal = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nomOriginal) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const questionExistante = await getQuestionByName(groupId, nomOriginal);
+      const questionExistante = await recupererQuestionParNom(idGroupe, nomOriginal);
       if (!questionExistante) {
         throw new NotFoundError(`Question introuvable avec le nom "${nomOriginal}"`);
       }
@@ -188,27 +188,27 @@ export class QuestionsController {
       const {
         type,
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
-        ...otherData
+        ...donneesComplementairesBrutes
       } = req.body;
 
       const typeFinal = QuestionsController.lireTexte(type ?? questionExistante.type);
       const nomFinal = QuestionsController.lireTexte(nom ?? questionExistante.nom);
-      const enonceFinal = QuestionsController.lireTexte(énoncé ?? questionExistante.énoncé);
+      const enonceFinal = QuestionsController.lireTexte(enonce ?? questionExistante.enonce);
 
       QuestionsController.validerChampsObligatoires(
         {
           type: typeFinal,
           nom: nomFinal,
-          énoncé: enonceFinal,
+          enonce: enonceFinal,
         },
-        ["type", "nom", "énoncé"]
+        ["type", "nom", "enonce"]
       );
 
-      await QuestionsController.validerNomQuestionUnique(groupId, nomFinal, nomOriginal);
+      await QuestionsController.validerNomQuestionUnique(idGroupe, nomFinal, nomOriginal);
 
       const retroactionValideFinale = QuestionsController.lireTexte(
         retroactionValide ?? questionExistante.retroactionValide
@@ -225,10 +225,10 @@ export class QuestionsController {
 
       if (typeFinal === "VraiFaux") {
         const reponseSource =
-          otherData.reponse !== undefined
-            ? otherData.reponse
-            : otherData.reponseVf !== undefined
-              ? otherData.reponseVf
+          donneesComplementairesBrutes.reponse !== undefined
+            ? donneesComplementairesBrutes.reponse
+            : donneesComplementairesBrutes.reponseVf !== undefined
+              ? donneesComplementairesBrutes.reponseVf
               : (questionExistante as any).reponse;
 
         const reponseBoolean = QuestionsController.lireBooleen(reponseSource);
@@ -246,7 +246,7 @@ export class QuestionsController {
           retroactionValideFinale
         );
 
-        await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+        await modifierQuestionDuCours(idGroupe, nomOriginal, questionMiseAJour);
 
         res.status(200).json({
           success: true,
@@ -257,32 +257,32 @@ export class QuestionsController {
       }
 
       const donneesComplementaires = {
-        ...otherData,
+        ...donneesComplementairesBrutes,
         seulementUnChoix:
-          otherData.seulementUnChoix !== undefined
-            ? otherData.seulementUnChoix
-            : otherData.seulementUnChoixCm !== undefined
-              ? otherData.seulementUnChoixCm
+          donneesComplementairesBrutes.seulementUnChoix !== undefined
+            ? donneesComplementairesBrutes.seulementUnChoix
+            : donneesComplementairesBrutes.seulementUnChoixCm !== undefined
+              ? donneesComplementairesBrutes.seulementUnChoixCm
             : (questionExistante as any).seulementUnChoix,
         reponses:
-          otherData.reponses !== undefined
-            ? otherData.reponses
-            : otherData.reponsesCm !== undefined
-              ? otherData.reponsesCm
+          donneesComplementairesBrutes.reponses !== undefined
+            ? donneesComplementairesBrutes.reponses
+            : donneesComplementairesBrutes.reponsesCm !== undefined
+              ? donneesComplementairesBrutes.reponsesCm
               : (questionExistante as any).reponses,
         paires:
-          otherData.paires !== undefined
-            ? otherData.paires
-            : otherData.pairesMec !== undefined
-              ? otherData.pairesMec
+          donneesComplementairesBrutes.paires !== undefined
+            ? donneesComplementairesBrutes.paires
+            : donneesComplementairesBrutes.pairesMec !== undefined
+              ? donneesComplementairesBrutes.pairesMec
               : (questionExistante as any).paires,
         reponse:
-          otherData.reponse !== undefined
-            ? otherData.reponse
-            : otherData.reponseLibre !== undefined
-              ? otherData.reponseLibre
-            : otherData.reponseAttendue !== undefined
-              ? otherData.reponseAttendue
+          donneesComplementairesBrutes.reponse !== undefined
+            ? donneesComplementairesBrutes.reponse
+            : donneesComplementairesBrutes.reponseLibre !== undefined
+              ? donneesComplementairesBrutes.reponseLibre
+            : donneesComplementairesBrutes.reponseAttendue !== undefined
+              ? donneesComplementairesBrutes.reponseAttendue
               : (questionExistante as any).reponseAttendue,
       };
 
@@ -330,7 +330,7 @@ export class QuestionsController {
         donneesComplementaires
       );
 
-      await updateQuestion(groupId, nomOriginal, questionMiseAJour);
+      await modifierQuestionDuCours(idGroupe, nomOriginal, questionMiseAJour);
 
       res.status(200).json({
         success: true,
@@ -338,15 +338,15 @@ export class QuestionsController {
         question: convertirQuestionModeleEnDonnees(questionMiseAJour),
       });
       return;
-    } catch (e: any) {
-      if (e instanceof AlreadyExistsError) {
-        res.status(409).json({ error: e.message });
-      } else if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof AlreadyExistsError) {
+        res.status(409).json({ error: erreur.message });
+      } else if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la modification de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la modification de la question" });
       }
       return;
     }
@@ -354,14 +354,14 @@ export class QuestionsController {
 
   static async supprimerQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nom) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await getQuestionByName(groupId, nom);
+      const question = await recupererQuestionParNom(idGroupe, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
@@ -372,13 +372,13 @@ export class QuestionsController {
         question,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la préparation de suppression" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la préparation de suppression" });
       }
       return;
     }
@@ -386,20 +386,20 @@ export class QuestionsController {
 
   static async confirmerSuppressionQuestion(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
+      const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
 
       if (!nom) {
         throw new InvalidParameterError("Nom de question manquant");
       }
 
-      const question = await getQuestionByName(groupId, nom);
+      const question = await recupererQuestionParNom(idGroupe, nom);
       if (!question) {
         throw new NotFoundError(`Question introuvable avec le nom "${nom}"`);
       }
 
-      await removeQuestion(groupId, nom);
-      const questions = await getQuestionsForCours(groupId);
+      await supprimerQuestionDuCours(idGroupe, nom);
+      const questions = await recupererQuestionsDuCours(idGroupe);
 
       res.status(200).json({
         success: true,
@@ -407,13 +407,13 @@ export class QuestionsController {
         questions,
       });
       return;
-    } catch (e: any) {
-      if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
-      } else if (e instanceof NotFoundError) {
-        res.status(404).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
+      } else if (erreur instanceof NotFoundError) {
+        res.status(404).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de la suppression de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de la suppression de la question" });
       }
       return;
     }
@@ -435,11 +435,11 @@ export class QuestionsController {
     if (Array.isArray(reponses)) {
       return reponses
         .map((item: any) => ({
-          text: String(item?.text ?? "").trim(),
+          texte: String(item?.texte ?? "").trim(),
           estBonneReponse: item?.estBonneReponse === true,
           retroaction: String(item?.retroaction ?? "").trim(),
         }))
-        .filter((item) => item.text.length > 0);
+        .filter((item) => item.texte.length > 0);
     }
 
     const texte = String(reponses ?? "").trim();
@@ -452,7 +452,7 @@ export class QuestionsController {
       .map((item) => item.trim())
       .filter((item) => item.length > 0)
       .map((item, index) => ({
-        text: item,
+        texte: item,
         estBonneReponse: index === 0,
         retroaction: "",
       }));
@@ -493,7 +493,7 @@ export class QuestionsController {
   private static creerQuestionAutreType(
     type: string,
     nom: string,
-    énoncé: string,
+    enonce: string,
     retroactionValide: string,
     retroactionInvalide: string,
     tags: string[],
@@ -507,7 +507,7 @@ export class QuestionsController {
 
       return new QuestionChoixMultipleModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -524,7 +524,7 @@ export class QuestionsController {
 
       return new QuestionMiseEnCorrespondanceModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -540,7 +540,7 @@ export class QuestionsController {
 
       return new QuestionReponseCourteModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -557,7 +557,7 @@ export class QuestionsController {
 
       return new QuestionNumeriqueModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags,
@@ -569,7 +569,7 @@ export class QuestionsController {
     if (type === "Essai") {
       return new QuestionEssaiModele(
         nom,
-        énoncé,
+        enonce,
         retroactionValide,
         retroactionInvalide,
         tags
@@ -581,11 +581,11 @@ export class QuestionsController {
   
   static async ajouterQuestionVraiFaux(req: any, res: Response): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
-      const { nom, énoncé, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
+      const { idGroupe } = QuestionsController.extraireContexteRequete(req);
+      const { nom, enonce, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
 
-      QuestionsController.validerChampsObligatoires({ nom, énoncé, reponse }, ["nom", "énoncé", "reponse"]);
-      await QuestionsController.validerNomQuestionUnique(groupId, String(nom));
+      QuestionsController.validerChampsObligatoires({ nom, enonce, reponse }, ["nom", "enonce", "reponse"]);
+      await QuestionsController.validerNomQuestionUnique(idGroupe, String(nom));
 
       const reponseBoolean = reponse === "true" || reponse === true;
 
@@ -593,7 +593,7 @@ export class QuestionsController {
 
       const nouvelleQuestion = new QuestionVraiFauxModele(
         String(nom).trim(),
-        String(énoncé).trim(),
+        String(enonce).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
         tagsValides,
@@ -601,7 +601,7 @@ export class QuestionsController {
         String(retroactionValide || "").trim()
       );
 
-      await addQuestion(String(groupId), nouvelleQuestion);
+      await ajouterQuestionAuCours(String(idGroupe), nouvelleQuestion);
 
       res.status(201).json({
         success: true,
@@ -609,13 +609,13 @@ export class QuestionsController {
         question: convertirQuestionModeleEnDonnees(nouvelleQuestion),
       });
       return;
-    } catch (e: any) {
-      if (e instanceof AlreadyExistsError) {
-        res.status(409).json({ error: e.message });
-      } else if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof AlreadyExistsError) {
+        res.status(409).json({ error: erreur.message });
+      } else if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de l'ajout de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de l'ajout de la question" });
       }
       return;
     }
@@ -623,25 +623,25 @@ export class QuestionsController {
 
   private static async ajouterQuestionParType(req: any, res: Response, typeQuestion: string): Promise<void> {
     try {
-      const { groupId } = QuestionsController.lireContexteRequete(req);
-      const { nom, énoncé, retroactionValide, retroactionInvalide, tags, ...otherData } = req.body;
+      const { idGroupe } = QuestionsController.extraireContexteRequete(req);
+      const { nom, enonce, retroactionValide, retroactionInvalide, tags, ...donneesComplementairesBrutes } = req.body;
 
-      QuestionsController.validerChampsObligatoires({ nom, énoncé }, ["nom", "énoncé"]);
-      await QuestionsController.validerNomQuestionUnique(groupId, String(nom));
+      QuestionsController.validerChampsObligatoires({ nom, enonce }, ["nom", "enonce"]);
+      await QuestionsController.validerNomQuestionUnique(idGroupe, String(nom));
 
       const tagsValides = QuestionsController.validerTagsObligatoires(tags);
 
       const nouvelleQuestion = QuestionsController.creerQuestionAutreType(
         typeQuestion,
         String(nom).trim(),
-        String(énoncé).trim(),
+        String(enonce).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
         tagsValides,
-        otherData
+        donneesComplementairesBrutes
       );
 
-      await addQuestion(String(groupId), nouvelleQuestion);
+      await ajouterQuestionAuCours(String(idGroupe), nouvelleQuestion);
 
       res.status(201).json({
         success: true,
@@ -649,13 +649,13 @@ export class QuestionsController {
         question: convertirQuestionModeleEnDonnees(nouvelleQuestion),
       });
       return;
-    } catch (e: any) {
-      if (e instanceof AlreadyExistsError) {
-        res.status(409).json({ error: e.message });
-      } else if (e instanceof InvalidParameterError) {
-        res.status(400).json({ error: e.message });
+    } catch (erreur: any) {
+      if (erreur instanceof AlreadyExistsError) {
+        res.status(409).json({ error: erreur.message });
+      } else if (erreur instanceof InvalidParameterError) {
+        res.status(400).json({ error: erreur.message });
       } else {
-        res.status(500).json({ error: e?.message ?? "Erreur lors de l'ajout de la question" });
+        res.status(500).json({ error: erreur?.message ?? "Erreur lors de l'ajout de la question" });
       }
       return;
     }
@@ -681,3 +681,5 @@ export class QuestionsController {
     await QuestionsController.ajouterQuestionParType(req, res, "Essai");
   }
 }
+
+

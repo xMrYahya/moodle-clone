@@ -1,7 +1,7 @@
 export abstract class Question {
   constructor(
     public nom: string,
-    public énoncé: string,
+    public enonce: string,
     public retroactionValide: string,
     public retroactionInvalide: string,
     public tags: string[]
@@ -13,14 +13,14 @@ export abstract class Question {
 export class QuestionVraiFauxModele extends Question {
   constructor(
     nom: string,
-    énoncé: string,
+    enonce: string,
     retroactionValide: string,
     retroactionInvalide: string,
     tags: string[],
     public reponse: boolean,
     public retroaction: string
   ) {
-    super(nom, énoncé, retroactionValide, retroactionInvalide, tags);
+    super(nom, enonce, retroactionValide, retroactionInvalide, tags);
   }
 
   obtenirType(): string {
@@ -31,14 +31,14 @@ export class QuestionVraiFauxModele extends Question {
 export class QuestionChoixMultipleModele extends Question {
   constructor(
     nom: string,
-    énoncé: string,
+    enonce: string,
     retroactionValide: string,
     retroactionInvalide: string,
     tags: string[],
     public seulementUnChoix: boolean,
     public reponses: ReponseChoixMultiple[]
   ) {
-    super(nom, énoncé, retroactionValide, retroactionInvalide, tags);
+    super(nom, enonce, retroactionValide, retroactionInvalide, tags);
   }
 
   obtenirType(): string {
@@ -49,13 +49,13 @@ export class QuestionChoixMultipleModele extends Question {
 export class QuestionMiseEnCorrespondanceModele extends Question {
   constructor(
     nom: string,
-    énoncé: string,
+    enonce: string,
     retroactionValide: string,
     retroactionInvalide: string,
     tags: string[],
     public paires: PairDeCorrespondance[]
   ) {
-    super(nom, énoncé, retroactionValide, retroactionInvalide, tags);
+    super(nom, enonce, retroactionValide, retroactionInvalide, tags);
   }
 
   obtenirType(): string {
@@ -66,14 +66,14 @@ export class QuestionMiseEnCorrespondanceModele extends Question {
 export class QuestionReponseCourteModele extends Question {
   constructor(
     nom: string,
-    énoncé: string,
+    enonce: string,
     retroactionValide: string,
     retroactionInvalide: string,
     tags: string[],
     public reponseAttendue: string,
     public retroaction: string
   ) {
-    super(nom, énoncé, retroactionValide, retroactionInvalide, tags);
+    super(nom, enonce, retroactionValide, retroactionInvalide, tags);
   }
 
   obtenirType(): string {
@@ -84,14 +84,14 @@ export class QuestionReponseCourteModele extends Question {
 export class QuestionNumeriqueModele extends Question {
   constructor(
     nom: string,
-    énoncé: string,
+    enonce: string,
     retroactionValide: string,
     retroactionInvalide: string,
     tags: string[],
     public reponseAttendue: number,
     public retroaction: string
   ) {
-    super(nom, énoncé, retroactionValide, retroactionInvalide, tags);
+    super(nom, enonce, retroactionValide, retroactionInvalide, tags);
   }
 
   obtenirType(): string {
@@ -107,7 +107,7 @@ export class QuestionEssaiModele extends Question {
 
 export type DonneesQuestion = {
   nom: string;
-  énoncé: string;
+  enonce: string;
   retroactionValide: string;
   retroactionInvalide: string;
   tags: string[];
@@ -121,7 +121,7 @@ export type QuestionVraiFaux = DonneesQuestion & {
 };
 
 export type ReponseChoixMultiple = {
-  text: string;
+  texte: string;
   estBonneReponse: boolean;
   retroaction: string;
 };

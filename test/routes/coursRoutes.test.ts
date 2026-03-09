@@ -66,7 +66,7 @@ describe("coursRoutes", () => {
   test("GET /cours/retirer-cours sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
-    const res = await request(app).get("/cours/retirer-cours?groupId=g-1");
+    const res = await request(app).get("/cours/retirer-cours?idGroupe=g-1");
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("/signin");
@@ -96,7 +96,7 @@ describe("coursRoutes", () => {
     expect(CoursController.selectionnerGroupeCours).toHaveBeenCalledTimes(1);
   });
 
-  test("GET /cours/:groupId/details-cours sans auth redirige vers /signin", async () => {
+  test("GET /cours/:idGroupe/details-cours sans auth redirige vers /signin", async () => {
     const app = makeApp();
 
     const res = await request(app).get("/cours/g-1/details-cours");
@@ -106,7 +106,7 @@ describe("coursRoutes", () => {
     expect(CoursController.afficherDetailsCours).not.toHaveBeenCalled();
   });
 
-  test("GET /cours/:groupId/details-cours avec auth appelle le controleur", async () => {
+  test("GET /cours/:idGroupe/details-cours avec auth appelle le controleur", async () => {
     const app = makeApp();
 
     const res = await request(app)
@@ -135,7 +135,7 @@ describe("coursRoutes", () => {
     const app = makeApp();
 
     const res = await request(app)
-      .get("/cours/retirer-cours?groupId=g-1")
+      .get("/cours/retirer-cours?idGroupe=g-1")
       .set("x-test-auth", "1");
 
     expect(res.status).toBe(200);
@@ -143,3 +143,5 @@ describe("coursRoutes", () => {
     expect(CoursController.retirerCours).toHaveBeenCalledTimes(1);
   });
 });
+
+

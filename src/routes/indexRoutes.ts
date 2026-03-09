@@ -4,7 +4,7 @@ import { HomeController } from "../controllers/HomeController";
 
 const router = Router();
 
-function requireAuth(req: any, res: any, next: any) {
+function exigerAuthentification(req: any, res: any, next: any) {
   if (!req.session?.token) {
     res.redirect("/signin");
     return;
@@ -18,6 +18,6 @@ router.get("/signin", AuthController.getSignin);
 router.post("/signin", AuthController.postSignin);
 router.get("/signout", AuthController.signout);
 
-router.get("/index", requireAuth, HomeController.afficherListeCours ?? HomeController.index);
+router.get("/index", exigerAuthentification, HomeController.afficherListeCours ?? HomeController.index);
 
 export default router;

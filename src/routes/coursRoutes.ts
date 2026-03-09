@@ -3,7 +3,7 @@ import { CoursController } from "../controllers/CoursController";
 
 const router = Router();
 
-function requireAuth(req: any, res: any, next: any) {
+function exigerAuthentification(req: any, res: any, next: any) {
   if (!req.session?.token) {
     res.redirect("/signin");
     return;
@@ -11,10 +11,10 @@ function requireAuth(req: any, res: any, next: any) {
   next();
 }
 
-router.post("/selectionner-groupe-cours", requireAuth, CoursController.selectionnerGroupeCours);
-router.get("/retirer-cours", requireAuth, CoursController.retirerCours);
-router.get("/confirmer-suppression-cours", requireAuth, CoursController.confirmerSuppressionCours);
-router.post("/suppression-cours", requireAuth, CoursController.suppressionCours);
-router.get("/:idCours/details-cours", requireAuth, CoursController.afficherDetailsCours);
+router.post("/selectionner-groupe-cours", exigerAuthentification, CoursController.selectionnerGroupeCours);
+router.get("/retirer-cours", exigerAuthentification, CoursController.retirerCours);
+router.get("/confirmer-suppression-cours", exigerAuthentification, CoursController.confirmerSuppressionCours);
+router.post("/suppression-cours", exigerAuthentification, CoursController.suppressionCours);
+router.get("/:idCours/details-cours", exigerAuthentification, CoursController.afficherDetailsCours);
 
 export default router;

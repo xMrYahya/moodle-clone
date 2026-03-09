@@ -1,6 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
-import { getQuestionsForCours } from "./coursStore";
+import { recupererQuestionsDuCours } from "./coursStore";
 import { AnyQuestion } from "../types/questionTypes";
 import {
   QuestionTagInfo,
@@ -231,7 +231,7 @@ function extraireTagsQuestion(question: AnyQuestion): string[] {
 }
 
 export async function obtenirListeTagsDesQuestions(idGroupe: string): Promise<string[]> {
-  const questions = await getQuestionsForCours(idGroupe);
+  const questions = await recupererQuestionsDuCours(idGroupe);
   const tagsSet = new Set<string>();
   for (const q of questions) {
     for (const tag of extraireTagsQuestion(q)) {
@@ -245,7 +245,7 @@ export async function obtenirQuestionParNom(
   idGroupe: string,
   nomQuestion: string
 ): Promise<AnyQuestion | undefined> {
-  const questions = await getQuestionsForCours(idGroupe);
+  const questions = await recupererQuestionsDuCours(idGroupe);
   return questions.find((q: any) => String(q.nom).toLowerCase() === String(nomQuestion).toLowerCase());
 }
 
@@ -254,7 +254,7 @@ export async function obtenirQuestionsParTag(
   nomTag: string
 ): Promise<QuestionTagInfo[]> {
   const [questionsCours, questionnaires] = await Promise.all([
-    getQuestionsForCours(idGroupe),
+    recupererQuestionsDuCours(idGroupe),
     obtenirQuestionnairesAssocies(idGroupe),
   ]);
 

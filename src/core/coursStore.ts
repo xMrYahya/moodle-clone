@@ -45,10 +45,10 @@ export async function viderStoreAuDemarrage(): Promise<void> {
   await fs.writeFile(STORE_PATH, JSON.stringify({ courses: [] }, null, 2), "utf-8");
 }
 
-export async function getCoursStockes(): Promise<Cours[]> {
+export async function recupererCoursStockes(): Promise<Cours[]> {
   await assurerFichier();
-  const raw = await fs.readFile(STORE_PATH, "utf-8");
-  const json = JSON.parse(raw);
+  const contenuJsonBrut = await fs.readFile(STORE_PATH, "utf-8");
+  const json = JSON.parse(contenuJsonBrut);
   if (!Array.isArray(json.courses)) {
     return [];
   }
@@ -64,53 +64,53 @@ async function ecrireCoursStockes(courses: CoursStockage[]): Promise<void> {
   await fs.writeFile(STORE_PATH, JSON.stringify({ courses }, null, 2), "utf-8");
 }
 
-export async function getStoredPourProf(teacherId: string): Promise<Cours[]> {
-  const all = await getCoursStockes();
-  return all.filter(c => String(c.idEnseignant) === String(teacherId));
+export async function recupererCoursStockesPourEnseignant(idEnseignant: string): Promise<Cours[]> {
+  const coursStockes = await recupererCoursStockes();
+  return coursStockes.filter(c => String(c.idEnseignant) === String(idEnseignant));
 }
 
-export async function getStoredParIdGroupe(groupId: string): Promise<Cours | undefined> {
-  const all = await getCoursStockes();
-  return all.find(c => c.idGroupe === String(groupId));
+export async function recupererCoursStockeParIdGroupe(idGroupe: string): Promise<Cours | undefined> {
+  const coursStockes = await recupererCoursStockes();
+  return coursStockes.find(c => c.idGroupe === String(idGroupe));
 }
 
 export async function ajouterCoursStocke(course: Cours
 
 ): Promise<void> {
-  const all = await getCoursStockes();
-  const exists = all.some(c => c.idGroupe === course.idGroupe);
-  if (!exists) {
-    all.push({
+  const coursStockes = await recupererCoursStockes();
+  const coursExisteDeja = coursStockes.some(c => c.idGroupe === course.idGroupe);
+  if (!coursExisteDeja) {
+    coursStockes.push({
       ...course,
       etudiants: Array.isArray(course.etudiants) ? course.etudiants : [],
       questions: Array.isArray(course.questions) ? course.questions : [],
     });
-    await ecrireCoursStockes(all);
+    await ecrireCoursStockes(coursStockes);
   }
 }
 
-export async function retirerCoursStocke(groupId: string): Promise<void> {
-  const all = await getCoursStockes();
-  const next = all.filter(c => c.idGroupe !== groupId);
-  await ecrireCoursStockes(next);
+export async function retirerCoursStocke(idGroupe: string): Promise<void> {
+  const coursStockes = await recupererCoursStockes();
+  const coursRestants = coursStockes.filter(c => c.idGroupe !== idGroupe);
+  await ecrireCoursStockes(coursRestants);
 }
 
-export async function getQuestionsForCours(groupId: string): Promise<AnyQuestion[]> {
-  const cours = await getStoredParIdGroupe(groupId);
+export async function recupererQuestionsDuCours(idGroupe: string): Promise<AnyQuestion[]> {
+  const cours = await recupererCoursStockeParIdGroupe(idGroupe);
   return cours?.questions ?? [];
 }
 
-export async function questionNameExists(groupId: string, nom: string): Promise<boolean> {
-  const questions = await getQuestionsForCours(groupId);
+export async function existeNomQuestion(idGroupe: string, nom: string): Promise<boolean> {
+  const questions = await recupererQuestionsDuCours(idGroupe);
   return questions.some(q => String(q.nom).toLowerCase() === String(nom).toLowerCase());
 }
 
-export async function questionNameExistsExcept(
-  groupId: string,
+export async function existeNomQuestionEnExcluant(
+  idGroupe: string,
   nom: string,
   nomAExclure: string
 ): Promise<boolean> {
-  const questions = await getQuestionsForCours(groupId);
+  const questions = await recupererQuestionsDuCours(idGroupe);
   const nomRecherche = String(nom).toLowerCase();
   const nomExclu = String(nomAExclure).toLowerCase();
 
@@ -121,18 +121,18 @@ export async function questionNameExistsExcept(
   );
 }
 
-export async function getQuestionByName(groupId: string, nom: string): Promise<AnyQuestion | undefined> {
-  const questions = await getQuestionsForCours(groupId);
+export async function recupererQuestionParNom(idGroupe: string, nom: string): Promise<AnyQuestion | undefined> {
+  const questions = await recupererQuestionsDuCours(idGroupe);
   const nomRecherche = String(nom).toLowerCase();
   return questions.find((question) => String(question.nom).toLowerCase() === nomRecherche);
 }
 
-export async function addQuestion(groupId: string, question: AnyQuestion | Question): Promise<void> {
-  const allCours = await getCoursStockes();
-  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
+export async function ajouterQuestionAuCours(idGroupe: string, question: AnyQuestion | Question): Promise<void> {
+  const allCours = await recupererCoursStockes();
+  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(idGroupe));
 
   if (indexCours === -1) {
-    throw new Error(`Cours introuvable pour le groupe "${groupId}".`);
+    throw new Error(`Cours introuvable pour le groupe "${idGroupe}".`);
   }
 
   const nouveauModele: Question = question instanceof Question ? question : deserialiserQuestionDepuisJson(question);
@@ -155,16 +155,16 @@ export async function addQuestion(groupId: string, question: AnyQuestion | Quest
   await ecrireCoursStockes(allCours);
 }
 
-export async function updateQuestion(
-  groupId: string,
+export async function modifierQuestionDuCours(
+  idGroupe: string,
   nomOriginal: string,
   questionMiseAJour: AnyQuestion | Question
 ): Promise<void> {
-  const allCours = await getCoursStockes();
-  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
+  const allCours = await recupererCoursStockes();
+  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(idGroupe));
 
   if (indexCours === -1) {
-    throw new Error(`Cours introuvable pour le groupe "${groupId}".`);
+    throw new Error(`Cours introuvable pour le groupe "${idGroupe}".`);
   }
 
   const questionsModeles = deserialiserQuestionsDepuisJson(allCours[indexCours].questions);
@@ -201,12 +201,12 @@ export async function updateQuestion(
   await ecrireCoursStockes(allCours);
 }
 
-export async function removeQuestion(groupId: string, nom: string): Promise<void> {
-  const allCours = await getCoursStockes();
-  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(groupId));
+export async function supprimerQuestionDuCours(idGroupe: string, nom: string): Promise<void> {
+  const allCours = await recupererCoursStockes();
+  const indexCours = allCours.findIndex((cours) => String(cours.idGroupe) === String(idGroupe));
 
   if (indexCours === -1) {
-    throw new Error(`Cours introuvable pour le groupe "${groupId}".`);
+    throw new Error(`Cours introuvable pour le groupe "${idGroupe}".`);
   }
 
   const questionsModeles = deserialiserQuestionsDepuisJson(allCours[indexCours].questions);

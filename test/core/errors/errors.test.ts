@@ -24,3 +24,4 @@ describe("classes derreur", () => {
     expect(err.message).toBe("introuvable");
   });
 });
+

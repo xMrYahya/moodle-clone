@@ -53,7 +53,7 @@ function lireTags(valeur: unknown): string[] {
 function lireBase(donnees: ObjetJson) {
   return {
     nom: lireTexte(donnees.nom),
-    énoncé: lireTexte(donnees.énoncé),
+    enonce: lireTexte(donnees.enonce),
     retroactionValide: lireTexte(donnees.retroactionValide),
     retroactionInvalide: lireTexte(donnees.retroactionInvalide),
     tags: lireTags(donnees.tags),
@@ -68,7 +68,7 @@ function lireReponsesChoixMultiple(valeur: unknown): ReponseChoixMultiple[] {
       .filter((item) => item.length > 0);
 
     return parties.map((texte, index) => ({
-      text: texte,
+      texte,
       estBonneReponse: index === 0,
       retroaction: "",
     }));
@@ -81,7 +81,7 @@ function lireReponsesChoixMultiple(valeur: unknown): ReponseChoixMultiple[] {
   return valeur
     .filter(estObjet)
     .map((item) => ({
-      text: lireTexte(item.text),
+      texte: lireTexte(item.texte),
       estBonneReponse: item.estBonneReponse === true,
       retroaction: lireTexte(item.retroaction),
     }));
@@ -127,7 +127,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
   if (donneesBrutes.reponses !== undefined || donneesBrutes.seulementUnChoix !== undefined) {
     return new QuestionChoixMultipleModele(
       base.nom,
-      base.énoncé,
+      base.enonce,
       base.retroactionValide,
       base.retroactionInvalide,
       base.tags,
@@ -139,7 +139,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
   if (donneesBrutes.paires !== undefined) {
     return new QuestionMiseEnCorrespondanceModele(
       base.nom,
-      base.énoncé,
+      base.enonce,
       base.retroactionValide,
       base.retroactionInvalide,
       base.tags,
@@ -152,7 +152,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
     if (reponseNumerique !== null) {
       return new QuestionNumeriqueModele(
         base.nom,
-        base.énoncé,
+        base.enonce,
         base.retroactionValide,
         base.retroactionInvalide,
         base.tags,
@@ -163,7 +163,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
 
     return new QuestionReponseCourteModele(
       base.nom,
-      base.énoncé,
+      base.enonce,
       base.retroactionValide,
       base.retroactionInvalide,
       base.tags,
@@ -176,7 +176,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
     if (typeof donneesBrutes.reponse === "boolean") {
       return new QuestionVraiFauxModele(
         base.nom,
-        base.énoncé,
+        base.enonce,
         base.retroactionValide,
         base.retroactionInvalide,
         base.tags,
@@ -190,7 +190,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
       if (reponseTexte.toLowerCase() === "true" || reponseTexte.toLowerCase() === "false") {
         return new QuestionVraiFauxModele(
           base.nom,
-          base.énoncé,
+          base.enonce,
           base.retroactionValide,
           base.retroactionInvalide,
           base.tags,
@@ -203,7 +203,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
       if (reponseNumerique !== null) {
         return new QuestionNumeriqueModele(
           base.nom,
-          base.énoncé,
+          base.enonce,
           base.retroactionValide,
           base.retroactionInvalide,
           base.tags,
@@ -214,7 +214,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
 
       return new QuestionReponseCourteModele(
         base.nom,
-        base.énoncé,
+        base.enonce,
         base.retroactionValide,
         base.retroactionInvalide,
         base.tags,
@@ -227,7 +227,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
     if (reponseNumerique !== null) {
       return new QuestionNumeriqueModele(
         base.nom,
-        base.énoncé,
+        base.enonce,
         base.retroactionValide,
         base.retroactionInvalide,
         base.tags,
@@ -239,7 +239,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
 
   return new QuestionEssaiModele(
     base.nom,
-    base.énoncé,
+    base.enonce,
     base.retroactionValide,
     base.retroactionInvalide,
     base.tags
@@ -249,7 +249,7 @@ export function deserialiserQuestionDepuisJson(donneesBrutes: unknown): Question
 function serialiserBase(question: Question) {
   return {
     nom: question.nom,
-    énoncé: question.énoncé,
+    enonce: question.enonce,
     retroactionValide: question.retroactionValide,
     retroactionInvalide: question.retroactionInvalide,
     tags: question.tags,
@@ -304,7 +304,7 @@ export function serialiserQuestionPourStockage(question: Question): Record<strin
 export function convertirQuestionModeleEnDonnees(question: Question): AnyQuestion {
   const base = {
     nom: question.nom,
-    énoncé: question.énoncé,
+    enonce: question.enonce,
     retroactionValide: question.retroactionValide,
     retroactionInvalide: question.retroactionInvalide,
     tags: question.tags,
