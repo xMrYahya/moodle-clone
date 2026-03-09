@@ -18,6 +18,8 @@ export class HomeController {
         : (req.session.email ?? "Enseignant");
 
       const showAddCourseModal = req.query.addCourse === "1";
+      const messageSucces = typeof req.query.succes === "string" ? req.query.succes : "";
+      const messageErreur = typeof req.query.erreur === "string" ? req.query.erreur : "";
 
       const confirmRemoveGroupId =
         typeof req.query.confirmRemove === "string" ? req.query.confirmRemove : null;
@@ -37,6 +39,8 @@ export class HomeController {
       res.render("index", {
         title: "Moodle",
         displayName,
+        messageSucces,
+        messageErreur,
         showAddCourseModal,
         confirmRemoveGroupId, 
         groups,

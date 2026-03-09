@@ -79,7 +79,9 @@ export class CoursController {
         questions: [],
       });
 
-      res.redirect("/index");
+      res.redirect(
+        `/index?succes=${encodeURIComponent("Cours ajoute avec succes.")}`
+      );
       return;
     } catch (e: any) {
       res.status(500).send(e?.message ?? "Echec de creation");
@@ -113,7 +115,9 @@ export class CoursController {
         return;
       }
       await retirerCoursStocke(String(idCours));
-      res.redirect("/index");
+      res.redirect(
+        `/index?succes=${encodeURIComponent("Cours retire avec succes.")}`
+      );
       return;
     } catch (e: any) {
       res.status(500).send(e?.message ?? "Echec de suppression");
@@ -143,6 +147,8 @@ export class CoursController {
         typeAffichage: CoursController.obtenirTypeQuestionPourAffichage(question),
       }));
       const showAddQuestionModal = req.query.addQuestion === "1";
+      const messageSucces = typeof req.query.succes === "string" ? req.query.succes : "";
+      const messageErreur = typeof req.query.erreur === "string" ? req.query.erreur : "";
       const displayName = `${teacher.first_name} ${teacher.last_name}`;
 
       res.render("questions", {
@@ -156,6 +162,8 @@ export class CoursController {
         students: cours.etudiants ?? [],
         questions,
         showAddQuestionModal,
+        messageSucces,
+        messageErreur,
       });
     } catch (e: any) {
       res.status(500).send(e?.message ?? "Echec du chargement des questions");

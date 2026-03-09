@@ -112,6 +112,14 @@ export class QuestionsController {
     }
   }
 
+  private static validerTagsObligatoires(tags: unknown): string[] {
+    const tagsValides = QuestionsController.lireTags(tags);
+    if (tagsValides.length === 0) {
+      throw new InvalidParameterError("Champs manquants: tags");
+    }
+    return tagsValides;
+  }
+
   static async consulterQuestionsCours(req: any, res: Response): Promise<void> {
     try {
       const { groupId } = QuestionsController.lireContexteRequete(req);
@@ -581,12 +589,14 @@ export class QuestionsController {
 
       const reponseBoolean = reponse === "true" || reponse === true;
 
+      const tagsValides = QuestionsController.validerTagsObligatoires(tags);
+
       const nouvelleQuestion = new QuestionVraiFauxModele(
         String(nom).trim(),
         String(énoncé).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
-        QuestionsController.lireTags(tags),
+        tagsValides,
         reponseBoolean,
         String(retroactionValide || "").trim()
       );
@@ -619,13 +629,15 @@ export class QuestionsController {
       QuestionsController.validerChampsObligatoires({ nom, énoncé }, ["nom", "énoncé"]);
       await QuestionsController.validerNomQuestionUnique(groupId, String(nom));
 
+      const tagsValides = QuestionsController.validerTagsObligatoires(tags);
+
       const nouvelleQuestion = QuestionsController.creerQuestionAutreType(
         typeQuestion,
         String(nom).trim(),
         String(énoncé).trim(),
         String(retroactionValide || "").trim(),
         String(retroactionInvalide || "").trim(),
-        QuestionsController.lireTags(tags),
+        tagsValides,
         otherData
       );
 

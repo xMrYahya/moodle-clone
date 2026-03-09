@@ -6,8 +6,10 @@ import flash from "express-flash-plus";
 import indexRoutes from "./routes/indexRoutes";
 import coursRoutes from "./routes/coursRoutes";
 import questionsRoutes from "./routes/questionsRoutes";
+import questionnairesRoutes from "./routes/questionnairesRoutes";
 
 import { viderStoreAuDemarrage } from "./core/coursStore";
+import { viderQuestionnairesAuDemarrage } from "./core/questionnairesStore";
 
 class App {
   public expressApp: express.Application;
@@ -16,6 +18,7 @@ class App {
     this.expressApp = express();
 
     viderStoreAuDemarrage().catch(console.error);
+    viderQuestionnairesAuDemarrage().catch(console.error);
 
     this.middleware();
     
@@ -25,6 +28,7 @@ class App {
     this.expressApp.use("/", indexRoutes);
     this.expressApp.use("/cours", coursRoutes);
     this.expressApp.use("/questions", questionsRoutes);
+    this.expressApp.use("/cours", questionnairesRoutes);
 
     this.expressApp.use(this.handleErrors);
   }
