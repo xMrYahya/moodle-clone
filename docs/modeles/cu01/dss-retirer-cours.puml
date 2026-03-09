@@ -3,7 +3,7 @@ title CU01c - Retirer un cours
 actor ":Enseignant" as e
 participant ":Systeme" as s
 
-e->s : supprimerCours(idCours : String);
+e->s : retirerCours(idCours : String);
 
 s-->>e : Demande de confirmation
 

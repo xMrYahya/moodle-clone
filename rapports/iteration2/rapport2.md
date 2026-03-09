@@ -238,7 +238,7 @@ Les dss suivant ont été mis a jout afin de corriger les erreurs qui avait ét�
 
 ![DSS recuperer un cours](../../docs/modeles/exports/updt-cu01b-recuperer-cours-dss.png "DSS recuperer un cours")
 
-![DSS retirer un cours ](../../docs/modeles/exports/updt-cu01c-retirer-cours-dss.png "DSS retirer un cours")
+![DSS retirer un cours ](../../docs/modeles/exports/updt-cu01c-retirer-cours-dss-v2.png "DSS retirer un cours")
 
 ![DSS ajouter une question ](../../docs/modeles/exports/dss-ajouter-question-updt-v1.png "DSS ajouter une question")
 
@@ -256,7 +256,6 @@ demarrerAjoutCours()
 **Références croisées:**
 - CU01a - Ajouter un cours
 - DSS - Ajouter un cours
-- MDD - Enseignant, Cours
 
 **Préconditions:**
 - L'Enseignant doit être authentifié.
@@ -268,7 +267,7 @@ HomeController.listeCours contiens la liste des cours associé a l'enseignant au
 
 ### Contrat CO02 - Sélectionner un Cours
 ---
-Les références croisées ont été ajoutés,
+Les références croisées ont été ajoutés,Précisé ce qui est associé au cours (information de l'étudiant en provenance de)
 
 **Opération:**
 sélectionnerGroupeCours(idGroupe : String)
@@ -277,7 +276,6 @@ sélectionnerGroupeCours(idGroupe : String)
 - Contrat CO01 - Démarrer Ajout Cours
 - CU01a - Ajouter un cours
 - DSS - Ajouter un cours
-- MDD - Enseignant, Cours
 
 **Préconditions:**
 - L'Enseignant est authentifié.
@@ -287,58 +285,74 @@ sélectionnerGroupeCours(idGroupe : String)
 **PostConditions:**
 - Une instance c : Cours a été créée.
 - c a été associée à l'Enseignant authentifié.
-- Les étudiants inscrit à ce groupe-cours étaient associés a c. 
+- Les Informations des étudiants (InfoEtudiant) inscrit à ce groupe-cours étaient associés a c. 
 - Les informations du groupe-cours(horaire, local, etc.) ont étés enregistrées dans c.
 
 
 ### Contrat CO03 - Afficher la liste des cours
 ---
+Les références croisées ont été ajoutés, précisé l'instance dans la précondition
 **Opération:**
 afficherListeCours()
 
 **Références croisées:**
+- CU01b afficher les détails d'un cours
+- DSS récuperer cours
 
 **Préconditions:**
-Une instance ens d'Enseignant existe.
+
+- L'Enseignant est authentifié.
+- Un jeton d'authentification valide est présent dans la session
 
 **PostConditions:**
 
 
 ### Contrat CO04 - Afficher les détails d'un cours
 ---
+Les références croisées ont été ajoutés, précondition au présent
+
 **Opération:**
 afficherDetailsCours(idCours: String)
 
 **Références croisées:**
+- CU01b afficher les détails d'un cours
+- DSS récuperer cours
 
 **Préconditions:** 
-L'Enseignant a eu au moins un cours qui lui est assigné.
+- L'Enseignant a au moins un cours qui lui est assigné.
 
 **PostConditions:** 
 
 ### Contrat CO05 - Retirer un cours
 ---
+Les références croisées ont été ajoutés, Le nom de l'operation a été modifié dans le DSS, la postcondition a été supprimé (le cours récupéré est celui qui sera effacé dans l'operation suivante)
+
 **Opération:**
 retirerCours(idCours : String)
 
 **Références croisées:**
-Contrat CO03 - Afficher la liste des cours
+- Contrat CO03 - Afficher la liste des cours
+- CU01c retirer un cours
+- DSS retirer un cours
 
 **Préconditions:**
 L'Enseignant est authentifié.
 L'Enseignant a récupéré un cours (Cu01b)
 
 **PostConditions:**
-Le cours c a été associcé à idCours
 
 
 ### Contrat CO06 - Confirmation de la suppression d'un cours
 ---
+Les références croisées ont été ajoutés
+
 **Opération:**
 confirmerSuppressionCours()
 
 **Références croisées:**
-Contrat CO05 - Retirer un cours
+- Contrat CO05 - Retirer un cours
+- CU01c retirer un cours
+- DSS retirer un cours
 
 **Préconditions:**
 L'Enseignant est authentifié.
@@ -347,15 +361,15 @@ L'Enseignant a récupéré un cours (Cu01b)
 **PostConditions:**
 Le cours (et seulement ce cours) a été supprimé du système SGA
 
-
-
 ### Contrat CO07 - Gestion de Question
 Le contrat est suprimé puisque la fonction n'existe plus
 
 ### Contrat CO08 - Ajouter une question vrai/faux
+Les références croisées ont été ajoutés,les tags ont été ajouté dans la déclaration
+
 ---
 **Opération:**
-ajouterQuestionVraiFaux(nom : String, énoncé : String, vérité : Boolean, rétroactionVrai : String, rétroactionFaux : String) : void
+ajouterQuestionVraiFaux(nom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[]) : void
 
 **Références croisées:**  
 CU02a – Ajouter question  
@@ -377,13 +391,15 @@ MDD – Question, Cours
 
 
 ### Contrat CO09 - Ajouter une question d'autre type
+Les références croisées ont été ajoutés,les tags ont été ajouté dans la déclaration
+
 ---
 **Opération:**
-ajouterQuestionAutreType(nom: String, énoncé: String, type: String, rétroactionValide: String, rétroactionInvalide: String, tags: String[])
+ajouterQuestionChoixMultiple(nom : String, enonce : String, reponses : String[], retroactionValide : String, retroactionInvalide : String, tags : String[],seulementUnChoix : bool)
 
 **Références croisées:**
 CU02a - Ajouter question
-DSS - Ajoute une question
+DSS - Ajouter une question
 MDD - Questions, Cours
 
 **Préconditions:**
@@ -400,10 +416,6 @@ MDD - Questions, Cours
 - `q.rétroactionInvalide` est devenu `rétroactionInvalide`
 - `q` a été associée au `Cours` courant via l'association *contient*
 - Pour chaque élément `t` dans `tags`, une instance de `tags` a été créée ou récupérée et associée à `q` via l'association *catégorisé par*
-
-
-> Veuillez insérer ici les diagrammes à revalider de l'itération précédente avec les corrections apportées.
-> Démontrer que vous avez réglé les problèmes identifiés dans le rapport de l'itération précédente.
 
 ## Vérification finale
 
