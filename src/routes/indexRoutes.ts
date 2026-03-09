@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/AuthController";
-import { HomeController } from "../controllers/HomeController";
+import { CoursController } from "../controllers/CoursController";
 
 const router = Router();
 
@@ -18,6 +18,6 @@ router.get("/signin", AuthController.getSignin);
 router.post("/signin", AuthController.postSignin);
 router.get("/signout", AuthController.signout);
 
-router.get("/index", exigerAuthentification, HomeController.afficherListeCours ?? HomeController.index);
+router.get("/index", exigerAuthentification, CoursController.afficherListeCours ?? CoursController.index);
 
 export default router;

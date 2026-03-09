@@ -47,7 +47,7 @@ describe("QuestionsController - CU02", () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "questionscontroller-"));
     jest.spyOn(process, "cwd").mockReturnValue(tmpDir);
     QuestionsController = require("../../src/controllers/QuestionsController").QuestionsController;
-    coursStore = require("../../src/core/coursStore");
+    coursStore = require("../../src/core/CoursModele");
     app = createMockApp(QuestionsController);
     await coursStore.viderStoreAuDemarrage();
     await coursStore.ajouterCoursStocke({
@@ -65,7 +65,7 @@ describe("QuestionsController - CU02", () => {
 
   afterEach(async () => {
     jest.restoreAllMocks();
-    jest.dontMock("../../src/core/coursStore");
+    jest.dontMock("../../src/core/CoursModele");
     try {
       await fs.rm(tmpDir, { recursive: true, force: true });
     } catch {}
@@ -725,30 +725,30 @@ describe("QuestionsController - CU02", () => {
 
     const loadController = (overrides?: {
       ajouterQuestionAuCours?: jest.Mock;
-      existeNomQuestion?: jest.Mock;
-      existeNomQuestionEnExcluant?: jest.Mock;
-      recupererQuestionParNom?: jest.Mock;
-      recupererQuestionsDuCours?: jest.Mock;
-      supprimerQuestionDuCours?: jest.Mock;
+      nomQuestionExiste?: jest.Mock;
+      nomQuestionExisteSauf?: jest.Mock;
+      obtenirQuestionParNom?: jest.Mock;
+      obtenirQuestionsDuCours?: jest.Mock;
+      retirerQuestionDuCours?: jest.Mock;
       modifierQuestionDuCours?: jest.Mock;
     }) => {
       const ajouterQuestionAuCours = overrides?.ajouterQuestionAuCours ?? jest.fn().mockResolvedValue(undefined);
-      const existeNomQuestion = overrides?.existeNomQuestion ?? jest.fn().mockResolvedValue(false);
-      const existeNomQuestionEnExcluant = overrides?.existeNomQuestionEnExcluant ?? jest.fn().mockResolvedValue(false);
-      const recupererQuestionParNom = overrides?.recupererQuestionParNom ?? jest.fn().mockResolvedValue(undefined);
-      const recupererQuestionsDuCours = overrides?.recupererQuestionsDuCours ?? jest.fn().mockResolvedValue([]);
-      const supprimerQuestionDuCours = overrides?.supprimerQuestionDuCours ?? jest.fn().mockResolvedValue(undefined);
+      const nomQuestionExiste = overrides?.nomQuestionExiste ?? jest.fn().mockResolvedValue(false);
+      const nomQuestionExisteSauf = overrides?.nomQuestionExisteSauf ?? jest.fn().mockResolvedValue(false);
+      const obtenirQuestionParNom = overrides?.obtenirQuestionParNom ?? jest.fn().mockResolvedValue(undefined);
+      const obtenirQuestionsDuCours = overrides?.obtenirQuestionsDuCours ?? jest.fn().mockResolvedValue([]);
+      const retirerQuestionDuCours = overrides?.retirerQuestionDuCours ?? jest.fn().mockResolvedValue(undefined);
       const modifierQuestionDuCours = overrides?.modifierQuestionDuCours ?? jest.fn().mockResolvedValue(undefined);
 
       let Controller: any;
       jest.isolateModules(() => {
-        jest.doMock("../../src/core/coursStore", () => ({
+        jest.doMock("../../src/core/CoursModele", () => ({
           ajouterQuestionAuCours,
-          existeNomQuestion,
-          existeNomQuestionEnExcluant,
-          recupererQuestionParNom,
-          recupererQuestionsDuCours,
-          supprimerQuestionDuCours,
+          nomQuestionExiste,
+          nomQuestionExisteSauf,
+          obtenirQuestionParNom,
+          obtenirQuestionsDuCours,
+          retirerQuestionDuCours,
           modifierQuestionDuCours,
         }));
         Controller = require("../../src/controllers/QuestionsController").QuestionsController;
@@ -757,11 +757,11 @@ describe("QuestionsController - CU02", () => {
       return {
         QuestionsController: Controller,
         ajouterQuestionAuCours,
-        existeNomQuestion,
-        existeNomQuestionEnExcluant,
-        recupererQuestionParNom,
-        recupererQuestionsDuCours,
-        supprimerQuestionDuCours,
+        nomQuestionExiste,
+        nomQuestionExisteSauf,
+        obtenirQuestionParNom,
+        obtenirQuestionsDuCours,
+        retirerQuestionDuCours,
         modifierQuestionDuCours,
       };
     };
@@ -769,7 +769,7 @@ describe("QuestionsController - CU02", () => {
     afterEach(() => {
       jest.resetModules();
       jest.clearAllMocks();
-      jest.dontMock("../../src/core/coursStore");
+      jest.dontMock("../../src/core/CoursModele");
     });
 
     test("ajouterQuestionVraiFaux: missing teacher or idGroupe -> 400", async () => {
@@ -798,7 +798,7 @@ describe("QuestionsController - CU02", () => {
 
     test("ajouterQuestionVraiFaux: duplicate name -> 409", async () => {
       const { QuestionsController } = loadController({
-        existeNomQuestion: jest.fn().mockResolvedValue(true),
+        nomQuestionExiste: jest.fn().mockResolvedValue(true),
       });
       const req: any = {
         session: { user: { id: "t1" } },
@@ -855,7 +855,7 @@ describe("QuestionsController - CU02", () => {
 
     test("selectionnerQuestion: introuvable -> 404", async () => {
       const { QuestionsController } = loadController({
-        recupererQuestionParNom: jest.fn().mockResolvedValue(undefined),
+        obtenirQuestionParNom: jest.fn().mockResolvedValue(undefined),
       });
       const req: any = {
         session: { user: { id: "t1" } },
@@ -870,7 +870,7 @@ describe("QuestionsController - CU02", () => {
 
     test("modifierQuestion: question absente -> 404", async () => {
       const { QuestionsController } = loadController({
-        recupererQuestionParNom: jest.fn().mockResolvedValue(undefined),
+        obtenirQuestionParNom: jest.fn().mockResolvedValue(undefined),
       });
       const req: any = {
         session: { user: { id: "t1" } },
@@ -886,7 +886,7 @@ describe("QuestionsController - CU02", () => {
 
     test("modifierQuestion: conflit de nom -> 409", async () => {
       const { QuestionsController } = loadController({
-        recupererQuestionParNom: jest.fn().mockResolvedValue({
+        obtenirQuestionParNom: jest.fn().mockResolvedValue({
           nom: "Q1",
           enonce: "e",
           type: "VraiFaux",
@@ -895,7 +895,7 @@ describe("QuestionsController - CU02", () => {
           retroactionInvalide: "ri",
           tags: ["t"],
         }),
-        existeNomQuestionEnExcluant: jest.fn().mockResolvedValue(true),
+        nomQuestionExisteSauf: jest.fn().mockResolvedValue(true),
       });
       const req: any = {
         session: { user: { id: "t1" } },
@@ -911,7 +911,7 @@ describe("QuestionsController - CU02", () => {
 
     test("modifierQuestion: store throws -> 500", async () => {
       const { QuestionsController } = loadController({
-        recupererQuestionParNom: jest.fn().mockResolvedValue({
+        obtenirQuestionParNom: jest.fn().mockResolvedValue({
           nom: "Q1",
           enonce: "e",
           type: "VraiFaux",
@@ -937,8 +937,8 @@ describe("QuestionsController - CU02", () => {
 
     test("confirmerSuppressionQuestion: store throws -> 500", async () => {
       const { QuestionsController } = loadController({
-        recupererQuestionParNom: jest.fn().mockResolvedValue({ nom: "Q1" }),
-        supprimerQuestionDuCours: jest.fn().mockRejectedValue(new Error("boom-suppression")),
+        obtenirQuestionParNom: jest.fn().mockResolvedValue({ nom: "Q1" }),
+        retirerQuestionDuCours: jest.fn().mockRejectedValue(new Error("boom-suppression")),
       });
       const req: any = {
         session: { user: { id: "t1" } },
@@ -953,3 +953,4 @@ describe("QuestionsController - CU02", () => {
     });
   });
 });
+
