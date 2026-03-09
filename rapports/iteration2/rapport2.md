@@ -253,7 +253,7 @@
 - L'enseignant appuie sur gérer les questionnaires
 
 **Postconditions:**
-- 
+- f
 
 ### Contrat CO23 - Obtenir les tags
 ---
@@ -288,7 +288,49 @@
 
 ![RDCU  ](../../docs/modeles/exports/ "RDCU ")
 
-![RDCU  ](../../docs/modeles/exports/rdc "RDCU ")
+![RDCU consulter question d'un cours ](../../docs/modeles/exports/rdcu-afficher-liste-questions.png "RDCU consulter les questions d'un cours")
+
+![RDCU selectionner une question ](../../docs/modeles/exports/rdcu-selectionner-question.png "RDCU selectionner une question")
+
+![RDCU selectionner modifier une question ](../../docs/modeles/exports/rdcu-selectionner-question-modifier.png "RDCU selectionner modifier une question ")
+
+![RDCU modifier une question ](../../docs/modeles/exports/rdcu-modifier-question.png "RDCU modifier une question")
+
+![RDCU  supprimer question (demande) ](../../docs/modeles/exports/rdcu-supprimer-question-demande.png "RDCU supprimer question (demande)")
+
+![RDCU supprimer question (confirmation) ](../../docs/modeles/exports/rdcu-supprimer-question-confirmation.png "RDCU supprimer question (confirmation)")
+
+![RDCU gerer questionnaires ](../../docs/modeles/exports/rdcu-gerer-questionnaires.png "RDCU gerer questionnaires")
+
+![RDCU  ajouter un questionnaire ](../../docs/modeles/exports/rdcu-ajouter-questionnaire.png "RDCU ajouter un questionnaire")
+
+![RDCU selectionner un tag ](../../docs/modeles/exports/rdcu-selectionner-tag.png "RDCU selectionner un Tag")
+
+![RDCU ajouter question ](../../docs/modeles/exports/rdcu-ajouter-question.png "RDCU ajouter une question ")
+
+![RDCU sauvegarder un questionnaire ](../../docs/modeles/exports/rdcu-sauvegarder-questionnaire.png "RDCU sauvegarder un questionnaire")
+
+![RDCU selectionner un questionnaire ](../../docs/modeles/exports/rdcu-selectionner-questionnaire.png "RDCU selectionner un questionnaire")
+
+![RDCU selectionner modifier un questionnaire ](../../docs/modeles/exports/rdcu-selectionner-modifier-questionnaire.png "RDCU selectionner modifier un questionnaire ")
+
+![RDCU obtenir les tags ](../../docs/modeles/exports/rdcu-obtenir-tags-questions.png "RDCU obtenir les tags")
+
+![RDCU dissocier une question ](../../docs/modeles/exports/rdcu-dissocier-question.png "RDCU dissocier une question ")
+
+![RDCU modifier l'ordre d'une question ](../../docs/modeles/exports/rdcu-modifier-ordre-question.png "RDCU modifier l'ordre d'une question")
+
+![RDCU modifier un questionnaire ](../../docs/modeles/exports/rdcu-modifier-questionnaire.png "RDCU modifier un questionnaire")
+
+![RDCU verifier supprimer questionnaire ](../../docs/modeles/exports/rdcu-verifier-supprimer-questionnaire.png "RDCU verifier supprimer questionnaire ")
+
+![RDCU confirmer une suppression  ](../../docs/modeles/exports/rdcu-supprimer-questionnaire.png "RDCU confirmer suppression")
+
+
+
+
+
+
 
 
 ## Diagramme de classe logicielle (DCL)
