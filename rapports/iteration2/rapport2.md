@@ -315,9 +315,42 @@
 - DSS - Modifier un questionnaire
 
 **Préconditions:**
+- le nouveau nom du questionnaire n'est pas déja utilisé
 
 **Postconditions:**
+- questionnaireTemp.nom est devenu nom
+- questionnaireTemp.description est devenu description 
+- questionnaireTemp.actif est devenu actif
 
+### Contrat CO27 - Verifier pour supprimer un questionnaire
+---
+
+**Opération: verifierSupprimerQuestionnaire(nom:String)**
+
+**Références croisées:**
+- CU05d - Supprimer un questionnaire
+- DSS - Supprimer un questionnaire
+
+**Préconditions:**
+- Aucune précondition
+
+**Postconditions:**
+- Aucune postcondition
+
+### Contrat CO28 - Supprimer un questionnaire
+---
+
+**Opération: confirmerSuppression()**
+
+**Références croisées:**
+- CU05d - Supprimer un questionnaire
+- DSS - Supprimer un questionnaire
+
+**Préconditions:**
+- vérifierSupprimerQuestionnaire a été effectué avec succes sur le questionnaire qui doit être supprimé
+
+**Postconditions:**
+- le questionnaire qui doit être supprimé est effacé
 
 
 ## Réalisation de cas d'utilisation (RDCU)
