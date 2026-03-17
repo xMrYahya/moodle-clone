@@ -1,0 +1,24 @@
+@startuml
+title CU05b - Afficher un questionnaire
+actor ":Etudiant" as e
+participant ":Systeme" as s
+
+e -> s : selectionnerCours(idCours: String) 
+s -->> e : Liste des questionnaires déjà complétés avec les notes reçues\net la liste des questionnnaires à compléter
+'Possiblement afficher les deux dans des sections différentes
+e -> s : selectionnerQuestionnaire(nomQuestionnaire: String)
+loop tant que toutes les questions n'ont pas été complétées.
+
+s -->> e : Prochaine question à répondre
+note over e,s : Pour notre implémentation, seule les question choix multiples seront affichées,\n les autres types de questions ne sont pas implémentés
+e -> s : repondreQuestionChoixMultiple(reponse: String) 
+note over e,s : Seulement les question choix multiples sont dans l'implémentation
+end loop
+alt 
+s-->> e : Note obtenue et le texte de rétroaction (bonne ou mauvaise réponse) pour chaque question ainsi que la note résultante en pourcentage
+
+else Le questionnaire a des questions nécessitant une correction manuelle
+s-->> e : Informe l'étudiant que sa note sera déterminée plus tard après une correction manuelle.
+end alt
+
+@enduml
