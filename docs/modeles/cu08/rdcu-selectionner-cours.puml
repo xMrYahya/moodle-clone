@@ -1,0 +1,21 @@
+@startuml
+
+title CU08 - Selectionner un cours
+
+participant ":CoursController" as c
+participant ":CoursModele" as m
+
+-> c ++: selectionnerCours(idCours: String) : String
+note right: GRASP: Contoller
+
+c -> m ++: getQuestionnairesRemplis(idCours: String, idEtudiant: String) : String
+note right : GRASP: Expert
+m --> c --: listeQuestionnairesRemplisAvecNoteJSON: String
+
+c -> m ++: getQuestionnairesACompleter(idCours: String, idEtudiant: String) : String
+note right : GRASP: Expert
+m --> c --: listeQuestionnairesACompleterJSON: String
+
+<-- c --: listeTousQuestionnairesJSON: String
+
+@enduml

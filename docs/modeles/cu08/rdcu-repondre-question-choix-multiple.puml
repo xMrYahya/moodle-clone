@@ -1,0 +1,16 @@
+@startuml
+
+title RDCU - Repondre à une question à choix multiple
+
+participant ":QuestionnaireController" as c
+participant ":QuestionnaireModele" as m
+
+-> c ++: repondreQuestionChoixMultiple(reponse: String, nomQuestion: String) : void
+note right: GRASP: Controller
+c -> m ++: mettreAJourReponseQuestion(reponseEtudiant: String, nomQuestion: String) : void
+note right: GRASP: Expert
+deactivate m
+
+deactivate c
+
+@enduml
