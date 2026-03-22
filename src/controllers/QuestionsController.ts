@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { 
   ajouterQuestionAuCours,
   obtenirQuestionParNom,
@@ -71,7 +71,7 @@ export class QuestionsController {
     return nombre;
   }
 
-  private static extraireContexteRequete(req: any): { idEnseignant: string; idGroupe: string } {
+  private static extraireContexteRequete(req: Request): { idEnseignant: string; idGroupe: string } {
     const idEnseignant = QuestionsController.lireTexte(req?.session?.user?.id);
     const idGroupe = QuestionsController.lireTexte(req?.params?.idGroupe);
 
@@ -121,7 +121,7 @@ export class QuestionsController {
     return tagsValides;
   }
 
-  static async consulterQuestionsCours(req: any, res: Response): Promise<void> {
+  static async consulterQuestionsCours(req: Request, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const questions = await obtenirQuestionsDuCours(idGroupe);
@@ -141,7 +141,7 @@ export class QuestionsController {
     }
   }
 
-  static async selectionnerQuestion(req: any, res: Response): Promise<void> {
+  static async selectionnerQuestion(req: Request, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
@@ -172,7 +172,7 @@ export class QuestionsController {
     }
   }
 
-  static async modifierQuestion(req: any, res: Response): Promise<void> {
+  static async modifierQuestion(req: Request, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nomOriginal = QuestionsController.lireTexte(req.params?.nom);
@@ -353,7 +353,7 @@ export class QuestionsController {
     }
   }
 
-  static async supprimerQuestion(req: any, res: Response): Promise<void> {
+  static async supprimerQuestion(req: Request, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
@@ -385,7 +385,7 @@ export class QuestionsController {
     }
   }
 
-  static async confirmerSuppressionQuestion(req: any, res: Response): Promise<void> {
+  static async confirmerSuppressionQuestion(req: Request, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const nom = QuestionsController.lireTexte(req.params?.nom);
@@ -595,7 +595,7 @@ export class QuestionsController {
     throw new InvalidParameterError(`Type de question non supporté: ${type}`);
   }
   
-  static async ajouterQuestionVraiFaux(req: any, res: Response): Promise<void> {
+  static async ajouterQuestionVraiFaux(req: Request, res: Response): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const { nom, enonce, reponse, retroactionValide, retroactionInvalide, tags } = req.body;
@@ -637,7 +637,7 @@ export class QuestionsController {
     }
   }
 
-  private static async ajouterQuestionParType(req: any, res: Response, typeQuestion: string): Promise<void> {
+  private static async ajouterQuestionParType(req: Request, res: Response, typeQuestion: string): Promise<void> {
     try {
       const { idGroupe } = QuestionsController.extraireContexteRequete(req);
       const { nom, enonce, retroactionValide, retroactionInvalide, tags, ...donneesComplementairesBrutes } = req.body;
@@ -677,23 +677,23 @@ export class QuestionsController {
     }
   }
 
-  static async ajouterQuestionChoixMultiple(req: any, res: Response): Promise<void> {
+  static async ajouterQuestionChoixMultiple(req: Request, res: Response): Promise<void> {
     await QuestionsController.ajouterQuestionParType(req, res, "ChoixMultiple");
   }
 
-  static async ajouterQuestionNumerique(req: any, res: Response): Promise<void> {
+  static async ajouterQuestionNumerique(req: Request, res: Response): Promise<void> {
     await QuestionsController.ajouterQuestionParType(req, res, "Numerique");
   }
 
-  static async ajouterQuestionReponseCourte(req: any, res: Response): Promise<void> {
+  static async ajouterQuestionReponseCourte(req: Request, res: Response): Promise<void> {
     await QuestionsController.ajouterQuestionParType(req, res, "ReponseCourte");
   }
 
-  static async ajouterQuestionMiseEnCorrespondance(req: any, res: Response): Promise<void> {
+  static async ajouterQuestionMiseEnCorrespondance(req: Request, res: Response): Promise<void> {
     await QuestionsController.ajouterQuestionParType(req, res, "MiseEnCorrespondance");
   }
 
-  static async ajouterQuestionEssai(req: any, res: Response): Promise<void> {
+  static async ajouterQuestionEssai(req: Request, res: Response): Promise<void> {
     await QuestionsController.ajouterQuestionParType(req, res, "Essai");
   }
 }

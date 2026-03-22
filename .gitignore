@@ -152,3 +152,6 @@ docs/modeles/cu02/rdcu-ajouter-question-autre-type.puml
 documents projet/aj qstvf.md
 test-api-questions.http
 TESTS_MANUELS.md
+eslint.config.mts
+package-lock.json
+package.json
