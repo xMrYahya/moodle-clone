@@ -10,7 +10,7 @@ skinparam class {
   BackgroundColor<< SGB >> #ddffdd
   backgroundColor<<Itération 1>> #ddffdd
   backgroundColor<<Itération 2>> #ddf9ff
-  backgroundColor<<Itération 3>> BLUE
+  backgroundColor<<Itération 3>> #d9f666
 }
 hide stereotype
 
@@ -84,6 +84,10 @@ hide stereotype
   class "PositionQuestion" as position <<Itération 2>>{
     ordre : int
   }
+  class "ReponseQuestionnaire" as reponseQuestionnaire <<Itération 3>> {
+    réponses : String[]
+    /note : int
+  }
 
   etudiant "*" -- "*" cours : associé-à >
   cours "1" -- "*" question :contient >
@@ -99,13 +103,11 @@ legend right
     |Color| Type |
     |<#ddffdd>| Itération 1 |
     |<#ddf9ff>| Itération 2 |
-    |<#0000FF>| Itération 3 |
+    |<#d9f666>| Itération 3 |
 endlegend
 
 
-  class "ReponseQuestionnaire" as reponseQuestionnaire {
 
-  }
   etudiant "*" -- "*" questionnaire : répond-à >
   (etudiant,questionnaire) .. reponseQuestionnaire
 @enduml

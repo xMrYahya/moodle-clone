@@ -4,12 +4,27 @@ title RDCU - Repondre à une question à choix multiple
 
 participant ":QuestionnaireController" as c
 participant ":QuestionnaireModele" as m
+participant "reponseQuestionnaire:ReponseQuestionnaire" as reponseQuestionnaire
+participant "reponses:ArrayList<String>" as reponses
 
--> c ++: repondreQuestionChoixMultiple(reponse: String, nomQuestion: String) : void
+-> c ++: repondreQuestionChoixMultiple\n(reponse: String) : Question
 note right: GRASP: Controller
-c -> m ++: mettreAJourReponseQuestion(reponseEtudiant: String, nomQuestion: String) : void
+c -> m ++: mettreAJourReponseQuestion\n(reponseEtudiant: String) : Question
 note right: GRASP: Expert
-deactivate m
+
+m -> reponseQuestionnaire ++: repondreSuivant(string reponseEtudiant) : void
+
+reponseQuestionnaire -> reponses ++: reponses.add(reponseEtudiant: String) : void
+note right: GRASP: Expert
+
+reponses --> reponseQuestionnaire --: void
+
+reponseQuestionnaire --> m --: void
+
+m --> c --: questionSuivante : Question
+
+<-- c : questionSuivante : Question
+
 
 deactivate c
 

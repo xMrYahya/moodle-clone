@@ -11,7 +11,7 @@ loop tant que toutes les questions n'ont pas été complétées.
 
 s -->> e : Prochaine question à répondre
 note over e,s : Pour notre implémentation, seule les question choix multiples seront affichées,\n les autres types de questions ne sont pas implémentés
-e -> s : repondreQuestionChoixMultiple(reponse: String, nomQuestion: String) 
+e -> s : repondreQuestionChoixMultiple(reponse: String) 
 note over e,s : Seulement les question choix multiples sont dans l'implémentation
 end loop
 alt 

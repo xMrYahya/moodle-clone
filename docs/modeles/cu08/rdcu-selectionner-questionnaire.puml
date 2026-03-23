@@ -4,6 +4,7 @@ title RDCU - Selectionner un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
+participant "reponseQuestionnaire:ReponseQuestionnaire" as reponseQuestionnaire
 
 -> controller : selectionnerQuestionnaire(nom:String):Questionnaire
 note right: GRASP: Controller
@@ -12,6 +13,9 @@ activate controller
 controller -> questionnaireModele : recupererQuestionnaireParNom(nom:String):Questionnaire
 note right: GRASP: Expert
 activate questionnaireModele
+
+questionnaireModele -> reponseQuestionnaire ** : create
+note right: GRASP: Createur
 
 questionnaireModele --> controller : detailsQuestionnaire:Questionnaire
 deactivate questionnaireModele
