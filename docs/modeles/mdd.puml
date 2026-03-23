@@ -103,10 +103,9 @@ legend right
 endlegend
 
 
-  'Selon le CU08 
-  'class "ReponseQuestionnaire" as reponseQuestionnaire {
+  class "ReponseQuestionnaire" as reponseQuestionnaire {
 
-  '}
-  'etudiant "*" -- "*" questionnaire : répond-à >
-  '(etudiant,questionnaire) .. reponseQuestionnaire
+  }
+  etudiant "*" -- "*" questionnaire : répond-à >
+  (etudiant,questionnaire) .. reponseQuestionnaire
 @enduml
