@@ -16,6 +16,14 @@ activate questionnaireModele
 
 questionnaireModele -> reponseQuestionnaire ** : create
 note right: GRASP: Createur
+note over reponseQuestionnaire
+On creer une instance de ReponseQuestionnaire
+pour stocker les réponses de l'étudiant pour ce questionnaire
+et chaque réponse de l'étudiant est ajoutée à la liste de réponses
+dans ReponseQuestionnaire
+et on corriger à la fin en comparant les réponses
+de l'étudiant avec les réponses correctes du questionnaire
+end note
 
 questionnaireModele --> controller : detailsQuestionnaire:Questionnaire
 deactivate questionnaireModele
