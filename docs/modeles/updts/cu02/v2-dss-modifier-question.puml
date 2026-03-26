@@ -1,0 +1,33 @@
+@startuml
+title CU02c - Modifier une question
+actor ":Enseignant" as e
+participant ":Systeme" as s
+
+e->s : consulterQuestionsCours(groupId : String)
+s-->>e : Liste des questions associees au cours
+
+e->s : selectionnerQuestion(nom : String)
+alt Question existante
+	s-->>e : Details de la question (type, nom, enonce, reponse, retroactions, tags)
+
+alt modifier une Question Vrai ou Faux
+e->s : modifierQuestionVraiFaux(nomOriginal : String, nom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])
+else modifier une Question a choix multiple
+ e->s : modifierQuestionChoixMultiple(nomOriginal : String, nom : String, enonce : String, reponses : String[], retroactionValide : String, retroactionInvalide : String, tags : String[],seulementUnChoix : bool)
+else modifier une Question a reponse courte
+ e->s : modifierQuestionReponseCourte(nomOriginal : String, nom : String, enonce : String, reponse : String, retroactionValide : String, retroactionInvalide : String, tags : String[])
+else modifier une Question a reponse numerique
+ e->s : modifierQuestionReponseNumerique(nomOriginal : String, nom : String, enonce : String, reponse : number, retroactionValide : String, retroactionInvalide : String, tags : String[])
+else modifier une Question essai
+    e->s : modifierQuestionEssai(nomOriginal : String, nom : String, enonce : String, retroactionValide : String, retroactionInvalide : String, tags : String[])
+else modifier une Question de mise en correspondance
+    e->s : modifierQuestionMiseCorrespondance(nomOriginal : String, nom : String, enonce : String, pairesQuestion : String[], pairesReponse : String[], retroactionValide : String, retroactionInvalide : String, tags : String[])
+end alt
+    
+    alt Modification valide
+		s-->>e : Question modifiee et message de confirmation
+	else Nom deja utilise ou donnees invalides
+		s-->>e : Signalement d'erreur
+	end alt
+end alt
+@enduml
