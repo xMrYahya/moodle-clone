@@ -1,0 +1,49 @@
+@startuml
+hide footbox
+title RDCU - Modifier une question mise en correspondance
+
+participant "qc:QuestionsController" as QC
+participant "cm:CoursModele" as CM
+participant "q:QuestionMiseEnCorrespondanceModele" as Q
+
+-> QC : modifierQuestion(nomOriginal : String, type : "MiseEnCorrespondance",\n nom : String, enonce : String, paires : PairDeCorrespondance[],\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+note right: GRASP: Controller
+activate QC
+
+QC -> CM : obtenirQuestionParNom(idGroupe : String, nomOriginal : String)
+note right: GRASP: Expert
+activate CM
+CM --> QC : questionExistante : AnyQuestion
+deactivate CM
+
+QC -> QC : validerChampsObligatoires(type, nom, enonce)
+note right: GRASP: Expert
+
+QC -> CM : nomQuestionExisteSauf(idGroupe : String, nom : String, nomOriginal : String)
+note right: GRASP: Expert
+activate CM
+CM --> QC : nomExiste : boolean
+deactivate CM
+
+alt Nom unique et donnees valides
+  QC -> QC : lirePairesCorrespondance(paires)
+  note right: GRASP: Expert
+
+  create Q
+  QC -> Q : <<create>> QuestionMiseEnCorrespondanceModele(nom, enonce,\n retroactionValide, retroactionInvalide, tags, paires)
+  note right: GRASP: Creator
+  activate Q
+  deactivate Q
+
+  QC -> CM : modifierQuestionDuCours(idGroupe : String, nomOriginal : String, q)
+  note right: GRASP: Expert
+  activate CM
+  deactivate CM
+
+  <-- QC : afficherConfirmationModification(questionMiseAJour)
+else Nom deja utilise ou donnees invalides
+  <-- QC : signalerErreurModification()
+end
+
+deactivate QC
+@enduml
