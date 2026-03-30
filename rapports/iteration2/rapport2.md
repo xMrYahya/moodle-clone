@@ -178,7 +178,7 @@
 - MDD - Enseignant, Cours, Question
 - DSS -Ajouter un questionnaire
 **Préconditions:**
-- Un tag est selectionné
+- Un questionnaire a été selectionné
 
 **PostConditions:**
 - Une instance questionnaireTemp de Questionnaire a été crée

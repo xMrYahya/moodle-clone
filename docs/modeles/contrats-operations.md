@@ -413,7 +413,7 @@ MDD - Question, Cours, Tags
 - MDD - Enseignant, Cours, Question
 - DSS -Ajouter un questionnaire
 **Préconditions:**
-- Un tag a été selectionné
+- Un questionnaire a été selectionné
 
 **PostConditions:**
 - Une instance questionnaireTemp de Questionnaire a été crée
@@ -443,3 +443,144 @@ MDD - Question, Cours, Tags
 
 **PostConditions:**
 - une question a été ajouté au questionnaireTemp avec la correspondance du nomQuestion
+
+### Contrat CO20 - Sélectionner une question a modifier
+---
+
+**Opération: selectionnerModifierQuestion(groupId: String, nom: String)**
+**Références croisées:**
+- CU02c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
+**Préconditions:**
+- L'enseignant est authentifié
+- Un cours est sélectionné
+
+**Postconditions:**
+- Aucune postcondition (les informations de la question ont été récupéré et affiché)
+
+### Contrat CO21 - Sélectionner un questionnaire
+---
+
+**Opération: selectionnerQuestionnaire(nom : String)**
+**Références croisées:**
+- CU05b - Afficher un questionnaire
+- DSS - Afficher un questionnaire
+- CO15 - Gérer les questionnaires
+
+**Préconditions:**
+- Aucune précondition
+
+**PostConditions:**
+- Aucune postcondition (les détails du questionnaire sélectionné sont affiché)
+
+### Contrat CO22 - Sélectionner un questionnaire a modifier
+---
+
+**Opération: selectionModifierQuestionnaire(nom : String)**
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+- CO15 - Gérer les questionnaires
+
+**Préconditions:**
+- L'enseignant est authentifié
+- L'enseignant appuie sur gérer les questionnaires
+
+**Postconditions:**
+- tout les attributs de questionnaieTemp ont pris les valeurs de celui du questionnaire q
+
+### Contrat CO23 - Obtenir les tags
+---
+
+**Opération: obtenirTags()**
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+- CO22 Sélectionner un questionnaire a modifier
+
+**Préconditions:**
+- Un questionnaire est sélectionné avec selectionModifierQuestionnaire(nom : String)
+
+**Postconditions:**
+- Aucun postcondition (la liste des tags a été affiché)
+
+### Contrat CO24 - dissocier une question
+---
+
+**Opération: dissocierQuestion(nomQuestion : String)**
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
+**Préconditions:**
+- Un questionnaire est sélectionné avec selectionModifierQuestionnaire(nom : String)
+
+**Postconditions:**
+- la question avec le nom nomQuestion a été dissocié de questionnaireTemp.questions
+
+### Contrat CO25 - Modifier l'ordre d'une question
+---
+
+**Opération: modifierOrdreQuestion(nomQuestion:String, nouvellePosition:int)**
+
+**Référence croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
+**Préconditions:**
+- Le questionnaire a au moins deux questions d'associé
+- La nouvelle position doit etre plus petite ou égale au nombre de questions dans le questionnaire
+
+**PostConditions:**
+- la question avec le nom nomQuestion a été associé à questionnaireTemp.question[nouvellePosition]
+
+
+
+### Contrat CO26 - Modifier un questionnaire
+---
+
+**Opération: modifierQuestionnaire(nom:String, description: String, actif:boolean)**
+
+**Références croisées:**
+- CU05c - Modifier un questionnaire
+- DSS - Modifier un questionnaire
+
+**Préconditions:**
+- Un questionnaire est sélectionné
+- le nouveau nom du questionnaire n'est pas déja utilisé
+
+**Postconditions:**
+- questionnaireTemp.nom est devenu nom
+- questionnaireTemp.description est devenu description 
+- questionnaireTemp.actif est devenu actif
+
+### Contrat CO27 - Verifier pour supprimer un questionnaire
+---
+
+**Opération: verifierSupprimerQuestionnaire(nom:String)**
+
+**Références croisées:**
+- CU05d - Supprimer un questionnaire
+- DSS - Supprimer un questionnaire
+
+**Préconditions:**
+- Aucune précondition
+
+**Postconditions:**
+- Aucune postcondition
+
+### Contrat CO28 - Supprimer un questionnaire
+---
+
+**Opération: confirmerSuppression()**
+
+**Références croisées:**
+- CU05d - Supprimer un questionnaire
+- DSS - Supprimer un questionnaire
+
+**Préconditions:**
+- vérifierSupprimerQuestionnaire a été effectué avec succes sur le questionnaire qui doit être supprimé
+
+**Postconditions:**
+- le questionnaire qui doit être supprimé est effacé
