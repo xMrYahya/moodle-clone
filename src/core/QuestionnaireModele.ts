@@ -3,6 +3,8 @@ import path from "path";
 import { obtenirQuestionsDuCours } from "./CoursModele";
 import { AnyQuestion } from "../types/questionTypes";
 import {
+  ResultatQuestionEtudiant,
+  StatutCorrectionQuestionnaire,
   QuestionTagInfo,
   Questionnaire,
   QuestionnaireTemp,
@@ -237,6 +239,58 @@ export class QuestionnaireModele {
     return true;
   }
 
+  static async enregistrerResultatEtudiant(
+    idGroupe: string,
+    nomQuestionnaire: string,
+    courrielEtudiant: string,
+    note: number | undefined,
+    statutGlobal: StatutCorrectionQuestionnaire,
+    detailsCorrection?: ResultatQuestionEtudiant[]
+  ): Promise<boolean> {
+    const donnees = await QuestionnaireModele.obtenirTousQuestionnairesParCours();
+    const indexCours = donnees.findIndex((c) => c.idGroupe === String(idGroupe));
+    if (indexCours < 0) return false;
+
+    const indexQ = donnees[indexCours].questionnaires.findIndex(
+      (q) => String(q.nom).toLowerCase() === String(nomQuestionnaire).toLowerCase()
+    );
+    if (indexQ < 0) return false;
+
+    const questionnaire = donnees[indexCours].questionnaires[indexQ];
+    const resultats = Array.isArray(questionnaire.resultatsEtudiants)
+      ? [...questionnaire.resultatsEtudiants]
+      : [];
+
+    const indexResultat = resultats.findIndex(
+      (resultat) =>
+        String(resultat.courrielEtudiant).toLowerCase() === String(courrielEtudiant).toLowerCase()
+    );
+    const noteNormalisee =
+      typeof note === "number" && Number.isFinite(note) ? Number(note) : undefined;
+
+    const resultat = {
+      courrielEtudiant: String(courrielEtudiant),
+      statutGlobal,
+      ...(noteNormalisee !== undefined ? { note: noteNormalisee } : {}),
+      ...(Array.isArray(detailsCorrection) ? { detailsCorrection } : {}),
+    };
+
+    if (indexResultat >= 0) {
+      resultats[indexResultat] = resultat;
+    } else {
+      resultats.push(resultat);
+    }
+
+    donnees[indexCours].questionnaires[indexQ] = {
+      ...questionnaire,
+      resultatsEtudiants: resultats,
+      modifieLe: new Date().toISOString(),
+    };
+
+    await QuestionnaireModele.ecrireQuestionnairesParCours(donnees);
+    return true;
+  }
+
   static async obtenirListeTagsDesQuestions(idGroupe: string): Promise<string[]> {
     const questions = await obtenirQuestionsDuCours(idGroupe);
     const tagsSet = new Set<string>();
@@ -334,3 +388,4 @@ export const modifierQuestionnaire = QuestionnaireModele.modifierQuestionnaire;
 export const obtenirListeTagsDesQuestions = QuestionnaireModele.obtenirListeTagsDesQuestions;
 export const obtenirQuestionParNom = QuestionnaireModele.obtenirQuestionParNom;
 export const obtenirQuestionsParTag = QuestionnaireModele.obtenirQuestionsParTag;
+export const enregistrerResultatEtudiant = QuestionnaireModele.enregistrerResultatEtudiant;

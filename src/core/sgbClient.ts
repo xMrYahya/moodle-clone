@@ -10,6 +10,16 @@ export type SgbTeacherLoginResponse = {
   };
 };
 
+export type SgbStudentLoginResponse = {
+  message: string;
+  token: string;
+  user: {
+    first_name: string;
+    last_name: string;
+    id: string;
+  };
+};
+
 type GroupStudentLink = {
   group_id: string;
   student_id: string;
@@ -145,6 +155,67 @@ export class SgbClient {
 
   async getStudentsForGroup(token: string, idGroupe: string): Promise<StudentInfo[]> {
     return this.getEtudiantsParGroupe(token, idGroupe);
+  }
+
+  async loginStudent(email: string, password: string): Promise<SgbStudentLoginResponse> {
+    const url = new URL("/api/v3/student/login", this.baseUrl);
+    url.searchParams.set("email", email);
+    url.searchParams.set("password", password);
+
+    const resp = await fetch(url.href, { method: "GET" });
+
+    if (!resp.ok) {
+      const text = await resp.text().catch(() => "");
+      throw new Error(`Echec connexion etudiant SGB (${resp.status}): ${text}`);
+    }
+
+    const data = (await resp.json()) as SgbStudentLoginResponse;
+    if (!data.token) {
+      throw new Error("Reponse connexion etudiant SGB sans jeton");
+    }
+
+    return data;
+  }
+
+  async getCoursPourEtudiant(idEtudiant: string, token: string): Promise<GroupeCoursSGA[]> {
+    const [groupesCours, liens] = await Promise.all([
+      this.construireGroupesCours(token),
+      this.getGroupStudentLinks(token),
+    ]);
+
+    const groupesEtudiant = new Set(
+      (liens.data ?? [])
+        .filter((l) => String(l.student_id).toLowerCase() === String(idEtudiant).toLowerCase())
+        .map((l) => String(l.group_id))
+    );
+
+    return groupesCours.filter((cours) => groupesEtudiant.has(String(cours.idGroupe)));
+  }
+
+  async insererNote(
+    token: string,
+    payload: {
+      student_id: string;
+      group_id: string;
+      type: string;
+      type_id: number;
+      grade: number;
+    }
+  ): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/api/v3/grade/insert`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Impossible d'inserer la note (${res.status}): ${text}`);
+    }
   }
 
   private async construireGroupesCours(token: string, idEnseignant?: string): Promise<GroupeCoursSGA[]> {

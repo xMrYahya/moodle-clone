@@ -1,0 +1,66 @@
+html
+  include includes/head.pug
+
+  body
+    include includes/navbar.pug
+    +navbar(displayName)
+
+    .container.mt-4
+      .d-flex.justify-content-between.align-items-start.flex-wrap.gap-2
+        .mb-2
+          h1.mb-1 #{nomQuestionnaire}
+          .text-muted Question #{indexQuestionCourante} / #{totalQuestions}
+        a.btn.btn-outline-secondary(href=`/cours/${idCours}/questionnaires/etudiant`) Retour aux questionnaires
+
+      if messageErreur
+        .alert.alert-danger.mt-3 #{messageErreur}
+
+      .card.mt-3
+        .card-body
+          h4.mb-3 #{question.nom}
+          p.mb-4 #{question.enonce}
+
+          form(method="post" action=`/cours/${idCours}/questionnaires/etudiant/repondre`)
+            case question.type
+              when "VraiFaux"
+                .form-check.mb-2
+                  input.form-check-input(type="radio" name="reponse" id="reponse-true" value="true" required)
+                  label.form-check-label(for="reponse-true") Vrai
+                .form-check.mb-2
+                  input.form-check-input(type="radio" name="reponse" id="reponse-false" value="false" required)
+                  label.form-check-label(for="reponse-false") Faux
+
+              when "ChoixMultiple"
+                if question.donnees.seulementUnChoix
+                  each choix, choixIndex in question.donnees.choix
+                    .form-check.mb-2
+                      input.form-check-input(type="radio" name="reponse" id=`reponse-${choixIndex}` value=choix required)
+                      label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+                else
+                  each choix, choixIndex in question.donnees.choix
+                    .form-check.mb-2
+                      input.form-check-input(type="checkbox" name="reponse" id=`reponse-${choixIndex}` value=choix)
+                      label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+                  .form-text.text-muted Selectionnez une ou plusieurs reponses.
+
+              when "Numerique"
+                .mb-3
+                  label.form-label(for="reponse-numerique") Entrez le nombre:
+                  input.form-control(type="number" id="reponse-numerique" name="reponse" step="any" required)
+
+              when "ReponseCourte"
+                .mb-3
+                  label.form-label(for="reponse-courte") Entrez votre réponse:
+                  textarea.form-control(id="reponse-courte" name="reponse" rows="2" required)
+
+              when "MiseEnCorrespondance"
+                .mb-3
+                  label.form-label(for="reponse-mec") Reponse (texte libre, correction manuelle):
+                  textarea.form-control(id="reponse-mec" name="reponse" rows="4" required)
+
+              when "Essai"
+                .mb-3
+                  label.form-label(for="reponse-essai") Réponse (à corriger manuellement):
+                  textarea.form-control(id="reponse-essai" name="reponse" rows="5" required)
+
+            button.btn.btn-primary.mt-3(type="submit") Suivant

@@ -59,7 +59,7 @@
 
 
 ## Contrats
-### Contrat CO29 - Selectionner Cours (Étudiant)
+### Contrat CO29 - Consulter les questionnaires d'un cours
 ---
 **Opération:selectionnerCours(idCours:String)**  
 **Références croisées:**
@@ -69,38 +69,47 @@
 
 **Préconditions:**
 - L'étudiant est authentifié
+- L'etudiant est inscrit au cours identifie par idCours
 
 **PostConditions:**
-- Aucune post condition (La liste des questionnaires du cours est affiché)
+- Aucune
 
-### Contrat CO30 - 
+### Contrat CO30 - Demarrer une tentative de questionnaire
 ---
 **Opération:selectionnerQuestionnaire(nomQuestionnaire:String)**
 **Références croisées:**
 - CU08 Passer questionnaire
 - DSS Passer un questionnaire 
-- MDD Questionnaire, Cours, RéponseQuestionnaire
+- MDD Questionnaire, ReponseQuestionnaire
 
 **Préconditions:**
+- L'etudiant est authentifie
 - L'étudiant a sélectionné un cours
+- Le questionnaire identifie par nomQuestionnaire appartient au cours selectionne
+- Le questionnaire identifie par nomQuestionnaire est actif
+- Le questionnaire identifie par nomQuestionnaire fait partie des questionnaires a completer de l'etudiant
 
 **PostConditions:**
-- une instance reponseQuestionnaire de réponseQuestionnaire a été crée
-- L'instance a été associé avec le questionnaire qui a été selectionné
+- Une instance reponseQuestionnaire de ReponseQuestionnaire a ete creee
+- reponseQuestionnaire a ete associee au questionnaire selectionne
+- reponseQuestionnaire a ete associee a l'etudiant
 
-### Contrat CO31 - Répondre a une Question Choix Multiple
+### Contrat CO31 - Enregistrer la reponse de l'etudiant
 ---
-**Opération:repondreQuestionChoixMultiple(reponse:String, nomQuestion:String)**  
+**Opération:repondreQuestionChoixMultiple(reponse:String)**  
 **Références croisées:**
 - CU08 Passer questionnaire
 - DSS Passer un questionnaire
 - MDD ReponseQuestionnaire, Questionnaire, Question
 
 **Préconditions:**
-- L'étudiant a commencé a répondre a un questionnaire (un objet réponseQuestionnaire existe)
+- L'etudiant est authentifie
+- L'etudiant a une instance reponseQuestionnaire en cours
+- La question courante du questionnaire en cours est une question de type choix multiple
 
 **PostConditions:**
-- la reponse reponseEtudiant a été ajouté dans réponses a la position de la question actuelle.
+- La reponse reponseEtudiant a ete ajoutee a reponseQuestionnaire
+- reponseQuestionnaire a ete mise a jour pour pointer la prochaine question, le cas echeant
 
 ## Réalisation de cas d'utilisation (RDCU)
 
