@@ -1,24 +1,33 @@
 @startuml
 hide footbox
-title RDCU – Modifier une question
+title RDCU – Modifier une question Vrai ou Faux
 
 participant "qc:QuestionsController" as QC
 participant "cs:CoursStore" as CS
-participant "q:Question" as Q
+participant "q:QuestionVraiFaux" as Q
 
--> QC : modifierQuestion(groupId, nomOriginal, nom, enonce, type,\nretroactionValide, retroactionInvalide, tags, donneesType)
+-> QC : modifierQuestionVraiFaux(nomOriginal : String, nom : String, enonce : String,\n reponse : bool, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
 note right: GRASP: Controller
 activate QC
 
-QC -> CS : recupererQuestionParNom(groupId : String, nomOriginal : String)
+QC -> QC : validerDonnees(nom, enonce, reponse, tags)
+note right: GRASP: Expert
+
+QC -> CS : nomQuestionExisteSauf(groupId : String, nom : String, nomOriginal : String)
 note right: GRASP: Expert
 activate CS
-CS --> QC : questionExistante : Question
+CS --> QC : nomExiste : boolean
 deactivate CS
 
 alt Nom unique et donnees valides
+  QC -> CS : recupererQuestionParNom(groupId : String, nomOriginal : String)
+  note right: GRASP: Expert
+  activate CS
+  CS --> QC : questionExistante : Question
+  deactivate CS
+
   create Q
-  QC -> Q : <<create>> Question(type, nom, enonce, retroactions, tags, donneesType)
+  QC -> Q : <<create>> QuestionVraiFaux(nom, enonce, reponse,\n retroactionValide, retroactionInvalide, tags)
   note right: GRASP: Creator
   activate Q
   deactivate Q

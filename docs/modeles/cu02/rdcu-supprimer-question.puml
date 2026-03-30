@@ -1,9 +1,10 @@
 @startuml
 hide footbox
-title RDCU – Supprimer une question (Demande)
+title RDCU – Supprimer une question
 
 participant "qc:QuestionsController" as QC
 participant "cs:CoursStore" as CS
+participant "qm:QuestionnaireModele" as QM
 
 -> QC : supprimerQuestion(groupId : String, nom : String)
 note right: GRASP: Controller
@@ -15,8 +16,40 @@ activate CS
 CS --> QC : question : Question
 deactivate CS
 
-<-- QC : void
+alt Question existante
+  <-- QC : afficherValeursSuppression(question, demandeConfirmation)
+  
+  -> QC : confirmerSuppression(groupId : String, nom : String)
+  activate QC
+  
+  QC -> QM : obtenirQuestionnairesAssocies(groupId : String)
+  note right: Check if used in questionnaires
+  activate QM
+  QM --> QC : questionnaires : Questionnaire[]
+  deactivate QM
+  
+  QC -> QC : verifierUtilisationQuestion(questionnaires, nom)
+  note right: GRASP: Expert
+  
+  alt Question non utilisee dans questionnaire
+    QC -> CS : retirerQuestionDuCours(groupId : String, nom : String)
+    note right: GRASP: Expert
+    activate CS
+    deactivate CS
+    
+    QC -> CS : obtenirQuestionsDuCours(groupId : String)
+    activate CS
+    CS --> QC : questionsRestantes : Question[]
+    deactivate CS
+    
+    <-- QC : confirmationSuppression(questionsRestantes)
+  else Question utilisee dans questionnaire
+    <-- QC : signalerErreurUtilisation(questionnaires)
+  end
+end
 
 deactivate QC
+
+@enduml
 
 @enduml
