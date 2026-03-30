@@ -126,27 +126,86 @@
 ## Retour sur la correction du rapport précédent
 
 ### DSS Mis a jour
-
+Ajouté le traitement pour chaque type de question dans le diagramme
 ![DSS Ajouter Question ](../../docs/modeles/exports/dss-ajouter-question-updt-v1.png "DSS Ajouter Question")
 
 ### Contrats Mis a jour 
+
+Contrats Ajouté et modifié pour le traitement de l'ajout de chaque tpe de question
+
+### Contrat CO32 - Ajouter une question Vrai ou faux
+---
+**Opération:ajouterQuestionVraiFaux(nom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])**  
+**Références croisées:**
+- CU02a Ajouter une question
+- DSS Ajouter une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance de q QuestionVraiFaux a été créé
+- q.nom est devenu nom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+- q.reponse est devenu reponse
+- q a été associé au cours sélectionné
+
+### Contrat CO33 - Ajouter une question Choix multiple
+---
+**Opération:ajouterQuestionChoixMultiple(nom : String, enonce : String, reponses : String[], retroactionValide : String, retroactionInvalide : String, tags : String[],seulementUnChoix : bool)**  
+**Références croisées:**
+- CU02a Ajouter une question
+- DSS Ajouter une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance de q QuestionChoixMultiple a été créé
+- q.nom est devenu nom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+- q.reponseChoixMultiple est devenu reponses  
+
 
 
 
 
 ### RDCUs Mis a jour
-Ajouté 
+Ajouté le RDCU pour le traitement des question VF
+
 ![RDCU Ajouter question VF ](../../docs/modeles/exports/rdcu-ajouter-question-vf.png "RDCU Ajouter question VF")
+
+Ajouté le RDCU pour le traitement des questions Choix multiple
 
 ![RDCU Ajouter question choix multiple ](../../docs/modeles/exports/rdcu-ajouter-question-choix-multiple.png "RDCU Ajouter question choix multiple")
 
+Ajouté le RDCU pour le traitement des questions Réponse courte
+
 ![RDCU Ajouter question reponse courte ](../../docs/modeles/exports/rdcu-ajouter-question-reponse-courte.png "RDCU Ajouter question reponse courte")
+
+Ajouté le RDCU pour le traitement des questions numériques
 
 ![RDCU Ajouter question numerique ](../../docs/modeles/exports/rdcu-ajouter-question-numerique.png "RDCU Ajouter question numerique")
 
+Ajouté le RDCU pour le traitement des questions essai
+
 ![RDCU Ajouter question essai ](../../docs/modeles/exports/rdcu-ajouter-question-essai.png "RDCU Ajouter question essai")
 
+Ajouté le RDCU pour les correpondances de questions
+
 ![RDCU Ajouter question correpondance ](../../docs/modeles/exports/rdcu-ajouter-question-mise-en-correspondance.png "RDCU ajouter question correspondance")
+
+Ajouté la suppression du questionnaire dans le RDCU
 
 ![RDCU confirmer suppression ](../../docs/modeles/exports-it-3/v2-rdcu-confirmer-suppression.png "RDCU confirmer suppression")
 
@@ -170,4 +229,4 @@ Ajouté
   - [ ] Votre code source (implémentation) est cohérent avec la RDCU (ce n'est pas juste un diagramme)
 - [ ] Vous avez un seul diagramme de classes
 - [ ] Vous avez remis la version PDF de ce document dans votre répertoire
-- [ ] [Vous avez regardé cette petite présentation pour l'architecture en couche et avez appliqué ces concepts](https://log210-cfuhrman.github.io/log210-valider-architecture-couches/#/) 
+- [X] [Vous avez regardé cette petite présentation pour l'architecture en couche et avez appliqué ces concepts](https://log210-cfuhrman.github.io/log210-valider-architecture-couches/#/) 

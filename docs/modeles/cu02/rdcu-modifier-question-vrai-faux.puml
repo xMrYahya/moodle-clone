@@ -6,7 +6,7 @@ participant "qc:QuestionsController" as QC
 participant "cm:CoursModele" as CM
 participant "q:QuestionVraiFauxModele" as Q
 
--> QC : modifierQuestion(nomOriginal : String, type : "VraiFaux",\n nom : String, enonce : String, reponse : bool,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+-> QC : modifierQuestionVraiFaux(nomOriginal : String, nom : String,\n enonce : String, reponse : bool, retroactionValide : String, \nretroactionInvalide : String, tags : String[])
 note right: GRASP: Controller
 activate QC
 
