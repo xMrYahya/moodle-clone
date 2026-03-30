@@ -1,0 +1,29 @@
+html
+  include includes/head.pug
+
+  body
+    include includes/navbar.pug
+    +navbar(displayName)
+
+    .container.mt-4
+      .d-flex.justify-content-between.align-items-start.flex-wrap.gap-2
+        .mb-2
+          h1.mb-1 #{nomQuestionnaire}
+          .text-muted Question #{indexQuestionCourante} / #{totalQuestions}
+        a.btn.btn-outline-secondary(href=`/cours/${idCours}/questionnaires/etudiant`) Retour aux questionnaires
+
+      if messageErreur
+        .alert.alert-danger.mt-3 #{messageErreur}
+
+      .card.mt-3
+        .card-body
+          h4.mb-3 #{question.nom}
+          p.mb-4 #{question.enonce}
+
+          form(method="post" action=`/cours/${idCours}/questionnaires/etudiant/repondre`)
+            each choix, choixIndex in question.choix
+              .form-check.mb-2
+                input.form-check-input(type="radio" name="reponse" id=`reponse-${choixIndex}` value=choix required)
+                label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+
+            button.btn.btn-primary.mt-3(type="submit") Suivant
