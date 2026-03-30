@@ -42,25 +42,24 @@
 
 | Nom / Description               | Assigné à (nom)     |
 | --------------------------------| ------------------- |
-| CU08                            | (tous)              |
-|   CU08 - conception             | Raphael + Alexandre |
-|   CU08 - test et implémentation | Kassem + Yahya      |
-|   CU08 - mise à jour des modèles| Alex                |
+| CU08a                            | (tous)              |
+|   CU08a - conception             | Raphael + Alexandre |
+|   CU08a - test et implémentation | Kassem + Yahya      |
+|   CU08a - mise à jour des modèles| Alex                |
 
 
 ## Modèle du domaine (MDD)
 
-> Le MDD est cumulatif : vous devez y ajouter des éléments à chaque itération (ou corriger les erreurs), selon la portée (et votre meilleure compréhension du problème) visée par votre solution. 
-> Utilisez une légende dans le MDD pour indiquer la couleur de chaque itération afin de faire ressortir les changements (ce n'est pas toujours possible pour les associations et les attributs). Voir les stéréotypes personnalisés : <https://plantuml.com/fr/class-diagram> et [comment faire une légende avec couleurs en PlantUML](https://stackoverflow.com/questions/30999290/how-to-generate-a-legend-with-colors-in-plantuml).
+![MDD ](../../docs/modeles/exports-it-3/MDD_SGB_SGA.png "MDD")
+
 
 ## Diagramme de séquence système (DSS)
 
-> Un DSS pour chaque cas d'utilisation. 
-> Veuillez utiliser des noms d'opérations significatifs comme "ajouterCours" (pas "opération1" ou "gérerCours").
-> Veuillez typer les paramètres sans utiliser de types complexes (ex: "List<Cours>" n'est pas un type simple).
+![DSS Passer Questionnaire  ](../../docs/modeles/exports-it-3/dss-passer-questionnaire.png "DSS Passer Questionnaire")
+
 
 ## Contrats
-### Contrat CO29 - Selectionner Cours (Étudiant)
+### Contrat CO29 - Consulter les questionnaires d'un cours
 ---
 **Opération:selectionnerCours(idCours:String)**  
 **Références croisées:**
@@ -70,63 +69,90 @@
 
 **Préconditions:**
 - L'étudiant est authentifié
+- L'etudiant est inscrit au cours identifie par idCours
 
 **PostConditions:**
-- Aucune post condition (La liste des questionnaires du cours est affiché)
+- Aucune
 
-### Contrat CO30 - 
+### Contrat CO30 - Demarrer une tentative de questionnaire
 ---
 **Opération:selectionnerQuestionnaire(nomQuestionnaire:String)**
 **Références croisées:**
 - CU08 Passer questionnaire
 - DSS Passer un questionnaire 
-- MDD Questionnaire, Cours, RéponseQuestionnaire
+- MDD Questionnaire, ReponseQuestionnaire
 
 **Préconditions:**
+- L'etudiant est authentifie
 - L'étudiant a sélectionné un cours
+- Le questionnaire identifie par nomQuestionnaire appartient au cours selectionne
+- Le questionnaire identifie par nomQuestionnaire est actif
+- Le questionnaire identifie par nomQuestionnaire fait partie des questionnaires a completer de l'etudiant
 
 **PostConditions:**
-- une instance reponseQuestionnaire de réponseQuestionnaire a été crée
-- L'instance a été associé avec le questionnaire qui a été selectionné
+- Une instance reponseQuestionnaire de ReponseQuestionnaire a ete creee
+- reponseQuestionnaire a ete associee au questionnaire selectionne
+- reponseQuestionnaire a ete associee a l'etudiant
 
-### Contrat CO31 - Répondre a une Question Choix Multiple
+### Contrat CO31 - Enregistrer la reponse de l'etudiant
 ---
-**Opération:repondreQuestionChoixMultiple(reponse:String, nomQuestion:String)**  
+**Opération:repondreQuestionChoixMultiple(reponse:String)**  
 **Références croisées:**
 - CU08 Passer questionnaire
 - DSS Passer un questionnaire
 - MDD ReponseQuestionnaire, Questionnaire, Question
 
 **Préconditions:**
-- L'étudiant a commencé a répondre a un questionnaire (un objet réponseQuestionnaire existe)
+- L'etudiant est authentifie
+- L'etudiant a une instance reponseQuestionnaire en cours
+- La question courante du questionnaire en cours est une question de type choix multiple
 
 **PostConditions:**
-- la reponse reponseEtudiant a été ajouté dans réponses a la position de la question actuelle.
+- La reponse reponseEtudiant a ete ajoutee a reponseQuestionnaire
+- reponseQuestionnaire a ete mise a jour pour pointer la prochaine question, le cas echeant
 
 ## Réalisation de cas d'utilisation (RDCU)
 
-> Chaque cas d'utilisation nécessite une RDCU.
-> Vos RDCU doivent être des diagrammes de séquences d'opérations tel que vu dans le cours de LOG121.
-> Vos diagrammes doivent inclurent: 
-> - La création des instances nécessaires pour réaliser cette séquence
-> - Toutes les objets et classes nécessaires pour réaliser cette séquences, incluant les structures de données comme des objets Map, List, Set, etc.
-> - Les appels de méthodes avec leurs paramètres et les types (paramètres et méthodes)
-> - Les valeurs de retour avec leur type
-> - L'ordre chronologique précis des messages
-> - Les barres d'activation des instances pour montrer quand chaque objet est actif
+![RDCU Selectionner Cours  ](../../docs/modeles/exports-it-3/rdcu-selectionner-cours.png "RDCU Selectionner Cours")
 
-## Diagramme de classe logicielle (DCL)
+![RDCU Selectionner Questionnaire ](../../docs/modeles/exports-it-3/rdcu-selectionner-questionnaire.png "RDCU Selectionner Questionnaire")
 
-> Facultatif, mais fortement suggéré
-> Ce diagramme vous aidera à planifier l'ordre d'implémentation des classes.  Très utile lorsqu'on utilise TDD.
+![RDCU Repondre Question choix multiple ](../../docs/modeles/exports-it-3/rdcu-repondre-question-choix-multiple.png "Repondre Question choix multiple")
 
 ### Diagramme de classe TPLANT
 - Générer un diagramme de classe avec l'outil TPLANT et commenter celui-ci par rapport à votre MDD.
 - https://www.npmjs.com/package/tplant
   
 ## Retour sur la correction du rapport précédent
-> Veuillez insérer ici les diagrammes à revalider de l'itération précédente avec les corrections apportées.
-> Démontrer que vous avez réglé les problèmes identifiés dans le rapport de l'itération précédente.
+
+### DSS Mis a jour
+
+![DSS Ajouter Question ](../../docs/modeles/exports/dss-ajouter-question-updt-v1.png "DSS Ajouter Question")
+
+### Contrats Mis a jour 
+
+
+
+
+### RDCUs Mis a jour
+Ajouté 
+![RDCU Ajouter question VF ](../../docs/modeles/exports/rdcu-ajouter-question-vf.png "RDCU Ajouter question VF")
+
+![RDCU Ajouter question choix multiple ](../../docs/modeles/exports/rdcu-ajouter-question-choix-multiple.png "RDCU Ajouter question choix multiple")
+
+![RDCU Ajouter question reponse courte ](../../docs/modeles/exports/rdcu-ajouter-question-reponse-courte.png "RDCU Ajouter question reponse courte")
+
+![RDCU Ajouter question numerique ](../../docs/modeles/exports/rdcu-ajouter-question-numerique.png "RDCU Ajouter question numerique")
+
+![RDCU Ajouter question essai ](../../docs/modeles/exports/rdcu-ajouter-question-essai.png "RDCU Ajouter question essai")
+
+![RDCU Ajouter question correpondance ](../../docs/modeles/exports/rdcu-ajouter-question-mise-en-correspondance.png "RDCU ajouter question correspondance")
+
+![RDCU confirmer suppression ](../../docs/modeles/exports-it-3/v2-rdcu-confirmer-suppression.png "RDCU confirmer suppression")
+
+
+
+
 
 ## Vérification finale
 

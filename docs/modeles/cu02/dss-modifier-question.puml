@@ -9,7 +9,20 @@ s-->>e : Liste des questions associees au cours
 e->s : selectionnerQuestion(nom : String)
 alt Question existante
 	s-->>e : Details de la question (type, nom, enonce, reponse, retroactions, tags)
-	e->s : modifierQuestion(nomOriginal : String, nom : String, enonce : String, type : String, retroactionValide : String, retroactionInvalide : String, tags : String[], donneesType)
+	alt Modification de Question Vrai ou Faux
+		e->s : modifierQuestionVraiFaux(nomOriginal : String, nom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])
+	else Modification de Question a choix multiple
+		e->s : modifierQuestionChoixMultiple(nomOriginal : String, nom : String, enonce : String, reponses : String[], seulementUnChoix : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])
+	else Modification de Question a reponse courte
+		e->s : modifierQuestionReponseCourte(nomOriginal : String, nom : String, enonce : String, reponse : String, retroactionValide : String, retroactionInvalide : String, tags : String[])
+	else Modification de Question a reponse numerique
+		e->s : modifierQuestionReponseNumerique(nomOriginal : String, nom : String, enonce : String, reponse : number, retroactionValide : String, retroactionInvalide : String, tags : String[])
+	else Modification de Question essai
+		e->s : modifierQuestionEssai(nomOriginal : String, nom : String, enonce : String, retroactionValide : String, retroactionInvalide : String, tags : String[])
+	else Modification de Question de mise en correspondance
+		e->s : modifierQuestionMiseCorrespondance(nomOriginal : String, nom : String, enonce : String, pairesQuestion : String[], pairesReponse : String[], retroactionValide : String, retroactionInvalide : String, tags : String[])
+	end alt
+	
 	alt Modification valide
 		s-->>e : Question modifiee et message de confirmation
 	else Nom deja utilise ou donnees invalides

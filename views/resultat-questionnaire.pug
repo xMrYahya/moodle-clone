@@ -1,0 +1,59 @@
+html
+  include includes/head.pug
+
+  body
+    include includes/navbar.pug
+    +navbar(displayName)
+
+    .container.mt-4
+      h1 Resultat du questionnaire
+      p.text-muted.mb-4 #{resultat.nomQuestionnaire}
+
+      if resultat.contientCorrectionManuelle
+        .alert.alert-warning
+          | Ce questionnaire contient des questions necessitant une correction manuelle.
+          |  La note finale sera determinee plus tard.
+      else
+        .alert.alert-success
+          strong Note obtenue: #{resultat.notePourcentage}%
+
+      if !resultat.contientCorrectionManuelle && !resultat.noteTransmiseSgb && resultat.messageErreurSgb
+        .alert.alert-danger
+          | La note a ete calculee localement, mais le transfert vers le SGB a echoue:
+          |  #{resultat.messageErreurSgb}
+
+      if !resultat.contientCorrectionManuelle && resultat.noteTransmiseSgb
+        .alert.alert-info Note transmise au SGB avec succes.
+
+      if resultat.detailsCorrection && resultat.detailsCorrection.length
+        .card
+          .card-body
+            h4.mb-3 Retroaction par question
+            each detail in resultat.detailsCorrection
+              .mb-3.pb-3.border-bottom
+                h5.mb-1 #{detail.nomQuestion}
+                p.mb-1 #{detail.enonce}
+                p.mb-1
+                  strong Reponse: 
+                  case detail.type
+                    when "VraiFaux"
+                      if detail.reponseEtudiant === "true"
+                        | Vrai
+                      else if detail.reponseEtudiant === "false"
+                        | Faux
+                      else
+                        | (non répondu)
+                    default
+                      | #{detail.reponseEtudiant}
+                if detail.statutCorrection === "en_attente_correction"
+                  p.text-warning.mb-1 Statut: en attente de correction
+                else if detail.statutCorrection === "corrige"
+                  p.text-info.mb-1 Statut: corrige
+                else if detail.estBonneReponse
+                  p.text-success.mb-1 Bonne reponse
+                else
+                  p.text-danger.mb-1 Mauvaise reponse
+                if detail.retroaction
+                  p.text-muted.mb-0 #{detail.retroaction}
+
+      a.btn.btn-primary.mt-4(href=`/cours/${idCours}/questionnaires/etudiant`) Retour aux questionnaires

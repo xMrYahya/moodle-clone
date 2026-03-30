@@ -7,6 +7,13 @@ html
 
         form#formLogin
           .form-group
+            label.mr-3
+              input(type="radio" name="role" value="teacher" checked)
+              |  Enseignant
+            label
+              input(type="radio" name="role" value="student")
+              |  Etudiant
+          .form-group
             input.form-control(name="email", type="email", placeholder="Courriel", required)
           .form-group
             input.form-control(name="password", type="password", placeholder="Mot de passe", required)
@@ -20,12 +27,14 @@ html
 
         const email = form.elements["email"].value;
         const password = form.elements["password"].value;
+        const roleField = form.elements["role"];
+        const role = roleField && roleField.value ? roleField.value : "teacher";
 
         try {
           const resp = await fetch("/signin", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password, role })
           });
 
           const data = await resp.json();
