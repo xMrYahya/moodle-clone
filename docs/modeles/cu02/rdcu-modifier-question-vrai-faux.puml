@@ -40,9 +40,9 @@ alt Nom unique et donnees valides
   activate CM
   deactivate CM
 
-  <-- QC : afficherConfirmationModification(questionMiseAJour)
+  <-- QC : afficherConfirmationModification
 else Nom deja utilise ou donnees invalides
-  <-- QC : signalerErreurModification()
+  <-- QC : signalerErreurModification
 end
 
 deactivate QC

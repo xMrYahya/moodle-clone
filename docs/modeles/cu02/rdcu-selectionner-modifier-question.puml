@@ -15,7 +15,7 @@ activate CS
 CS --> QC : question : Question
 deactivate CS
 
-<-- QC : ouvrirFormulaireModification(question)
+<-- QC : ouvrirFormulaireModification
 
 deactivate QC
 

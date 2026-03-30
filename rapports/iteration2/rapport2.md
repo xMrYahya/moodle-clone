@@ -96,7 +96,7 @@
 
 ### Contrat CO12 - Demande de suppression de question
 ---
-**Opération: supprimerQuestion(groupid : String, nom : String)**  
+**Opération: supprimerQuestion(groupId : String, nom : String)**  
 **Références croisées:**
 - CU02d - Supprimer une question
 - MDD - Enseignant, Cours, Question
@@ -118,12 +118,12 @@
 - Une demande de suppression est débuté pour un cours
 
 **PostConditions:**
-- La question selectionné a été dissocié du QuestionStore de la question selectionné
+- La question selectionné a été dissocié du Cours à laquelle il était relié
 - La question selectionné a été supprimée
 
 ### Contrat CO14 - Modification de question
 ---
-**Opération: modifierQuestion(nom, enonce, type,retroactionValide, retroactionInvalide, tags)**  
+**Opération: modifierQuestion(nom : String, enonce, type,retroactionValide, retroactionInvalide, tags)**  
 **Références croisées:**
 - CU02c - Modifier une question
 - MDD - Enseignant, Cours, Question
@@ -356,7 +356,7 @@
 
 ![RDCU consulter question d'un cours ](../../docs/modeles/exports/rdcu-afficher-liste-questions.png "RDCU consulter les questions d'un cours")
 
-![RDCU selectionner une question ](../../docs/modeles/exports/rdcu-selectionner-question.png "RDCU selectionner une question")
+![RDCU selectionner une question ](../../docs/modeles/exports/rdcu-selectionner-question-modifier.png "RDCU selectionner une question")
 
 ![RDCU selectionner modifier une question ](../../docs/modeles/exports/rdcu-selectionner-question-modifier.png "RDCU selectionner modifier une question ")
 

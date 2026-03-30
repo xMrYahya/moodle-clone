@@ -15,7 +15,7 @@ activate CS
 CS --> QC : questions : List<Question>
 deactivate CS
 
-<-- QC : retournerListeQuestions(questions)
+<-- QC : retournerListeQuestions
 deactivate QC
 
 @enduml

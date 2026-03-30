@@ -5,7 +5,6 @@ title RDCU - Sauvegarder un questionnaire
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
 participant "q:Questionnaire" as questionnaire
-participant "questionnaireTemp:Questionnaire"
 
 -> controller : sauvegarderQuestionnaire():boolean
 note right: GRASP: Controller
