@@ -17,11 +17,16 @@ export class AuthController {
   static async postSignin(req: any, res: Response): Promise<void> {
     try {
       const { email, password } = req.body;
-      const login = await sgbClient.loginTeacher(email, password);
+      const role = String(req.body?.role ?? "teacher").toLowerCase();
+      const login =
+        role === "student"
+          ? await sgbClient.loginStudent(email, password)
+          : await sgbClient.loginTeacher(email, password);
 
       req.session.token = login.token;
       req.session.user = login.user;
       req.session.email = email;
+      req.session.role = role === "student" ? "student" : "teacher";
 
       res.status(200).json({ ok: true });
       return;
