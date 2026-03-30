@@ -32,7 +32,12 @@ html
                     strong #{q.nom}
                     if q.description
                       div.text-muted #{q.description}
-                  span.badge.bg-success Note: #{q.noteEtudiant}
+                  if q.statutEtudiant === "en_attente_correction"
+                    span.badge.bg-warning.text-dark En attente de correction
+                  else if q.noteEtudiant !== undefined
+                    span.badge.bg-success Note: #{q.noteEtudiant}
+                  else
+                    span.badge.bg-info Corrige
           else
             p.text-muted Aucun questionnaire complete.
 

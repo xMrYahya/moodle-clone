@@ -31,10 +31,17 @@ html
                   label.form-check-label(for="reponse-false") Faux
 
               when "ChoixMultiple"
-                each choix, choixIndex in question.donnees.choix
-                  .form-check.mb-2
-                    input.form-check-input(type="radio" name="reponse" id=`reponse-${choixIndex}` value=choix required)
-                    label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+                if question.donnees.seulementUnChoix
+                  each choix, choixIndex in question.donnees.choix
+                    .form-check.mb-2
+                      input.form-check-input(type="radio" name="reponse" id=`reponse-${choixIndex}` value=choix required)
+                      label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+                else
+                  each choix, choixIndex in question.donnees.choix
+                    .form-check.mb-2
+                      input.form-check-input(type="checkbox" name="reponse" id=`reponse-${choixIndex}` value=choix)
+                      label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+                  .form-text.text-muted Selectionnez une ou plusieurs reponses.
 
               when "Numerique"
                 .mb-3
@@ -47,8 +54,9 @@ html
                   textarea.form-control(id="reponse-courte" name="reponse" rows="2" required)
 
               when "MiseEnCorrespondance"
-                .alert.alert-info
-                  | Appairage de questions - Cette question nécessite une correction manuelle
+                .mb-3
+                  label.form-label(for="reponse-mec") Reponse (texte libre, correction manuelle):
+                  textarea.form-control(id="reponse-mec" name="reponse" rows="4" required)
 
               when "Essai"
                 .mb-3

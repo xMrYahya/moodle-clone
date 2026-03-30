@@ -48,20 +48,69 @@ export class ValidateurVraiFaux implements ValidateurReponse {
 
 export class ValidateurChoixMultiple implements ValidateurReponse {
   valider(reponse: unknown): { valide: boolean; message?: string } {
-    if (typeof reponse !== "string" || !reponse.trim()) {
-      return { valide: false, message: "Veuillez selectionner une reponse valide" };
+    if (typeof reponse === "string") {
+      if (!reponse.trim()) {
+        return { valide: false, message: "Veuillez selectionner une reponse valide" };
+      }
+      return { valide: true };
     }
-    return { valide: true };
+
+    if (Array.isArray(reponse)) {
+      const choix = reponse.map((v) => String(v).trim()).filter((v) => v.length > 0);
+      if (choix.length === 0) {
+        return { valide: false, message: "Veuillez selectionner au moins une reponse" };
+      }
+      return { valide: true };
+    }
+
+    return { valide: false, message: "Veuillez selectionner une reponse valide" };
   }
 
   estBonneReponse(reponse: unknown, donnees: unknown): boolean {
-    if (!donnees || typeof donnees !== "object" || !("bonneReponse" in donnees)) {
+    if (!donnees || typeof donnees !== "object") {
       return false;
     }
-    const data = donnees as { bonneReponse: string };
-    const repAnswerNorm = String(reponse ?? "").trim().toLowerCase();
-    const bonneRepNorm = String(data.bonneReponse).trim().toLowerCase();
-    return repAnswerNorm === bonneRepNorm;
+
+    const data = donnees as {
+      seulementUnChoix?: boolean;
+      bonneReponse?: string;
+      bonnesReponses?: string[];
+    };
+
+    const bonnesReponses = Array.isArray(data.bonnesReponses)
+      ? data.bonnesReponses.map((v) => String(v).trim().toLowerCase()).filter((v) => v.length > 0)
+      : String(data.bonneReponse ?? "").trim()
+        ? [String(data.bonneReponse ?? "").trim().toLowerCase()]
+        : [];
+
+    if (bonnesReponses.length === 0) {
+      return false;
+    }
+
+    const seulementUnChoix = data.seulementUnChoix !== false;
+
+    if (seulementUnChoix) {
+      const reponseSimple = Array.isArray(reponse)
+        ? String(reponse[0] ?? "").trim().toLowerCase()
+        : String(reponse ?? "").trim().toLowerCase();
+      return reponseSimple.length > 0 && reponseSimple === bonnesReponses[0];
+    }
+
+    const reponsesEtudiant = Array.isArray(reponse)
+      ? reponse.map((v) => String(v).trim().toLowerCase()).filter((v) => v.length > 0)
+      : String(reponse ?? "")
+        .split("|")
+        .map((v) => v.trim().toLowerCase())
+        .filter((v) => v.length > 0);
+
+    const uniquesEtudiant = [...new Set(reponsesEtudiant)].sort();
+    const uniquesBonnes = [...new Set(bonnesReponses)].sort();
+
+    if (uniquesEtudiant.length !== uniquesBonnes.length) {
+      return false;
+    }
+
+    return uniquesEtudiant.every((value, index) => value === uniquesBonnes[index]);
   }
 
   obtenirRetroaction(
@@ -75,7 +124,7 @@ export class ValidateurChoixMultiple implements ValidateurReponse {
     }
 
     const data = donnees as { retroactionParChoix: Record<string, string> };
-    const reponseStr = String(reponse ?? "");
+    const reponseStr = Array.isArray(reponse) ? String(reponse[0] ?? "") : String(reponse ?? "");
     const retroactionSpecifique = data.retroactionParChoix[reponseStr] ?? "";
 
     if (retroactionSpecifique) {
@@ -161,8 +210,9 @@ export class ValidateurReponseCourte implements ValidateurReponse {
 
 export class ValidateurMiseEnCorrespondance implements ValidateurReponse {
   valider(reponse: unknown): { valide: boolean; message?: string } {
-    // Pour MiseEnCorrespondance, on accepte tout pour maintenanr (complexité élevée)
-    // Marqué pour correction manuelle
+    if (typeof reponse !== "string" || !reponse.trim()) {
+      return { valide: false, message: "Veuillez entrer une reponse" };
+    }
     return { valide: true };
   }
 
@@ -177,7 +227,7 @@ export class ValidateurMiseEnCorrespondance implements ValidateurReponse {
     retroactionValide: string,
     retroactionInvalide: string
   ): string {
-    return "Cette question necessite une correction manuelle";
+    return "Votre reponse a ete recueillie et sera corrigee manuellement";
   }
 }
 

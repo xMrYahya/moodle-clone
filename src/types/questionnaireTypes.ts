@@ -1,6 +1,20 @@
+export type StatutCorrectionQuestionnaire = "corrige_automatiquement" | "en_attente_correction" | "corrige";
+
+export type ResultatQuestionEtudiant = {
+  nomQuestion: string;
+  type: string;
+  enonce: string;
+  reponseEtudiant: string;
+  statutCorrection: "corrige_automatiquement" | "en_attente_correction" | "corrige";
+  estBonneReponse?: boolean;
+  retroaction: string;
+};
+
 export type ResultatEtudiantQuestionnaire = {
   courrielEtudiant: string;
-  note: number;
+  note?: number;
+  statutGlobal: StatutCorrectionQuestionnaire;
+  detailsCorrection?: ResultatQuestionEtudiant[];
 };
 
 export type Questionnaire = {

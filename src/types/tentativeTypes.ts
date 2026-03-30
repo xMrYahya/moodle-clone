@@ -2,9 +2,17 @@ import { PairDeCorrespondance } from "./questionTypes";
 
 export type QuestionType = "VraiFaux" | "ChoixMultiple" | "Numerique" | "ReponseCourte" | "MiseEnCorrespondance" | "Essai";
 
+export type StatutCorrectionQuestion = "corrige_automatiquement" | "en_attente_correction" | "corrige";
+
 export type DonneesQuestionParType =
   | { type: "VraiFaux"; bonneReponse: boolean }
-  | { type: "ChoixMultiple"; choix: string[]; bonneReponse: string; retroactionParChoix: Record<string, string> }
+  | {
+      type: "ChoixMultiple";
+      choix: string[];
+      seulementUnChoix: boolean;
+      bonnesReponses: string[];
+      retroactionParChoix: Record<string, string>;
+    }
   | { type: "Numerique"; bonneReponse: number }
   | { type: "ReponseCourte"; bonneReponse: string }
   | { type: "MiseEnCorrespondance"; paires: PairDeCorrespondance[] }
@@ -27,5 +35,5 @@ export type TentativeQuestionnaireSession = {
   contientCorrectionManuelle: boolean;
   indexQuestionCourante: number;
   questions: QuestionEnTentative[];
-  reponses: (string | number | boolean)[];
+  reponses: (string | number | boolean | string[])[];
 };

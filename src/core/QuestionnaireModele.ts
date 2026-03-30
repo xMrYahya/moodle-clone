@@ -3,6 +3,8 @@ import path from "path";
 import { obtenirQuestionsDuCours } from "./CoursModele";
 import { AnyQuestion } from "../types/questionTypes";
 import {
+  ResultatQuestionEtudiant,
+  StatutCorrectionQuestionnaire,
   QuestionTagInfo,
   Questionnaire,
   QuestionnaireTemp,
@@ -241,7 +243,9 @@ export class QuestionnaireModele {
     idGroupe: string,
     nomQuestionnaire: string,
     courrielEtudiant: string,
-    note: number
+    note: number | undefined,
+    statutGlobal: StatutCorrectionQuestionnaire,
+    detailsCorrection?: ResultatQuestionEtudiant[]
   ): Promise<boolean> {
     const donnees = await QuestionnaireModele.obtenirTousQuestionnairesParCours();
     const indexCours = donnees.findIndex((c) => c.idGroupe === String(idGroupe));
@@ -261,7 +265,15 @@ export class QuestionnaireModele {
       (resultat) =>
         String(resultat.courrielEtudiant).toLowerCase() === String(courrielEtudiant).toLowerCase()
     );
-    const resultat = { courrielEtudiant: String(courrielEtudiant), note: Number(note) };
+    const noteNormalisee =
+      typeof note === "number" && Number.isFinite(note) ? Number(note) : undefined;
+
+    const resultat = {
+      courrielEtudiant: String(courrielEtudiant),
+      statutGlobal,
+      ...(noteNormalisee !== undefined ? { note: noteNormalisee } : {}),
+      ...(Array.isArray(detailsCorrection) ? { detailsCorrection } : {}),
+    };
 
     if (indexResultat >= 0) {
       resultats[indexResultat] = resultat;

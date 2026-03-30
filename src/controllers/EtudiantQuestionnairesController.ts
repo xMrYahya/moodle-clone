@@ -2,7 +2,13 @@ import { Response } from "express";
 import { obtenirCoursStockeParIdGroupe, obtenirQuestionsDuCours } from "../core/CoursModele";
 import { QuestionnaireModele } from "../core/QuestionnaireModele";
 import { SgbClient } from "../core/sgbClient";
-import { TentativeQuestionnaireSession, QuestionEnTentative, DonneesQuestionParType, QuestionType } from "../types/tentativeTypes";
+import {
+  TentativeQuestionnaireSession,
+  QuestionEnTentative,
+  DonneesQuestionParType,
+  QuestionType,
+  StatutCorrectionQuestion,
+} from "../types/tentativeTypes";
 import { obtenirValidateur } from "../core/validateursQuestionnaire";
 import {
   QuestionVraiFauxModele,
@@ -19,6 +25,14 @@ const sgbClient = new SgbClient(sgbBaseUrl);
 
 function lireTexte(valeur: unknown): string {
   return String(valeur ?? "").trim();
+}
+
+function lireListeTexte(valeur: unknown): string[] {
+  if (Array.isArray(valeur)) {
+    return valeur.map((v) => String(v).trim()).filter((v) => v.length > 0);
+  }
+  const texte = String(valeur ?? "").trim();
+  return texte ? [texte] : [];
 }
 
 function estEtudiantAuthentifie(req: any): boolean {
@@ -99,7 +113,9 @@ function extraireDonneesParType(question: any): DonneesQuestionParType {
       {
         const q = question as QuestionChoixMultipleModele;
         const choix = (q.reponses ?? []).map((r: any) => String(r.texte));
-        const bonneReponse = (q.reponses ?? []).find((r: any) => r.estBonneReponse === true);
+        const bonnesReponses = (q.reponses ?? [])
+          .filter((r: any) => r.estBonneReponse === true)
+          .map((r: any) => String(r.texte));
         const retroactionParChoix: Record<string, string> = {};
         for (const reponse of q.reponses ?? []) {
           retroactionParChoix[String(reponse.texte)] = String(reponse.retroaction ?? "");
@@ -107,7 +123,8 @@ function extraireDonneesParType(question: any): DonneesQuestionParType {
         return {
           type: "ChoixMultiple",
           choix,
-          bonneReponse: bonneReponse ? String(bonneReponse.texte) : "",
+          seulementUnChoix: q.seulementUnChoix === true,
+          bonnesReponses,
           retroactionParChoix,
         };
       }
@@ -173,9 +190,10 @@ export class EtudiantQuestionnairesController {
           return {
             ...questionnaire,
             noteEtudiant: resultatEtudiant?.note,
+            statutEtudiant: resultatEtudiant?.statutGlobal,
           };
         })
-        .filter((questionnaire) => questionnaire.noteEtudiant !== undefined);
+        .filter((questionnaire) => questionnaire.statutEtudiant !== undefined);
       const questionnairesACompleter = questionnaires.filter((questionnaire) => {
         const dejaComplete = (questionnaire.resultatsEtudiants ?? []).some(
           (r) => normaliserCle(String(r.courrielEtudiant)) === normaliserCle(etudiantId)
@@ -347,7 +365,7 @@ export class EtudiantQuestionnairesController {
       }
 
       const idGroupe = lireTexte(req.params?.idCours);
-      const reponse = lireTexte(req.body?.reponse);
+      const reponseBrute = req.body?.reponse;
       const tentative = getTentative(req);
       if (!tentative || tentative.idGroupe !== idGroupe) {
         res.redirect(
@@ -365,7 +383,17 @@ export class EtudiantQuestionnairesController {
       // Dispatcher polymorphe: valider selon le type
       const type = questionCourante.type;
       const validateur = obtenirValidateur(type);
-      const { valide, message } = validateur.valider(reponse);
+
+      let reponseSaisie: unknown = lireTexte(reponseBrute);
+      if (type === "ChoixMultiple") {
+        if (questionCourante.donnees.type === "ChoixMultiple" && questionCourante.donnees.seulementUnChoix === false) {
+          reponseSaisie = lireListeTexte(reponseBrute);
+        } else {
+          reponseSaisie = lireTexte(reponseBrute);
+        }
+      }
+
+      const { valide, message } = validateur.valider(reponseSaisie);
 
       if (!valide) {
         res.redirect(
@@ -375,11 +403,13 @@ export class EtudiantQuestionnairesController {
       }
 
       // Parser la réponse selon le type et la stocker de manière typée
-      let reponseTypee: string | number | boolean = reponse;
+      let reponseTypee: string | number | boolean | string[] = Array.isArray(reponseSaisie)
+        ? reponseSaisie
+        : String(reponseSaisie ?? "");
       if (type === "VraiFaux") {
-        reponseTypee = reponse.toLowerCase() === "true";
+        reponseTypee = String(reponseSaisie).toLowerCase() === "true";
       } else if (type === "Numerique") {
-        reponseTypee = parseFloat(reponse);
+        reponseTypee = parseFloat(String(reponseSaisie));
       }
 
       tentative.reponses.push(reponseTypee);
@@ -396,8 +426,15 @@ export class EtudiantQuestionnairesController {
         const reponseEtudiant = tentative.reponses[index] ?? null;
         const type = question.type;
         const validateur = obtenirValidateur(type);
+        const estCorrectionManuelle = type === "Essai" || type === "MiseEnCorrespondance";
 
-        const estBonneReponse = validateur.estBonneReponse(reponseEtudiant, question.donnees);
+        const statutCorrection: StatutCorrectionQuestion = estCorrectionManuelle
+          ? "en_attente_correction"
+          : "corrige_automatiquement";
+
+        const estBonneReponse = estCorrectionManuelle
+          ? undefined
+          : validateur.estBonneReponse(reponseEtudiant, question.donnees);
 
         const retroaction = validateur.obtenirRetroaction(
           reponseEtudiant,
@@ -406,27 +443,43 @@ export class EtudiantQuestionnairesController {
           question.retroactionInvalide
         );
 
+        const reponseAffichable = Array.isArray(reponseEtudiant)
+          ? reponseEtudiant.join(" | ")
+          : reponseEtudiant !== null
+            ? String(reponseEtudiant)
+            : "";
+
         return {
           nomQuestion: question.nom,
           type,
           enonce: question.enonce,
-          reponseEtudiant: reponseEtudiant !== null ? String(reponseEtudiant) : "",
+          reponseEtudiant: reponseAffichable,
+          statutCorrection,
           estBonneReponse,
           retroaction,
         };
       });
 
-      const nbBonnesReponses = detailsCorrection.filter((detail) => detail.estBonneReponse).length;
+      const detailsAuto = detailsCorrection.filter(
+        (detail) => detail.statutCorrection === "corrige_automatiquement"
+      );
+      const nbBonnesReponses = detailsAuto.filter((detail) => detail.estBonneReponse === true).length;
       const notePourcentage =
-        tentative.questions.length > 0
-          ? Number(((nbBonnesReponses / tentative.questions.length) * 100).toFixed(2))
+        detailsAuto.length > 0
+          ? Number(((nbBonnesReponses / detailsAuto.length) * 100).toFixed(2))
           : 0;
+
+      const statutGlobal = tentative.contientCorrectionManuelle
+        ? "en_attente_correction"
+        : "corrige_automatiquement";
 
       await QuestionnaireModele.enregistrerResultatEtudiant(
         tentative.idGroupe,
         tentative.nomQuestionnaire,
         tentative.etudiantId,
-        notePourcentage
+        tentative.contientCorrectionManuelle ? undefined : notePourcentage,
+        statutGlobal,
+        detailsCorrection
       );
 
       let noteTransmiseSgb = false;
@@ -451,6 +504,7 @@ export class EtudiantQuestionnairesController {
         nomQuestionnaire: tentative.nomQuestionnaire,
         notePourcentage,
         detailsCorrection,
+        statutGlobal,
         contientCorrectionManuelle: tentative.contientCorrectionManuelle,
         noteTransmiseSgb,
         messageErreurSgb,

@@ -45,7 +45,11 @@ html
                         | (non répondu)
                     default
                       | #{detail.reponseEtudiant}
-                if detail.estBonneReponse
+                if detail.statutCorrection === "en_attente_correction"
+                  p.text-warning.mb-1 Statut: en attente de correction
+                else if detail.statutCorrection === "corrige"
+                  p.text-info.mb-1 Statut: corrige
+                else if detail.estBonneReponse
                   p.text-success.mb-1 Bonne reponse
                 else
                   p.text-danger.mb-1 Mauvaise reponse
