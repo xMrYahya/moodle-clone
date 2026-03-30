@@ -2,25 +2,17 @@ import { Response } from "express";
 import { obtenirCoursStockeParIdGroupe, obtenirQuestionsDuCours } from "../core/CoursModele";
 import { QuestionnaireModele } from "../core/QuestionnaireModele";
 import { SgbClient } from "../core/sgbClient";
-
-type TentativeQuestionnaireSession = {
-  idGroupe: string;
-  nomQuestionnaire: string;
-  etudiantId: string;
-  typeId: number;
-  contientCorrectionManuelle: boolean;
-  indexQuestionCourante: number;
-  questions: Array<{
-    nom: string;
-    enonce: string;
-    choix: string[];
-    bonneReponse: string | null;
-    retroactionValide: string;
-    retroactionInvalide: string;
-    retroactionParChoix: Record<string, string>;
-  }>;
-  reponses: string[];
-};
+import { TentativeQuestionnaireSession, QuestionEnTentative, DonneesQuestionParType, QuestionType } from "../types/tentativeTypes";
+import { obtenirValidateur } from "../core/validateursQuestionnaire";
+import {
+  QuestionVraiFauxModele,
+  QuestionChoixMultipleModele,
+  QuestionNumeriqueModele,
+  QuestionReponseCourteModele,
+  QuestionMiseEnCorrespondanceModele,
+  QuestionEssaiModele,
+  Question,
+} from "../types/questionTypes";
 
 const sgbBaseUrl = process.env.SGB_BASE_URL ?? "http://localhost:3200";
 const sgbClient = new SgbClient(sgbBaseUrl);
@@ -65,6 +57,85 @@ function consumeResultatFinal(req: any): any {
     delete req.session.resultatQuestionnaire;
   }
   return resultat;
+}
+
+/**
+ * Déterminer le type d'une question basé sur sa structure
+ */
+function detecterTypeQuestion(question: any): QuestionType {
+  if (question instanceof QuestionVraiFauxModele) return "VraiFaux";
+  if (question instanceof QuestionChoixMultipleModele) return "ChoixMultiple";
+  if (question instanceof QuestionNumeriqueModele) return "Numerique";
+  if (question instanceof QuestionReponseCourteModele) return "ReponseCourte";
+  if (question instanceof QuestionMiseEnCorrespondanceModele) return "MiseEnCorrespondance";
+  if (question instanceof QuestionEssaiModele) return "Essai";
+
+  // Heuristique de secours basée sur les champs présents
+  if (question.reponses !== undefined) return "ChoixMultiple";
+  if (question.paires !== undefined) return "MiseEnCorrespondance";
+  if (question.reponseAttendue !== undefined) {
+    return typeof question.reponseAttendue === "number" ? "Numerique" : "ReponseCourte";
+  }
+  if (question.reponse !== undefined) {
+    return typeof question.reponse === "boolean" ? "VraiFaux" : "Numerique";
+  }
+  return "Essai";
+}
+
+/**
+ * Extraire les données type-spécifiques d'une question
+ */
+function extraireDonneesParType(question: any): DonneesQuestionParType {
+  const type = detecterTypeQuestion(question);
+
+  switch (type) {
+    case "VraiFaux":
+      return {
+        type: "VraiFaux",
+        bonneReponse: (question as QuestionVraiFauxModele).reponse,
+      };
+
+    case "ChoixMultiple":
+      {
+        const q = question as QuestionChoixMultipleModele;
+        const choix = (q.reponses ?? []).map((r: any) => String(r.texte));
+        const bonneReponse = (q.reponses ?? []).find((r: any) => r.estBonneReponse === true);
+        const retroactionParChoix: Record<string, string> = {};
+        for (const reponse of q.reponses ?? []) {
+          retroactionParChoix[String(reponse.texte)] = String(reponse.retroaction ?? "");
+        }
+        return {
+          type: "ChoixMultiple",
+          choix,
+          bonneReponse: bonneReponse ? String(bonneReponse.texte) : "",
+          retroactionParChoix,
+        };
+      }
+
+    case "Numerique":
+      return {
+        type: "Numerique",
+        bonneReponse: (question as QuestionNumeriqueModele).reponseAttendue,
+      };
+
+    case "ReponseCourte":
+      return {
+        type: "ReponseCourte",
+        bonneReponse: (question as QuestionReponseCourteModele).reponseAttendue,
+      };
+
+    case "MiseEnCorrespondance":
+      return {
+        type: "MiseEnCorrespondance",
+        paires: (question as QuestionMiseEnCorrespondanceModele).paires,
+      };
+
+    case "Essai":
+    default:
+      return {
+        type: "Essai",
+      };
+  }
 }
 
 export class EtudiantQuestionnairesController {
@@ -192,41 +263,34 @@ export class EtudiantQuestionnairesController {
         return;
       }
 
-      const questionsChoixMultiples = questionsQuestionnaire.filter(
-        (q: any) => Array.isArray(q.reponses)
+      // ÉTAPE 3: Adapter le mapping — Charger TOUS les types (suppression du filtre ChoixMultiple)
+      const questionsEnTentative: QuestionEnTentative[] = questionsQuestionnaire.map((q: any) => {
+        const type = detecterTypeQuestion(q);
+        const donnees = extraireDonneesParType(q);
+
+        return {
+          nom: String(q.nom),
+          enonce: String(q.enonce ?? ""),
+          type,
+          retroactionValide: String(q.retroactionValide ?? ""),
+          retroactionInvalide: String(q.retroactionInvalide ?? ""),
+          donnees,
+        };
+      });
+
+      // Détecter correction manuelle: Essai ou MiseEnCorrespondance
+      const contientCorrectionManuelle = questionsEnTentative.some(
+        (q) => q.type === "Essai" || q.type === "MiseEnCorrespondance"
       );
-      if (questionsChoixMultiples.length === 0) {
-        res.redirect(
-          `/cours/${encodeURIComponent(idGroupe)}/questionnaires/etudiant?erreur=${encodeURIComponent("Aucune question a choix multiple disponible pour ce questionnaire")}`
-        );
-        return;
-      }
 
       const tentative: TentativeQuestionnaireSession = {
         idGroupe,
         nomQuestionnaire: questionnaire.nom,
         etudiantId,
         typeId: construireTypeIdQuestionnaire(indexQuestionnaire),
-        contientCorrectionManuelle: questionsChoixMultiples.length < questionsQuestionnaire.length,
+        contientCorrectionManuelle,
         indexQuestionCourante: 0,
-        questions: questionsChoixMultiples.map((q: any) => {
-          const choix = (q.reponses ?? []).map((r: any) => String(r.texte));
-          const bonneReponse = (q.reponses ?? []).find((r: any) => r.estBonneReponse === true);
-          const retroactionParChoix: Record<string, string> = {};
-          for (const reponse of q.reponses ?? []) {
-            retroactionParChoix[String(reponse.texte)] = String(reponse.retroaction ?? "");
-          }
-
-          return {
-            nom: String(q.nom),
-            enonce: String(q.enonce ?? ""),
-            choix,
-            bonneReponse: bonneReponse ? String(bonneReponse.texte) : null,
-            retroactionValide: String(q.retroactionValide ?? ""),
-            retroactionInvalide: String(q.retroactionInvalide ?? ""),
-            retroactionParChoix,
-          };
-        }),
+        questions: questionsEnTentative,
         reponses: [],
       };
 
@@ -274,7 +338,8 @@ export class EtudiantQuestionnairesController {
     });
   }
 
-  static async repondreQuestionChoixMultiple(req: any, res: Response): Promise<void> {
+  // ÉTAPE 4: Renommer repondreQuestionChoixMultiple → repondreQuestion (dispatcher polymorphe)
+  static async repondreQuestion(req: any, res: Response): Promise<void> {
     try {
       if (!estEtudiantAuthentifie(req)) {
         res.redirect("/signin");
@@ -297,14 +362,27 @@ export class EtudiantQuestionnairesController {
         return;
       }
 
-      if (!reponse || !questionCourante.choix.includes(reponse)) {
+      // Dispatcher polymorphe: valider selon le type
+      const type = questionCourante.type;
+      const validateur = obtenirValidateur(type);
+      const { valide, message } = validateur.valider(reponse);
+
+      if (!valide) {
         res.redirect(
-          `/cours/${encodeURIComponent(idGroupe)}/questionnaires/etudiant/passer?erreur=${encodeURIComponent("Veuillez selectionner une reponse valide")}`
+          `/cours/${encodeURIComponent(idGroupe)}/questionnaires/etudiant/passer?erreur=${encodeURIComponent(message || "Reponse invalide")}`
         );
         return;
       }
 
-      tentative.reponses.push(reponse);
+      // Parser la réponse selon le type et la stocker de manière typée
+      let reponseTypee: string | number | boolean = reponse;
+      if (type === "VraiFaux") {
+        reponseTypee = reponse.toLowerCase() === "true";
+      } else if (type === "Numerique") {
+        reponseTypee = parseFloat(reponse);
+      }
+
+      tentative.reponses.push(reponseTypee);
       tentative.indexQuestionCourante += 1;
 
       if (tentative.indexQuestionCourante < tentative.questions.length) {
@@ -313,18 +391,26 @@ export class EtudiantQuestionnairesController {
         return;
       }
 
+      // ÉTAPE 5: Adapter détails de correction — Généraliser le calcul par type
       const detailsCorrection = tentative.questions.map((question, index) => {
-        const reponseEtudiant = tentative.reponses[index] ?? "";
-        const estBonneReponse =
-          question.bonneReponse !== null && normaliserCle(reponseEtudiant) === normaliserCle(question.bonneReponse);
-        const retroactionSpecifique = question.retroactionParChoix[reponseEtudiant] ?? "";
-        const retroaction = retroactionSpecifique
-          || (estBonneReponse ? question.retroactionValide : question.retroactionInvalide);
+        const reponseEtudiant = tentative.reponses[index] ?? null;
+        const type = question.type;
+        const validateur = obtenirValidateur(type);
+
+        const estBonneReponse = validateur.estBonneReponse(reponseEtudiant, question.donnees);
+
+        const retroaction = validateur.obtenirRetroaction(
+          reponseEtudiant,
+          question.donnees,
+          question.retroactionValide,
+          question.retroactionInvalide
+        );
 
         return {
           nomQuestion: question.nom,
+          type,
           enonce: question.enonce,
-          reponseEtudiant,
+          reponseEtudiant: reponseEtudiant !== null ? String(reponseEtudiant) : "",
           estBonneReponse,
           retroaction,
         };

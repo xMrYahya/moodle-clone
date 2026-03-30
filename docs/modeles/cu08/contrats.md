@@ -35,9 +35,14 @@
 - reponseQuestionnaire a ete associee au questionnaire selectionne.
 - reponseQuestionnaire a ete associee a l'etudiant.
 
+**Notes d'implementation:**
+- Le questionnaire peut contenir des questions de type: Vrai/Faux, Choix Multiple, Numerique, Reponse Courte, Mise en Correspondance, ou Essai.
+- Les questions de type Essai ou Mise en Correspondance marquent le questionnaire comme contenant correction manuelle.
+- Un questionnaire 100% Essai ne peut pas etre darre ; une correction manuelle est toujours requise.
+
 ### Contrat CO31 - Enregistrer la reponse de l'etudiant
 ---
-**Operation: repondreQuestionChoixMultiple(reponse: String)**
+**Operation: repondreQuestion(reponse: String | Number | Boolean)**
 
 **References croisees:**
 - CU08 Passer questionnaire
@@ -46,8 +51,14 @@
 
 **Preconditions:**
 - L'etudiant a une instance reponseQuestionnaire en cours.
-- La question courante du questionnaire en cours est une question de type choix multiple.
+- La question courante du questionnaire en cours est une question quelconque (tous types acceptes).
 
 **Postconditions:**
 - La reponse reponseEtudiant a ete ajoutee a reponseQuestionnaire.
 - reponseQuestionnaire a ete mise a jour pour pointer la prochaine question, le cas echeant.
+
+**Notes d'implementation:**
+- La validation et le format de la reponse dependent du type de question.
+- Les types de reponse acceptes: String (ChoixMultiple, ReponseCourte, Essai, MiseEnCorrespondance), Number (Numerique), Boolean (VraiFaux).
+- Les questions Essai et MiseEnCorrespondance ne genent pas de note automatique; elles necessitent une correction manuelle.
+- Les questions VraiFaux, Numerique, ReponseCourte et ChoixMultiple genent automatiquement une note.

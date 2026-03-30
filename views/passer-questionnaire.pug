@@ -21,9 +21,38 @@ html
           p.mb-4 #{question.enonce}
 
           form(method="post" action=`/cours/${idCours}/questionnaires/etudiant/repondre`)
-            each choix, choixIndex in question.choix
-              .form-check.mb-2
-                input.form-check-input(type="radio" name="reponse" id=`reponse-${choixIndex}` value=choix required)
-                label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+            case question.type
+              when "VraiFaux"
+                .form-check.mb-2
+                  input.form-check-input(type="radio" name="reponse" id="reponse-true" value="true" required)
+                  label.form-check-label(for="reponse-true") Vrai
+                .form-check.mb-2
+                  input.form-check-input(type="radio" name="reponse" id="reponse-false" value="false" required)
+                  label.form-check-label(for="reponse-false") Faux
+
+              when "ChoixMultiple"
+                each choix, choixIndex in question.donnees.choix
+                  .form-check.mb-2
+                    input.form-check-input(type="radio" name="reponse" id=`reponse-${choixIndex}` value=choix required)
+                    label.form-check-label(for=`reponse-${choixIndex}`) #{choix}
+
+              when "Numerique"
+                .mb-3
+                  label.form-label(for="reponse-numerique") Entrez le nombre:
+                  input.form-control(type="number" id="reponse-numerique" name="reponse" step="any" required)
+
+              when "ReponseCourte"
+                .mb-3
+                  label.form-label(for="reponse-courte") Entrez votre réponse:
+                  textarea.form-control(id="reponse-courte" name="reponse" rows="2" required)
+
+              when "MiseEnCorrespondance"
+                .alert.alert-info
+                  | Appairage de questions - Cette question nécessite une correction manuelle
+
+              when "Essai"
+                .mb-3
+                  label.form-label(for="reponse-essai") Réponse (à corriger manuellement):
+                  textarea.form-control(id="reponse-essai" name="reponse" rows="5" required)
 
             button.btn.btn-primary.mt-3(type="submit") Suivant

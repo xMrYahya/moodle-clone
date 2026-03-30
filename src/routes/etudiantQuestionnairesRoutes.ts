@@ -29,7 +29,7 @@ router.get(
 router.post(
   "/:idCours/questionnaires/etudiant/repondre",
   exigerAuthentification,
-  EtudiantQuestionnairesController.repondreQuestionChoixMultiple
+  EtudiantQuestionnairesController.repondreQuestion
 );
 router.get(
   "/:idCours/questionnaires/etudiant/resultat",

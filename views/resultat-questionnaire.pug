@@ -35,7 +35,16 @@ html
                 p.mb-1 #{detail.enonce}
                 p.mb-1
                   strong Reponse: 
-                  | #{detail.reponseEtudiant}
+                  case detail.type
+                    when "VraiFaux"
+                      if detail.reponseEtudiant === "true"
+                        | Vrai
+                      else if detail.reponseEtudiant === "false"
+                        | Faux
+                      else
+                        | (non répondu)
+                    default
+                      | #{detail.reponseEtudiant}
                 if detail.estBonneReponse
                   p.text-success.mb-1 Bonne reponse
                 else

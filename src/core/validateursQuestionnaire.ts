@@ -1,0 +1,224 @@
+import { DonneesQuestionParType } from "../types/tentativeTypes";
+import { PairDeCorrespondance } from "../types/questionTypes";
+
+export interface ValidateurReponse {
+  valider(reponse: unknown): { valide: boolean; message?: string };
+  estBonneReponse(reponse: unknown, bonnRep: unknown): boolean;
+  obtenirRetroaction(
+    reponse: unknown,
+    donnees: DonneesQuestionParType,
+    retroactionValide: string,
+    retroactionInvalide: string
+  ): string;
+}
+
+export class ValidateurVraiFaux implements ValidateurReponse {
+  valider(reponse: unknown): { valide: boolean; message?: string } {
+    if (typeof reponse === "string") {
+      const val = reponse.trim().toLowerCase();
+      if (val === "true" || val === "false") {
+        return { valide: true };
+      }
+    }
+    if (typeof reponse === "boolean") {
+      return { valide: true };
+    }
+    return { valide: false, message: "Veuillez selectionner Vrai ou Faux" };
+  }
+
+  estBonneReponse(reponse: unknown, donnees: unknown): boolean {
+    if (!donnees || typeof donnees !== "object" || !("bonneReponse" in donnees)) {
+      return false;
+    }
+    const data = donnees as { bonneReponse: boolean };
+    const reponseVal = typeof reponse === "string" ? reponse.trim().toLowerCase() === "true" : Boolean(reponse);
+    return reponseVal === data.bonneReponse;
+  }
+
+  obtenirRetroaction(
+    reponse: unknown,
+    donnees: DonneesQuestionParType,
+    retroactionValide: string,
+    retroactionInvalide: string
+  ): string {
+    const estBonne = this.estBonneReponse(reponse, donnees);
+    return estBonne ? retroactionValide : retroactionInvalide;
+  }
+}
+
+export class ValidateurChoixMultiple implements ValidateurReponse {
+  valider(reponse: unknown): { valide: boolean; message?: string } {
+    if (typeof reponse !== "string" || !reponse.trim()) {
+      return { valide: false, message: "Veuillez selectionner une reponse valide" };
+    }
+    return { valide: true };
+  }
+
+  estBonneReponse(reponse: unknown, donnees: unknown): boolean {
+    if (!donnees || typeof donnees !== "object" || !("bonneReponse" in donnees)) {
+      return false;
+    }
+    const data = donnees as { bonneReponse: string };
+    const repAnswerNorm = String(reponse ?? "").trim().toLowerCase();
+    const bonneRepNorm = String(data.bonneReponse).trim().toLowerCase();
+    return repAnswerNorm === bonneRepNorm;
+  }
+
+  obtenirRetroaction(
+    reponse: unknown,
+    donnees: DonneesQuestionParType,
+    retroactionValide: string,
+    retroactionInvalide: string
+  ): string {
+    if (!donnees || typeof donnees !== "object" || !("retroactionParChoix" in donnees)) {
+      return this.estBonneReponse(reponse, donnees) ? retroactionValide : retroactionInvalide;
+    }
+
+    const data = donnees as { retroactionParChoix: Record<string, string> };
+    const reponseStr = String(reponse ?? "");
+    const retroactionSpecifique = data.retroactionParChoix[reponseStr] ?? "";
+
+    if (retroactionSpecifique) {
+      return retroactionSpecifique;
+    }
+
+    const estBonne = this.estBonneReponse(reponse, donnees);
+    return estBonne ? retroactionValide : retroactionInvalide;
+  }
+}
+
+export class ValidateurNumerique implements ValidateurReponse {
+  valider(reponse: unknown): { valide: boolean; message?: string } {
+    if (typeof reponse === "number") {
+      return { valide: Number.isFinite(reponse) };
+    }
+    if (typeof reponse === "string") {
+      const num = parseFloat(reponse.trim());
+      return { valide: Number.isFinite(num) };
+    }
+    return { valide: false, message: "Veuillez entrer un nombre valide" };
+  }
+
+  estBonneReponse(reponse: unknown, donnees: unknown): boolean {
+    if (!donnees || typeof donnees !== "object" || !("bonneReponse" in donnees)) {
+      return false;
+    }
+    const data = donnees as { bonneReponse: number };
+    let reponseNum: number | null = null;
+
+    if (typeof reponse === "number") {
+      reponseNum = reponse;
+    } else if (typeof reponse === "string") {
+      reponseNum = parseFloat(reponse.trim());
+    }
+
+    if (reponseNum === null || !Number.isFinite(reponseNum)) {
+      return false;
+    }
+
+    return reponseNum === data.bonneReponse;
+  }
+
+  obtenirRetroaction(
+    reponse: unknown,
+    donnees: DonneesQuestionParType,
+    retroactionValide: string,
+    retroactionInvalide: string
+  ): string {
+    const estBonne = this.estBonneReponse(reponse, donnees);
+    return estBonne ? retroactionValide : retroactionInvalide;
+  }
+}
+
+export class ValidateurReponseCourte implements ValidateurReponse {
+  valider(reponse: unknown): { valide: boolean; message?: string } {
+    if (typeof reponse !== "string" || !reponse.trim()) {
+      return { valide: false, message: "Veuillez entrer une reponse" };
+    }
+    return { valide: true };
+  }
+
+  estBonneReponse(reponse: unknown, donnees: unknown): boolean {
+    if (!donnees || typeof donnees !== "object" || !("bonneReponse" in donnees)) {
+      return false;
+    }
+    const data = donnees as { bonneReponse: string };
+    const reponseStr = String(reponse ?? "").trim().toLowerCase();
+    const bonneRepStr = String(data.bonneReponse).trim().toLowerCase();
+    return reponseStr === bonneRepStr;
+  }
+
+  obtenirRetroaction(
+    reponse: unknown,
+    donnees: DonneesQuestionParType,
+    retroactionValide: string,
+    retroactionInvalide: string
+  ): string {
+    const estBonne = this.estBonneReponse(reponse, donnees);
+    return estBonne ? retroactionValide : retroactionInvalide;
+  }
+}
+
+export class ValidateurMiseEnCorrespondance implements ValidateurReponse {
+  valider(reponse: unknown): { valide: boolean; message?: string } {
+    // Pour MiseEnCorrespondance, on accepte tout pour maintenanr (complexité élevée)
+    // Marqué pour correction manuelle
+    return { valide: true };
+  }
+
+  estBonneReponse(reponse: unknown, donnees: unknown): boolean {
+    // MiseEnCorrespondance nécessite correction manuelle
+    return false; // Toujours false, marqué pour correction manuelle
+  }
+
+  obtenirRetroaction(
+    reponse: unknown,
+    donnees: DonneesQuestionParType,
+    retroactionValide: string,
+    retroactionInvalide: string
+  ): string {
+    return "Cette question necessite une correction manuelle";
+  }
+}
+
+export class ValidateurEssai implements ValidateurReponse {
+  valider(reponse: unknown): { valide: boolean; message?: string } {
+    if (typeof reponse !== "string" || !reponse.trim()) {
+      return { valide: false, message: "Veuillez entrer une reponse" };
+    }
+    return { valide: true };
+  }
+
+  estBonneReponse(reponse: unknown, donnees: unknown): boolean {
+    // Essai nécessite correction manuelle
+    return false;
+  }
+
+  obtenirRetroaction(
+    reponse: unknown,
+    donnees: DonneesQuestionParType,
+    retroactionValide: string,
+    retroactionInvalide: string
+  ): string {
+    return "Votre reponse a ete recueillie et sera corrigee manuellement";
+  }
+}
+
+export function obtenirValidateur(type: string): ValidateurReponse {
+  switch (type) {
+    case "VraiFaux":
+      return new ValidateurVraiFaux();
+    case "ChoixMultiple":
+      return new ValidateurChoixMultiple();
+    case "Numerique":
+      return new ValidateurNumerique();
+    case "ReponseCourte":
+      return new ValidateurReponseCourte();
+    case "MiseEnCorrespondance":
+      return new ValidateurMiseEnCorrespondance();
+    case "Essai":
+      return new ValidateurEssai();
+    default:
+      return new ValidateurEssai(); // Fallback
+  }
+}
