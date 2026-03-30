@@ -7,6 +7,7 @@ import indexRoutes from "./routes/indexRoutes";
 import coursRoutes from "./routes/coursRoutes";
 import questionsRoutes from "./routes/questionsRoutes";
 import questionnairesRoutes from "./routes/questionnairesRoutes";
+import etudiantQuestionnairesRoutes from "./routes/etudiantQuestionnairesRoutes";
 
 import { viderStoreAuDemarrage } from "./core/CoursModele";
 import { viderQuestionnairesAuDemarrage } from "./core/QuestionnaireModele";
@@ -29,6 +30,7 @@ class App {
     this.expressApp.use("/cours", coursRoutes);
     this.expressApp.use("/questions", questionsRoutes);
     this.expressApp.use("/cours", questionnairesRoutes);
+    this.expressApp.use("/cours", etudiantQuestionnairesRoutes);
 
     this.expressApp.use(this.handleErrors);
   }
