@@ -219,29 +219,160 @@ MDD - Question, Cours, Tags
 - La nouvelle liste de questions du cours est retournée à l'acteur.
 - Si la question est utilisée dans un questionnaire: aucune suppression ne s'effectue et une erreur est retournée.
 
-### Contrat C014 - Modification de question
+### Contrat C014a - Modifier une question vrai/faux
 ---
-**Opération: modifierQuestionVraiFaux(nomOriginal : String, nom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Opération: modifierQuestion(nomOriginal : String, type : String, nom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])**
 **Références croisées:**
 - CU02c - Modifier une question
-- MDD - Enseignant, Cours, Question, Tags
+- RDCU - Modifier une question vrai/faux
 - DSS - Modifier une question
+- MDD - Enseignant, Cours, Question, Tags
 **Préconditions:**
 - L'enseignant est authentifié.
 - Un cours courant est sélectionné.
 - Une question avec le nom `nomOriginal` existe dans le cours.
-- Le nouveau nom `nom` n'existe pas déjà dans la banque de questions du cours (sauf s'il s'agit du même nom que l'original).
+- Le paramètre `type` vaut `VraiFaux`.
+- Le nouveau nom `nom` n'existe pas déjà dans la banque de questions du cours (sauf s'il est identique à `nomOriginal`).
+- La valeur `reponse` est booléenne.
 
 **PostConditions:**
-- L'instance `q` de `Question` existante (identifiée par `nomOriginal`) a subi les modifications suivantes:
-  - `q.nom` a reçu la valeur `nom`.
-  - `q.enonce` a reçu la valeur `enonce`.
-  - `q.reponse` a reçu la valeur `reponse`.
-  - `q.retroactionValide` a reçu la valeur `retroactionValide`.
-  - `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
-  - Toutes les associations antécédentes entre `q` et les instances `Tag` via l'association *appartient-à* ont été supprimées.
-  - Pour chaque élément `tagNom` du nouveau paramètre `tags`: une instance `tag` de `Tag` a été créée ou récupérée avec `tag.nom` = `tagNom`, et `q` a été associée à `tag` via l'association *appartient-à*.
-- Tous les autres attributs de `q` demeurent inchangés.
+- Une instance `q` de `QuestionVraiFaux` a remplacé la question identifiée par `nomOriginal` dans le `Cours` courant.
+- `q.nom` a reçu la valeur `nom`.
+- `q.enonce` a reçu la valeur `enonce`.
+- `q.reponse` a reçu la valeur `reponse`.
+- `q.retroactionValide` a reçu la valeur `retroactionValide`.
+- `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
+- `q` a été associée au `Cours` courant via l'association *contient*.
+- Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
+
+### Contrat C014b - Modifier une question choix multiple
+---
+**Opération: modifierQuestion(nomOriginal : String, type : String, nom : String, enonce : String, reponses : ReponseChoixMultiple[], seulementUnChoix : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références croisées:**
+- CU02c - Modifier une question
+- RDCU - Modifier une question choix multiple
+- DSS - Modifier une question
+- MDD - Enseignant, Cours, Question, Tags
+**Préconditions:**
+- L'enseignant est authentifié.
+- Un cours courant est sélectionné.
+- Une question avec le nom `nomOriginal` existe dans le cours.
+- Le paramètre `type` vaut `ChoixMultiple`.
+- Le nouveau nom `nom` n'existe pas déjà dans la banque de questions du cours (sauf s'il est identique à `nomOriginal`).
+- Le paramètre `reponses` contient au moins une réponse.
+
+**PostConditions:**
+- Une instance `q` de `QuestionChoixMultiple` a remplacé la question identifiée par `nomOriginal` dans le `Cours` courant.
+- `q.nom` a reçu la valeur `nom`.
+- `q.enonce` a reçu la valeur `enonce`.
+- `q.reponses` a reçu la valeur `reponses`.
+- `q.seulementUnChoix` a reçu la valeur `seulementUnChoix`.
+- `q.retroactionValide` a reçu la valeur `retroactionValide`.
+- `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
+- `q` a été associée au `Cours` courant via l'association *contient*.
+- Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
+
+### Contrat C014c - Modifier une question reponse courte
+---
+**Opération: modifierQuestion(nomOriginal : String, type : String, nom : String, enonce : String, reponse : String, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références croisées:**
+- CU02c - Modifier une question
+- RDCU - Modifier une question reponse courte
+- DSS - Modifier une question
+- MDD - Enseignant, Cours, Question, Tags
+**Préconditions:**
+- L'enseignant est authentifié.
+- Un cours courant est sélectionné.
+- Une question avec le nom `nomOriginal` existe dans le cours.
+- Le paramètre `type` vaut `ReponseCourte`.
+- Le nouveau nom `nom` n'existe pas déjà dans la banque de questions du cours (sauf s'il est identique à `nomOriginal`).
+- Le paramètre `reponse` n'est pas vide.
+
+**PostConditions:**
+- Une instance `q` de `QuestionReponseCourte` a remplacé la question identifiée par `nomOriginal` dans le `Cours` courant.
+- `q.nom` a reçu la valeur `nom`.
+- `q.enonce` a reçu la valeur `enonce`.
+- `q.reponseAttendue` a reçu la valeur `reponse`.
+- `q.retroactionValide` a reçu la valeur `retroactionValide`.
+- `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
+- `q` a été associée au `Cours` courant via l'association *contient*.
+- Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
+
+### Contrat C014d - Modifier une question numerique
+---
+**Opération: modifierQuestion(nomOriginal : String, type : String, nom : String, enonce : String, reponse : number, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références croisées:**
+- CU02c - Modifier une question
+- RDCU - Modifier une question numerique
+- DSS - Modifier une question
+- MDD - Enseignant, Cours, Question, Tags
+**Préconditions:**
+- L'enseignant est authentifié.
+- Un cours courant est sélectionné.
+- Une question avec le nom `nomOriginal` existe dans le cours.
+- Le paramètre `type` vaut `Numerique`.
+- Le nouveau nom `nom` n'existe pas déjà dans la banque de questions du cours (sauf s'il est identique à `nomOriginal`).
+- Le paramètre `reponse` est une valeur numérique valide.
+
+**PostConditions:**
+- Une instance `q` de `QuestionNumerique` a remplacé la question identifiée par `nomOriginal` dans le `Cours` courant.
+- `q.nom` a reçu la valeur `nom`.
+- `q.enonce` a reçu la valeur `enonce`.
+- `q.reponseAttendue` a reçu la valeur `reponse`.
+- `q.retroactionValide` a reçu la valeur `retroactionValide`.
+- `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
+- `q` a été associée au `Cours` courant via l'association *contient*.
+- Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
+
+### Contrat C014e - Modifier une question essai
+---
+**Opération: modifierQuestion(nomOriginal : String, type : String, nom : String, enonce : String, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références croisées:**
+- CU02c - Modifier une question
+- RDCU - Modifier une question essai
+- DSS - Modifier une question
+- MDD - Enseignant, Cours, Question, Tags
+**Préconditions:**
+- L'enseignant est authentifié.
+- Un cours courant est sélectionné.
+- Une question avec le nom `nomOriginal` existe dans le cours.
+- Le paramètre `type` vaut `Essai`.
+- Le nouveau nom `nom` n'existe pas déjà dans la banque de questions du cours (sauf s'il est identique à `nomOriginal`).
+
+**PostConditions:**
+- Une instance `q` de `QuestionEssai` a remplacé la question identifiée par `nomOriginal` dans le `Cours` courant.
+- `q.nom` a reçu la valeur `nom`.
+- `q.enonce` a reçu la valeur `enonce`.
+- `q.retroactionValide` a reçu la valeur `retroactionValide`.
+- `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
+- `q` a été associée au `Cours` courant via l'association *contient*.
+- Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
+
+### Contrat C014f - Modifier une question mise en correspondance
+---
+**Opération: modifierQuestion(nomOriginal : String, type : String, nom : String, enonce : String, paires : PairDeCorrespondance[], retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références croisées:**
+- CU02c - Modifier une question
+- RDCU - Modifier une question mise en correspondance
+- DSS - Modifier une question
+- MDD - Enseignant, Cours, Question, Tags
+**Préconditions:**
+- L'enseignant est authentifié.
+- Un cours courant est sélectionné.
+- Une question avec le nom `nomOriginal` existe dans le cours.
+- Le paramètre `type` vaut `MiseEnCorrespondance`.
+- Le nouveau nom `nom` n'existe pas déjà dans la banque de questions du cours (sauf s'il est identique à `nomOriginal`).
+- Le paramètre `paires` contient au moins une paire.
+
+**PostConditions:**
+- Une instance `q` de `QuestionMiseEnCorrespondance` a remplacé la question identifiée par `nomOriginal` dans le `Cours` courant.
+- `q.nom` a reçu la valeur `nom`.
+- `q.enonce` a reçu la valeur `enonce`.
+- `q.paires` a reçu la valeur `paires`.
+- `q.retroactionValide` a reçu la valeur `retroactionValide`.
+- `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
+- `q` a été associée au `Cours` courant via l'association *contient*.
+- Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
 
 ### Contrat C015 - Gerer les questionnaires
 ---
