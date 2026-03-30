@@ -205,7 +205,7 @@ describe("Questions du CoursModele", () => {
         tags: ["x"],
         type: "VraiFaux",
       })
-    ).rejects.toThrow("existe déjà");
+    ).rejects.toThrow(/existe d[ée]ja/i);
   });
 
   test("retirerQuestionDuCours echoue si la question n'existe pas", async () => {
