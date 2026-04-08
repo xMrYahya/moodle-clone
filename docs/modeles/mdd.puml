@@ -81,9 +81,6 @@ hide stereotype
     description : String
     actif : boolean
   }
-  class "PositionQuestion" as position <<Itération 2>>{
-    ordre : int
-  }
   class "ReponseQuestionnaire" as reponseQuestionnaire <<Itération 3>> {
     réponses : String[]
     /note : int
@@ -97,8 +94,6 @@ hide stereotype
   qmc "1" -- "*" pdc : contient >
   cours "1" -- "*" questionnaire : contient >
   questionnaire "*" -- "*" question : contient >
-  (questionnaire,question) .. position
-
 legend right
     |Color| Type |
     |<#ddffdd>| Itération 1 |

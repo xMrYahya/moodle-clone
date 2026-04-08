@@ -242,7 +242,7 @@ MDD - Question, Cours, Tags
 - `q.reponse` a reçu la valeur `reponse`.
 - `q.retroactionValide` a reçu la valeur `retroactionValide`.
 - `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
-- `q` a été associée au `Cours` courant via l'association *contient*.
+- `q` a été associée au `CoursModele` courant
 - Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
 
 ### Contrat C014b - Modifier une question choix multiple
@@ -269,7 +269,7 @@ MDD - Question, Cours, Tags
 - `q.seulementUnChoix` a reçu la valeur `seulementUnChoix`.
 - `q.retroactionValide` a reçu la valeur `retroactionValide`.
 - `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
-- `q` a été associée au `Cours` courant via l'association *contient*.
+- `q` a été associée au `CoursModele` courant.
 - Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
 
 ### Contrat C014c - Modifier une question reponse courte
@@ -295,7 +295,7 @@ MDD - Question, Cours, Tags
 - `q.reponseAttendue` a reçu la valeur `reponse`.
 - `q.retroactionValide` a reçu la valeur `retroactionValide`.
 - `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
-- `q` a été associée au `Cours` courant via l'association *contient*.
+- `q` a été associée au `CoursModele` courant
 - Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
 
 ### Contrat C014d - Modifier une question numerique
@@ -321,7 +321,7 @@ MDD - Question, Cours, Tags
 - `q.reponseAttendue` a reçu la valeur `reponse`.
 - `q.retroactionValide` a reçu la valeur `retroactionValide`.
 - `q.retroactionInvalide` a reçu la valeur `retroactionInvalide`.
-- `q` a été associée au `Cours` courant via l'association *contient*.
+- `q` a été associée au `CoursModele` courant
 - Les associations de `q` avec les `Tag` ont été mises à jour selon le paramètre `tags`.
 
 ### Contrat C014e - Modifier une question essai

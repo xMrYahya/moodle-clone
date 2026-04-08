@@ -1,0 +1,57 @@
+@startuml
+hide footbox
+title RDCU - Modifier une question choix multiple
+
+participant "qc:QuestionsController" as QC
+participant "cm:CoursModele" as CM
+participant "q:QuestionChoixMultipleModele" as Q
+
+-> QC : modifierQuestion(type:String, nomOriginal : String,\n nom : String, enonce : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[],donneesComplementairesBrutes:String)
+note right: GRASP: Controller
+activate QC
+
+QC -> CM : obtenirQuestionParNom(idGroupe : String, nomOriginal : String)
+note right: GRASP: Expert
+activate CM
+CM --> QC : questionExistante : AnyQuestion
+deactivate CM
+
+QC -> QC ++: validerChampsObligatoires(type : String, nom : String, enonce : String)
+note right: GRASP: Expert
+deactivate QC
+
+QC -> CM : validerNomQuestionUnique(idGroupe: String, nomFinal: String, nomOriginal: String)
+note right: GRASP: Expert
+activate CM
+CM --> QC : nomExiste : boolean
+deactivate CM
+
+alt Nom unique et donnees valides
+  QC -> QC ++: creerQuestionAutreType(type: string, nom: string, enonce: \nstring,retroactionValide: string, \nretroactionInvalide: string, tags: string[], autresDonnees: Record<string, unknown>)
+  alt type === "VraiFaux"
+    ref over QC:   RDCU - Modifier une question vrai/faux
+    else type === "ReponseCourte"
+    ref over QC:   RDCU - Modifier une question reponse courte
+    else type === "Numerique"
+    ref over QC:   RDCU - Modifier une question numerique
+    else type === "ChoixMultiple"
+    ref over QC:   RDCU - Modifier une question choix multiple
+    else type === "Essai"
+    ref over QC:   RDCU - Modifier une question essai
+    else type === "MiseEnCorrespondance"
+    ref over QC:   RDCU - Modifier une question mise en correspondance
+
+  end alt;
+    deactivate QC
+  QC -> CM : modifierQuestionDuCours(idGroupe : String, nomOriginal : String, q)
+  note right: GRASP: Expert
+  activate CM
+  deactivate CM
+
+  <-- QC : afficherConfirmationModification
+else Nom deja utilise ou donnees invalides
+  <-- QC : signalerErreurModification
+end
+
+deactivate QC
+@enduml

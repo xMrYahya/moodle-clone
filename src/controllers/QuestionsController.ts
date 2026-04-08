@@ -516,20 +516,7 @@ export class QuestionsController {
     autresDonnees: Record<string, unknown>
   ): Question {
     if (type === "ChoixMultiple") {
-      const reponses = QuestionsController.lireReponsesChoixMultiple(autresDonnees.reponses);
-      if (reponses.length === 0) {
-        throw new InvalidParameterError("Champs manquants: reponses");
-      }
-
-      return new QuestionChoixMultipleModele(
-        nom,
-        enonce,
-        retroactionValide,
-        retroactionInvalide,
-        tags,
-        autresDonnees.seulementUnChoix === true || autresDonnees.seulementUnChoix === "true",
-        reponses
-      );
+        return this.modifierQuestionChoixMultiple(nom, enonce, retroactionValide, retroactionInvalide, tags, autresDonnees);
     }
 
     if (type === "MiseEnCorrespondance") {
@@ -594,6 +581,30 @@ export class QuestionsController {
 
     throw new InvalidParameterError(`Type de question non supporté: ${type}`);
   }
+
+  private static modifierQuestionChoixMultiple(
+    nom: string,
+    enonce: string,
+    retroactionValide: string,
+    retroactionInvalide: string,
+    tags: string[],
+    autresDonnees: Record<string, unknown>): QuestionChoixMultipleModele {
+      const reponses = QuestionsController.lireReponsesChoixMultiple(autresDonnees.reponses);
+      if (reponses.length === 0) {
+        throw new InvalidParameterError("Champs manquants: reponses");
+      }
+
+      return new QuestionChoixMultipleModele(
+        nom,
+        enonce,
+        retroactionValide,
+        retroactionInvalide,
+        tags,
+        autresDonnees.seulementUnChoix === true || autresDonnees.seulementUnChoix === "true",
+        reponses
+      );
+  }
+
   
   static async ajouterQuestionVraiFaux(req: Request, res: Response): Promise<void> {
     try {

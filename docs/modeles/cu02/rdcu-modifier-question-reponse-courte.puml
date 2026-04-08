@@ -15,21 +15,24 @@ activate CM
 CM --> QC : questionExistante : AnyQuestion
 deactivate CM
 
-QC -> QC : validerChampsObligatoires(type, nom, enonce)
+QC -> QC : validerChampsObligatoires(type:String, nom:String, enonce:String)
 note right: GRASP: Expert
 
-QC -> CM : nomQuestionExisteSauf(idGroupe : String, nom : String, nomOriginal : String)
+QC -> CM : validerNomQuestionUnique(idGroupe: String, nomFinal: String, nomOriginal: String)
 note right: GRASP: Expert
 activate CM
 CM --> QC : nomExiste : boolean
 deactivate CM
 
 alt Nom unique et donnees valides
+  QC -> QC : creerQuestionAutreType(type: string, nom: string, enonce: \nstring,retroactionValide: string, \nretroactionInvalide: string, tags: string[], autresDonnees: Record<string, unknown>)
+
+
   QC -> QC : lireTexte(reponse)
   note right: GRASP: Expert
 
   create Q
-  QC -> Q : <<create>> QuestionReponseCourteModele(nom, enonce,\n retroactionValide, retroactionInvalide, tags, reponse, retroactionValide)
+  QC -> Q : <<create>> QuestionReponseCourteModele(nom:String, enonce:String,\n retroactionValide:String, retroactionInvalide:String, tags:String[], reponse:String, retroactionValide:String )
   note right: GRASP: Creator
   activate Q
   deactivate Q

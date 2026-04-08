@@ -45,12 +45,12 @@
 | CU08a                            | (tous)              |
 |   CU08a - conception             | Raphael + Alexandre |
 |   CU08a - test et implémentation | Kassem + Yahya      |
-|   CU08a - mise à jour des modèles| Alex                |
+| Mise à jour des modèles          | Alex                |
 
 
 ## Modèle du domaine (MDD)
 
-![MDD ](../../docs/modeles/exports-it-3/MDD_SGB_SGA.png "MDD")
+![MDD ](../../out/docs/modeles/mdd/MDD_SGB_SGA.png "MDD")
 
 
 ## Diagramme de séquence système (DSS)
@@ -215,13 +215,13 @@ Ajouté la suppression du questionnaire dans le RDCU
 
 ## Vérification finale
 
-- [ ] Vous avez un seul MDD
-  - [ ] Vous avez mis un verbe à chaque association
-  - [ ] Chaque association a une multiplicité
-- [ ] Vous avez un DSS par cas d'utilisation
-  - [ ] Chaque DSS a un titre
-  - [ ] Chaque opération synchrone a un retour d'opération
-  - [ ] L'utilisation d'une boucle (LOOP) est justifiée par les exigences
+- [X] Vous avez un seul MDD
+  - [X] Vous avez mis un verbe à chaque association
+  - [X] Chaque association a une multiplicité
+- [X] Vous avez un DSS par cas d'utilisation
+  - [X] Chaque DSS a un titre
+  - [X] Chaque opération synchrone a un retour d'opération
+  - [X] L'utilisation d'une boucle (LOOP) est justifiée par les exigences
 - [ ] Vous avez autant de contrats que d'opérations système (pour les cas d'utilisation nécessitant des contrats)
   - [ ] Les postconditions des contrats sont écrites au passé
 - [ ] Vous avez autant de RDCU que d'opérations système
