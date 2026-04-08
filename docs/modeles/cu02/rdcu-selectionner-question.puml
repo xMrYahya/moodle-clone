@@ -15,7 +15,7 @@ activate CS
 CS --> QC : question : Question
 deactivate CS
 
-<-- QC : afficherInfoQuestion(question)
+<-- QC : afficherInfoQuestion
 
 deactivate QC
 

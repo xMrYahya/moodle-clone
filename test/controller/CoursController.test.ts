@@ -347,7 +347,7 @@ describe("CoursController", () => {
     const removeSpy = jest.spyOn(coursStore, "retirerCoursStocke").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
-    const req: any = { body: { idGroupe: 55 } };
+    const req: any = { body: { idCours: 55 } };
     const res = makeRes();
 
     await CoursController.suppressionCours(req, res);
@@ -362,7 +362,7 @@ describe("CoursController", () => {
     jest.spyOn(coursStore, "retirerCoursStocke").mockRejectedValueOnce(new Error("remove-fail"));
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
-    const req: any = { body: { idGroupe: "x" } };
+    const req: any = { body: { idCours: "x" } };
     const res = makeRes();
 
     await CoursController.suppressionCours(req, res);
@@ -377,7 +377,7 @@ describe("CoursController", () => {
     jest.spyOn(coursStore, "retirerCoursStocke").mockRejectedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
-    const req: any = { body: { idGroupe: "y" } };
+    const req: any = { body: { idCours: "y" } };
     const res = makeRes();
 
     await CoursController.suppressionCours(req, res);
@@ -394,7 +394,7 @@ describe("CoursController", () => {
     await CoursController.afficherDetailsCours({ params: {}, session: {} }, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send).toHaveBeenCalledWith("idGroupe ou infos utilisateur manquant");
+    expect(res.send).toHaveBeenCalledWith("idGroupe ou informations utilisateur manquantes");
   });
 
   test("afficherDetailsCours: idGroupe present but teacher missing -> 400", async () => {
@@ -405,7 +405,7 @@ describe("CoursController", () => {
     await CoursController.afficherDetailsCours({ params: { idGroupe: "g-1" }, session: {} }, res);
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.send).toHaveBeenCalledWith("idGroupe ou infos utilisateur manquant");
+    expect(res.send).toHaveBeenCalledWith("idGroupe ou informations utilisateur manquantes");
   });
 
   test("afficherDetailsCours: course not found -> 404", async () => {
@@ -414,7 +414,7 @@ describe("CoursController", () => {
     jest.spyOn(coursStore, "obtenirCoursStockeParIdGroupe").mockResolvedValueOnce(undefined);
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
-    const req: any = { params: { idGroupe: "g-1" }, session: { user: { id: 1 } } };
+    const req: any = { params: { idCours: "g-1" }, session: { user: { id: 1 } } };
     const res = makeRes();
 
     await CoursController.afficherDetailsCours(req, res);
@@ -445,7 +445,7 @@ describe("CoursController", () => {
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
-      params: { idGroupe: "g-2" },
+      params: { idCours: "g-2" },
       query: { addQuestion: "1" },
       session: { user: { id: 1, first_name: "John", last_name: "Doe" } },
     };
@@ -489,7 +489,7 @@ describe("CoursController", () => {
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
-      params: { idGroupe: "g-10" },
+      params: { idCours: "g-10" },
       query: {},
       session: { user: { id: 1, first_name: "John", last_name: "Doe" } },
     };
@@ -526,7 +526,7 @@ describe("CoursController", () => {
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
-      params: { idGroupe: "g-4" },
+      params: { idCours: "g-4" },
       query: {},
       session: { user: { id: 1, first_name: "John", last_name: "Doe" } },
     };
@@ -559,7 +559,7 @@ describe("CoursController", () => {
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
-      params: { idGroupe: "g-3" },
+      params: { idCours: "g-3" },
       session: { user: { id: 1, first_name: "John", last_name: "Doe" } },
     };
     const res = makeRes();
@@ -577,7 +577,7 @@ describe("CoursController", () => {
 
     const CoursController = require("../../src/controllers/CoursController").CoursController;
     const req: any = {
-      params: { idGroupe: "g-5" },
+      params: { idCours: "g-5" },
       session: { user: { id: 1, first_name: "John", last_name: "Doe" } },
     };
     const res = makeRes();

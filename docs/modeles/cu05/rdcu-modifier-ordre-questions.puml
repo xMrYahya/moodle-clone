@@ -13,7 +13,11 @@ controller -> questionnaireModele ++: modifierOrdreQuestion(nomQuestion: String,
 note right: GRASP: Expert
 questionnaireModele -> temp ++: modifierOrdreQuestion(nomQuestion: String, nouvellePosition : int)
 note right: GRASP: Expert
+questionnaireModele <-- temp : Void
+deactivate temp
+controller <-- questionnaireModele : Void
 deactivate questionnaireModele
+<-- controller : Void
 deactivate controller
 
 @enduml

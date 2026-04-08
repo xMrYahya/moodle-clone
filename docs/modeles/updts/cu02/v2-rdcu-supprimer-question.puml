@@ -1,0 +1,43 @@
+@startuml
+hide footbox
+title RDCU – Supprimer une question (Confirmation)
+
+participant "qc:QuestionsController" as QC
+participant "cs:CoursModele" as CS
+participant "questionsModeles:QUestion[]" as QM
+participant "question:Question" as Q
+
+-> QC : confirmerSuppression()
+note right: GRASP: Controller
+activate QC
+
+QC -> CS : recupererQuestionParNom(groupId : String, nom : String)
+note right: GRASP: Expert
+activate CS
+CS --> QC : question : Question
+deactivate CS
+
+QC -> CS : supprimerQuestionDuCours(groupId : String, nom : String)
+activate CS
+
+note right: GRASP: Expert
+
+CS --> QM ++: remove(question:Question):void
+
+QM -> Q !!: supprimer() : void
+note left: Correpondace selon nom
+QM --> CS --: void
+
+CS --> QC--: void
+
+QC -> CS : recupererQuestionsDuCours(groupId: string)
+note right: GRASP: Expert
+activate CS
+CS --> QC : questions : List<Question>
+deactivate CS
+
+<-- QC : afficherConfirmationSuppression(questions):String
+
+deactivate QC
+
+@enduml

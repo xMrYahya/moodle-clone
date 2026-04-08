@@ -1,0 +1,59 @@
+html
+  include includes/head.pug
+
+  body
+    include includes/navbar.pug
+    +navbar(displayName)
+
+    .container.mt-4
+      .d-flex.justify-content-between.align-items-start.flex-wrap.gap-2
+        .mb-2
+          h1.mb-1 Passer un questionnaire
+          .text-muted.fs-5
+            strong #{cours.idCours}
+            |  · Groupe: #{idCours}
+        a.btn.btn-outline-secondary(href="/index") Retour aux cours
+
+      if messageSucces
+        .alert.alert-success.mt-3 #{messageSucces}
+      if messageErreur
+        .alert.alert-danger.mt-3 #{messageErreur}
+
+      hr
+
+      .card.mb-4
+        .card-body
+          h4.mb-3 Questionnaires deja completes
+          if questionnairesCompletes && questionnairesCompletes.length
+            ul.list-group
+              each q in questionnairesCompletes
+                li.list-group-item.d-flex.justify-content-between.align-items-center
+                  div
+                    strong #{q.nom}
+                    if q.description
+                      div.text-muted #{q.description}
+                  if q.statutEtudiant === "en_attente_correction"
+                    span.badge.bg-warning.text-dark En attente de correction
+                  else if q.noteEtudiant !== undefined
+                    span.badge.bg-success Note: #{q.noteEtudiant}
+                  else
+                    span.badge.bg-info Corrige
+          else
+            p.text-muted Aucun questionnaire complete.
+
+      .card
+        .card-body
+          h4.mb-3 Questionnaires a completer
+          if questionnairesACompleter && questionnairesACompleter.length
+            .list-group
+              each q in questionnairesACompleter
+                .list-group-item.d-flex.justify-content-between.align-items-center.flex-wrap.gap-2
+                  div
+                    strong #{q.nom}
+                    if q.description
+                      div.text-muted #{q.description}
+                  form(method="post" action=`/cours/${idCours}/questionnaires/etudiant/demarrer` class="m-0")
+                    input(type="hidden" name="nomQuestionnaire" value=q.nom)
+                    button.btn.btn-primary(type="submit") Commencer
+          else
+            p.text-muted Aucun questionnaire actif a completer.

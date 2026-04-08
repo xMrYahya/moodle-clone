@@ -383,3 +383,27 @@ export function convertirQuestionsModelesEnDonnees(questions: Question[]): AnyQu
 export function serialiserQuestionsPourStockage(questions: Question[]): Record<string, unknown>[] {
   return questions.map((question) => serialiserQuestionPourStockage(question));
 }
+
+/**
+ * Déterminer le type string d'une question basé sur sa structure de classe
+ * Utile pour les contrôleurs qui n'ont pas accès aux types TypeScript
+ */
+export function detecterTypeQuestion(question: any): string {
+  if (question instanceof QuestionVraiFauxModele) return "VraiFaux";
+  if (question instanceof QuestionChoixMultipleModele) return "ChoixMultiple";
+  if (question instanceof QuestionNumeriqueModele) return "Numerique";
+  if (question instanceof QuestionReponseCourteModele) return "ReponseCourte";
+  if (question instanceof QuestionMiseEnCorrespondanceModele) return "MiseEnCorrespondance";
+  if (question instanceof QuestionEssaiModele) return "Essai";
+
+  // Heuristique de secours
+  if (question.reponses !== undefined) return "ChoixMultiple";
+  if (question.paires !== undefined) return "MiseEnCorrespondance";
+  if (question.reponseAttendue !== undefined) {
+    return typeof question.reponseAttendue === "number" ? "Numerique" : "ReponseCourte";
+  }
+  if (question.reponse !== undefined) {
+    return typeof question.reponse === "boolean" ? "VraiFaux" : "Numerique";
+  }
+  return "Essai";
+}

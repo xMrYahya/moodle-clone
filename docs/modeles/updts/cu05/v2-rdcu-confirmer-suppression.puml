@@ -4,16 +4,20 @@ title RDCU - Supprimer un questionnaire
 
 participant ":QuestionnaireController" as controller
 participant ":QuestionnaireModele" as questionnaireModele
-participant ":questionnaire:Questionnaire" as questionnaire
+participant "questionnaires:Questionnaire[]" as questionnaires
+participant "questionnaire:Questionnaire" as questionnaire
 
 -> controller ++: confirmerSuppression():String
 note right: GRASP: Controller
 controller -> questionnaireModele ++: supprimerQuestionnaire(nom:String):boolean
 note right: GRASP: Expert
 
-questionnaireModele -> questionnaire !!: supprimer() : void
+questionnaireModele --> questionnaires ++: remove(questionnaire:Questionnaire):boolean
+
+questionnaires -> questionnaire !!: supprimer() : void
 note left: Correpondace selon nom
 
+questionnaires --> questionnaireModele --: 
 
 questionnaireModele --> controller --: confirmationSuppression:boolean
 <-- controller --: confirmationSuppression:String

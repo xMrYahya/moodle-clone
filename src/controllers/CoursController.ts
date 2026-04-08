@@ -5,6 +5,7 @@ import {
   retirerCoursStocke,
   obtenirCoursStockeParIdGroupe,
   obtenirCoursStockesPourProf,
+  obtenirCoursStockes,
   obtenirQuestionsDuCours,
 } from "../core/CoursModele";
 
@@ -18,10 +19,10 @@ export class CoursController {
 
   static async afficherListeCours(req: any, res: Response): Promise<void> {
     try {
-      const teacher = req.session.user;
-      const displayName = teacher
-        ? `${teacher.first_name} ${teacher.last_name}`
-        : req.session.email ?? "Enseignant";
+      const user = req.session.user;
+      const role = String(req.session?.role ?? "teacher").toLowerCase();
+      const isStudent = role === "student";
+      const displayName = user ? `${user.first_name} ${user.last_name}` : req.session.email ?? "Utilisateur";
 
       const showAddCourseModal = req.query.addCourse === "1";
       const messageSucces = typeof req.query.succes === "string" ? req.query.succes : "";
@@ -29,12 +30,19 @@ export class CoursController {
       const confirmRemoveGroupId =
         typeof req.query.confirmRemove === "string" ? req.query.confirmRemove : null;
 
-      const createdGroups = teacher?.id ? await obtenirCoursStockesPourProf(String(teacher.id)) : [];
+      const createdGroups = !isStudent && user?.id ? await obtenirCoursStockesPourProf(String(user.id)) : [];
+      const studentGroups = isStudent
+        ? (await obtenirCoursStockes()).filter((cours) =>
+            (cours.etudiants ?? []).some(
+              (etudiant) => String(etudiant.email).toLowerCase() === String(user?.id ?? "").toLowerCase()
+            )
+          )
+        : [];
       let groups: any[] = [];
 
-      if (showAddCourseModal && teacher?.id) {
+      if (!isStudent && showAddCourseModal && user?.id) {
         const listeCours = await CoursController.demarrerAjoutCours(
-          String(teacher.id),
+          String(user.id),
           req.session.token
         );
         const createdIds = new Set(createdGroups.map((g: any) => String(g.idGroupe)));
@@ -50,6 +58,8 @@ export class CoursController {
         confirmRemoveGroupId,
         groups,
         createdGroups,
+        studentGroups,
+        isStudent,
       });
       return;
     } catch (e: any) {

@@ -16,8 +16,11 @@ participant "questionnaireTemp:Questionnaire" as temp
     deactivate questionnaireModele
     questionnaireModele -> temp ++: ajouterQuestion(question:Question)
     note right: GRASP: Expert
+    questionnaireModele <-- temp : Void
     deactivate temp
+    controller <-- questionnaireModele : Void
     deactivate questionnaireModele
+    <-- controller : Void
     deactivate controller
 
 @enduml

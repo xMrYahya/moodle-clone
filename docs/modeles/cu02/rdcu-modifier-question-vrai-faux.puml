@@ -1,0 +1,50 @@
+@startuml
+hide footbox
+title RDCU - Modifier une question vrai/faux
+
+participant "qc:QuestionsController" as QC
+participant "cm:CoursModele" as CM
+participant "q:QuestionVraiFauxModele" as Q
+
+-> QC : modifierQuestionVraiFaux(nomOriginal : String, nom : String,\n enonce : String, reponse : bool, retroactionValide : String, \nretroactionInvalide : String, tags : String[])
+note right: GRASP: Controller
+activate QC
+
+QC -> CM : obtenirQuestionParNom(idGroupe : String, nomOriginal : String)
+note right: GRASP: Expert
+activate CM
+CM --> QC : questionExistante : AnyQuestion
+deactivate CM
+
+QC -> QC : validerChampsObligatoires(type, nom, enonce)
+note right: GRASP: Expert
+
+QC -> CM : nomQuestionExisteSauf(idGroupe : String, nom : String, nomOriginal : String)
+note right: GRASP: Expert
+activate CM
+CM --> QC : nomExiste : boolean
+deactivate CM
+
+alt Nom unique et donnees valides
+  QC -> QC : lireBooleen(reponse)
+  note right: GRASP: Expert
+
+  create Q
+  QC -> Q : <<create>> QuestionVraiFauxModele(nom, enonce,\n retroactionValide, retroactionInvalide, tags, reponse, retroactionValide)
+  note right: GRASP: Creator
+  activate Q
+  deactivate Q
+
+  QC -> CM : modifierQuestionDuCours(idGroupe : String, nomOriginal : String, q)
+  note right: GRASP: Expert
+  activate CM
+  deactivate CM
+
+  <-- QC : afficherConfirmationModification
+else Nom deja utilise ou donnees invalides
+  <-- QC : signalerErreurModification
+end
+
+deactivate QC
+
+@enduml

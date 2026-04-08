@@ -35,7 +35,7 @@ hide stereotype
   }
   class "reponseChoixMultiple" as rcm <<Itération 1>> {
     retroaction : String
-    text : String
+    texte : String
     estBonneReponse : boolean
   }
   class "questionMiseEnCorrespondance" as qmc <<Itération 1>> extends question {

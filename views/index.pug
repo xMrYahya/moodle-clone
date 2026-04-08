@@ -6,7 +6,10 @@ html
     +navbar(displayName)
 
     .container.mt-4
-      h1 Accueil
+      if isStudent
+        h1 Mes cours
+      else
+        h1 Accueil
 
       if messageSucces
         .alert.alert-success.mt-3.alert-fermeture
@@ -17,14 +20,26 @@ html
           span #{messageErreur}
           button.btn-fermer-alerte(type="button" aria-label="Fermer" onclick="fermerAlerte(this)") x
 
-      a.btn.btn-primary(href="/index?addCourse=1") Ajouter cours
+      if !isStudent
+        a.btn.btn-primary(href="/index?addCourse=1") Ajouter cours
 
       hr
 
       // ======================
       // TUILES DES COURS CRÉÉS
       // ======================
-      if createdGroups && createdGroups.length
+      if isStudent
+        if studentGroups && studentGroups.length
+          .row.mt-3
+            each g in studentGroups
+              a.col-12.col-md-6.col-lg-4.mb-3(href=`/cours/${g.idGroupe}/questionnaires/etudiant` style="text-decoration: none; color: inherit;")
+                .card.h-100
+                  .card-body
+                    h5.card-title.mb-1 #{g.idCours} · #{g.titreCours || g.activite}
+                    p.card-text.text-muted.mb-0 #{g.idGroupe}
+        else
+          p.text-muted.mt-3 Aucun cours disponible pour cet etudiant.
+      else if createdGroups && createdGroups.length
         .row.mt-3
           each g in createdGroups
             a.col-12.col-md-6.col-lg-4.mb-3(href=`/cours/${g.idGroupe}/details-cours` style="text-decoration: none; color: inherit;")
