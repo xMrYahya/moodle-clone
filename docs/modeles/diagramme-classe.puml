@@ -1,59 +1,81 @@
-@startuml
-class SgbClient {
+@startuml diagramme-classe
+skinparam style strictuml
+hide empty members
+
+title Diagramme de classes
+
+package "Integration SGB" {
+  class SgbClient {
     -baseUrl: string
-    +loginTeacher(email: string, password: string): Promise<SgbTeacherLoginResponse>
-    +getSchedules(token: string): Promise<any>
-    +getCourses(token: string): Promise<{ data: {    id: string;    titre: string;}[]; }>
-    +getGroupStudentLinks(token: string): Promise<GroupStudentResponse>
-    +getAllStudents(token: string): Promise<AllStudentsResponse>
-    +getEtudiantsParGroupe(token: string, idGroupe: string): Promise<StudentInfo[]>
-    +getStudentsForGroup(token: string, idGroupe: string): Promise<StudentInfo[]>
-    -construireGroupesCours(token: string, idEnseignant?: string): Promise<GroupeCoursSGA[]>
-    +getCours(idEnseignant: string, token: string): Promise<GroupeCoursSGA[]>
-    +getCoursParGroupe(idGroupe: string, token: string, idEnseignant?: string): Promise<GroupeCoursSGA>
-    +getListeCours(idEnseignant: string, token: string): Promise<GroupeCoursSGA[]>
+    +loginTeacher(email: string, password: string): Promise
+    +getSchedules(token: string): Promise
+    +getCourses(token: string): Promise
+    +getGroupStudentLinks(token: string): Promise
+    +getAllStudents(token: string): Promise
+    +getEtudiantsParGroupe(token: string, idGroupe: string): Promise
+    +getStudentsForGroup(token: string, idGroupe: string): Promise
+    -construireGroupesCours(token: string, idEnseignant?: string): Promise
+    +getCours(idEnseignant: string, token: string): Promise
+    +getCoursParGroupe(idGroupe: string, token: string, idEnseignant?: string): Promise
+    +getListeCours(idEnseignant: string, token: string): Promise
+  }
 }
-class AuthController {
-    +{static} getSignin(req: any, res: Response<any, Record<string, any>>): void
-    +{static} postSignin(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} signout(req: any, res: Response<any, Record<string, any>>): void
-}
-abstract class Question {
+
+package "Domaine" {
+  abstract class Question {
     +nom: string
     +enonce: string
     +retroactionValide: string
     +retroactionInvalide: string
     +tags: string[]
     +{abstract} obtenirType(): string
-}
-class QuestionVraiFauxModele extends Question {
+  }
+
+  class QuestionVraiFauxModele {
     +reponse: boolean
     +retroaction: string
     +obtenirType(): string
-}
-class QuestionChoixMultipleModele extends Question {
+  }
+
+  class QuestionChoixMultipleModele {
     +seulementUnChoix: boolean
     +reponses: ReponseChoixMultiple[]
     +obtenirType(): string
-}
-class QuestionMiseEnCorrespondanceModele extends Question {
+  }
+
+  class QuestionMiseEnCorrespondanceModele {
     +paires: PairDeCorrespondance[]
     +obtenirType(): string
-}
-class QuestionReponseCourteModele extends Question {
+  }
+
+  class QuestionReponseCourteModele {
     +reponseAttendue: string
     +retroaction: string
     +obtenirType(): string
-}
-class QuestionNumeriqueModele extends Question {
+  }
+
+  class QuestionNumeriqueModele {
     +reponseAttendue: number
     +retroaction: string
     +obtenirType(): string
-}
-class QuestionEssaiModele extends Question {
+  }
+
+  class QuestionEssaiModele {
     +obtenirType(): string
-}
-class Cours {
+  }
+
+  class ReponseChoixMultiple {
+    +texte: string
+    +estBonneReponse: boolean
+    +retroaction: string
+  }
+
+  class PairDeCorrespondance {
+    +question: string
+    +reponse: string
+  }
+
+  class Cours {
     +idGroupe: string
     +jour: string
     +heure: string
@@ -61,119 +83,186 @@ class Cours {
     +mode: string
     +local: string
     +idEnseignant: string
-    +idCours?: string
-    +titreCours?: string
+    +idCours: string
+    +titreCours: string
     +etudiants: StudentInfo[]
     +questions: AnyQuestion[]
     +toPlainObject(): CoursInit
+  }
+
+  class Questionnaire {
+    +nom: string
+    +description: string
+    +actif: boolean
+    +questions: string[]
+    +resultatsEtudiants: ResultatEtudiantQuestionnaire[]
+    +creeLe: string
+    +modifieLe: string
+  }
+
+  class ResultatEtudiantQuestionnaire {
+    +courrielEtudiant: string
+    +note: number
+  }
+
+  class QuestionnaireTemp {
+    +mode: string
+    +nomOriginal: string
+    +nomQuestionnaire: string
+    +description: string
+    +actif: boolean
+    +questions: string[]
+  }
+
+  class QuestionTagInfo {
+    +nom: string
+    +tags: string[]
+    +utilisationQuestionnaires: number
+  }
 }
-class CoursModele {
-    +{static} viderStoreAuDemarrage(): Promise<void>
-    +{static} obtenirCoursStockes(): Promise<Cours[]>
-    +{static} obtenirCoursStockesPourProf(idEnseignant: string): Promise<Cours[]>
-    +{static} obtenirCoursStockeParIdGroupe(idGroupe: string): Promise<Cours>
-    +{static} ajouterCoursStocke(cours: Cours | CoursInit): Promise<void>
-    +{static} retirerCoursStocke(idGroupe: string): Promise<void>
-    +{static} obtenirQuestionsDuCours(idGroupe: string): Promise<AnyQuestion[]>
-    +{static} nomQuestionExiste(idGroupe: string, nom: string): Promise<boolean>
-    +{static} nomQuestionExisteSauf(idGroupe: string, nom: string, nomAExclure: string): Promise<boolean>
-    +{static} obtenirQuestionParNom(idGroupe: string, nom: string): Promise<AnyQuestion>
-    +{static} ajouterQuestionAuCours(idGroupe: string, question: Question | AnyQuestion): Promise<void>
-    +{static} modifierQuestionDuCours(idGroupe: string, nomOriginal: string, questionMiseAJour: Question | AnyQuestion): Promise<void>
-    +{static} retirerQuestionDuCours(idGroupe: string, nom: string): Promise<void>
+
+package "Modele" {
+  class CoursModele {
+    +{static} viderStoreAuDemarrage(): Promise
+    +{static} obtenirCoursStockes(): Promise
+    +{static} obtenirCoursStockesPourProf(idEnseignant: string): Promise
+    +{static} obtenirCoursStockeParIdGroupe(idGroupe: string): Promise
+    +{static} ajouterCoursStocke(cours: Cours): Promise
+    +{static} retirerCoursStocke(idGroupe: string): Promise
+    +{static} obtenirQuestionsDuCours(idGroupe: string): Promise
+    +{static} nomQuestionExiste(idGroupe: string, nom: string): Promise
+    +{static} nomQuestionExisteSauf(idGroupe: string, nom: string, nomAExclure: string): Promise
+    +{static} obtenirQuestionParNom(idGroupe: string, nom: string): Promise
+    +{static} ajouterQuestionAuCours(idGroupe: string, question: Question): Promise
+    +{static} modifierQuestionDuCours(idGroupe: string, nomOriginal: string, questionMiseAJour: Question): Promise
+    +{static} retirerQuestionDuCours(idGroupe: string, nom: string): Promise
+  }
+
+  class QuestionnaireModele {
+    -{static} assurerFichierQuestionnaires(): Promise
+    -{static} ecrireQuestionnairesParCours(donnees: StockageQuestionnairesParCours[]): Promise
+    -{static} extraireTagsQuestion(question: AnyQuestion): string[]
+    +{static} viderQuestionnairesAuDemarrage(): Promise
+    +{static} obtenirTousQuestionnairesParCours(): Promise
+    +{static} obtenirQuestionnairesAssocies(idGroupe: string): Promise
+    +{static} obtenirQuestionnaireParNom(idGroupe: string, nomQuestionnaire: string): Promise
+    +{static} verifierSupprimerQuestionnaire(idGroupe: string, nomQuestionnaire: string): Promise
+    +{static} creerQuestionnaire(idGroupe: string, nom: string, description: string, actif: boolean): Promise
+    +{static} ajouterQuestionnaire(idGroupe: string, questionnaire: Questionnaire): Promise
+    +{static} sauvegarderQuestionnaire(idGroupe: string, nomQuestionnaire: string, questions: string[]): Promise
+    +{static} supprimerQuestionnaire(idGroupe: string, nomQuestionnaire: string): Promise
+    +{static} modifierQuestionnaire(idGroupe: string, nomOriginal: string, nom: string, description: string, actif: boolean, questions: string[]): Promise
+    +{static} obtenirListeTagsDesQuestions(idGroupe: string): Promise
+    +{static} obtenirQuestionParNom(idGroupe: string, nomQuestion: string): Promise
+    +{static} obtenirQuestionsParTag(idGroupe: string, nomTag: string): Promise
+    +{static} ajouterQuestion(questionnaireTemp: QuestionnaireTemp, nomQuestion: string): QuestionnaireTemp
+    +{static} dissocierQuestion(questionnaireTemp: QuestionnaireTemp, nomQuestion: string): QuestionnaireTemp
+    +{static} modifierOrdreQuestion(questionnaireTemp: QuestionnaireTemp, nomQuestion: string, nouvellePosition: number): QuestionnaireTemp
+  }
 }
-class CoursController {
-    +{static} demarrerAjoutCours(teacherId: string, token: string): Promise<any[]>
-    +{static} afficherListeCours(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} index(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    -{static} obtenirTypeQuestionPourAffichage(question: any): string
-    +{static} selectionnerGroupeCours(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} retirerCours(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} confirmerSuppressionCours(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} suppressionCours(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} afficherDetailsCours(req: any, res: Response<any, Record<string, any>>): Promise<void>
-}
-class QuestionsController {
+
+package "Controleurs" {
+  class AuthController {
+    +{static} getSignin(req: Request, res: Response): void
+    +{static} postSignin(req: Request, res: Response): Promise
+    +{static} signout(req: Request, res: Response): void
+  }
+
+  class CoursController {
+    +{static} demarrerAjoutCours(teacherId: string, token: string): Promise
+    +{static} afficherListeCours(req: Request, res: Response): Promise
+    +{static} index(req: Request, res: Response): Promise
+    -{static} obtenirTypeQuestionPourAffichage(question: AnyQuestion): string
+    +{static} selectionnerGroupeCours(req: Request, res: Response): Promise
+    +{static} retirerCours(req: Request, res: Response): Promise
+    +{static} confirmerSuppressionCours(req: Request, res: Response): Promise
+    +{static} suppressionCours(req: Request, res: Response): Promise
+    +{static} afficherDetailsCours(req: Request, res: Response): Promise
+  }
+
+  class QuestionsController {
     -{static} lireValeurSimple(valeur: unknown): unknown
     -{static} lireTexte(valeur: unknown): string
     -{static} lireBooleen(valeur: unknown): boolean
     -{static} lireNombre(valeur: unknown): number
-    -{static} extraireContexteRequete(req: any): { idEnseignant: string; idGroupe: string; }
-    -{static} validerChampsObligatoires(donnees: Record<string, unknown>, champsObligatoires: string[]): void
-    -{static} validerNomQuestionUnique(idGroupe: string, nom: string, nomAExclure?: string): Promise<void>
+    -{static} extraireContexteRequete(req: Request): ContexteRequete
+    -{static} validerChampsObligatoires(donnees: Record, champsObligatoires: string[]): void
+    -{static} validerNomQuestionUnique(idGroupe: string, nom: string, nomAExclure?: string): Promise
     -{static} validerTagsObligatoires(tags: unknown): string[]
-    +{static} consulterQuestionsCours(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} selectionnerQuestion(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} modifierQuestion(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} supprimerQuestion(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} confirmerSuppressionQuestion(req: any, res: Response<any, Record<string, any>>): Promise<void>
+    +{static} consulterQuestionsCours(req: Request, res: Response): Promise
+    +{static} selectionnerQuestion(req: Request, res: Response): Promise
+    +{static} modifierQuestion(req: Request, res: Response): Promise
+    +{static} supprimerQuestion(req: Request, res: Response): Promise
+    +{static} confirmerSuppressionQuestion(req: Request, res: Response): Promise
     -{static} lireTags(tags: unknown): string[]
     -{static} lireReponsesChoixMultiple(reponses: unknown): ReponseChoixMultiple[]
     -{static} lirePairesCorrespondance(paires: unknown): PairDeCorrespondance[]
-    -{static} creerQuestionAutreType(type: string, nom: string, enonce: string, retroactionValide: string, retroactionInvalide: string, tags: string[], autresDonnees: Record<string, unknown>): Question
-    +{static} ajouterQuestionVraiFaux(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    -{static} ajouterQuestionParType(req: any, res: Response<any, Record<string, any>>, typeQuestion: string): Promise<void>
-    +{static} ajouterQuestionChoixMultiple(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} ajouterQuestionNumerique(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} ajouterQuestionReponseCourte(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} ajouterQuestionMiseEnCorrespondance(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} ajouterQuestionEssai(req: any, res: Response<any, Record<string, any>>): Promise<void>
+    -{static} creerQuestionAutreType(type: string, nom: string, enonce: string, retroactionValide: string, retroactionInvalide: string, tags: string[]): Question
+    +{static} ajouterQuestionVraiFaux(req: Request, res: Response): Promise
+    -{static} ajouterQuestionParType(req: Request, res: Response, typeQuestion: string): Promise
+    +{static} ajouterQuestionChoixMultiple(req: Request, res: Response): Promise
+    +{static} ajouterQuestionNumerique(req: Request, res: Response): Promise
+    +{static} ajouterQuestionReponseCourte(req: Request, res: Response): Promise
+    +{static} ajouterQuestionMiseEnCorrespondance(req: Request, res: Response): Promise
+    +{static} ajouterQuestionEssai(req: Request, res: Response): Promise
+  }
+
+  class QuestionnairesController {
+    +{static} gererQuestionnaires(req: Request, res: Response): Promise
+    +{static} ajouterQuestionnaire(req: Request, res: Response): Promise
+    +{static} selectionnerTag(req: Request, res: Response): Promise
+    +{static} ajouterQuestion(req: Request, res: Response): Promise
+    +{static} sauvegarderQuestionnaire(req: Request, res: Response): Promise
+    +{static} retirerQuestion(req: Request, res: Response): Promise
+    +{static} selectionModifierQuestionnaire(req: Request, res: Response): Promise
+    +{static} modifierOrdreQuestion(req: Request, res: Response): Promise
+    +{static} modifierQuestionnaire(req: Request, res: Response): Promise
+    +{static} verifierSupprimerQuestionnaire(req: Request, res: Response): Promise
+    +{static} confirmerSuppression(req: Request, res: Response): Promise
+  }
 }
-class QuestionnaireModele {
-    -{static} assurerFichierQuestionnaires(): Promise<void>
-    -{static} ecrireQuestionnairesParCours(donnees: StockageQuestionnairesParCours[]): Promise<void>
-    -{static} extraireTagsQuestion(question: AnyQuestion): string[]
-    +{static} viderQuestionnairesAuDemarrage(): Promise<void>
-    +{static} obtenirTousQuestionnairesParCours(): Promise<StockageQuestionnairesParCours[]>
-    +{static} obtenirQuestionnairesAssocies(idGroupe: string): Promise<Questionnaire[]>
-    +{static} obtenirQuestionnaireParNom(idGroupe: string, nomQuestionnaire: string): Promise<Questionnaire>
-    +{static} verifierSupprimerQuestionnaire(idGroupe: string, nomQuestionnaire: string): Promise<{ confirmation: boolean; questionnaire?: Questionnaire; }>
-    +{static} creerQuestionnaire(idGroupe: string, nom: string, description: string, actif: boolean): Promise<Questionnaire>
-    +{static} ajouterQuestionnaire(idGroupe: string, questionnaire: Questionnaire): Promise<void>
-    +{static} sauvegarderQuestionnaire(idGroupe: string, nomQuestionnaire: string, questions: string[]): Promise<boolean>
-    +{static} supprimerQuestionnaire(idGroupe: string, nomQuestionnaire: string): Promise<boolean>
-    +{static} modifierQuestionnaire(idGroupe: string, nomOriginal: string, nom: string, description: string, actif: boolean, questions: string[]): Promise<boolean>
-    +{static} obtenirListeTagsDesQuestions(idGroupe: string): Promise<string[]>
-    +{static} obtenirQuestionParNom(idGroupe: string, nomQuestion: string): Promise<AnyQuestion>
-    +{static} obtenirQuestionsParTag(idGroupe: string, nomTag: string): Promise<QuestionTagInfo[]>
-    +{static} ajouterQuestion(questionnaireTemp: QuestionnaireTemp, nomQuestion: string): QuestionnaireTemp
-    +{static} dissocierQuestion(questionnaireTemp: QuestionnaireTemp, nomQuestion: string): QuestionnaireTemp
-    +{static} modifierOrdreQuestion(questionnaireTemp: QuestionnaireTemp, nomQuestion: string, nouvellePosition: number): QuestionnaireTemp
-}
-class QuestionnairesController {
-    +{static} gererQuestionnaires(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} ajouterQuestionnaire(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} selectionnerTag(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} ajouterQuestion(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} sauvegarderQuestionnaire(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} retirerQuestion(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} selectionModifierQuestionnaire(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} modifierOrdreQuestion(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} modifierQuestionnaire(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} verifierSupprimerQuestionnaire(req: any, res: Response<any, Record<string, any>>): Promise<void>
-    +{static} confirmerSuppression(req: any, res: Response<any, Record<string, any>>): Promise<void>
-}
-class App {
+
+package "Application" {
+  class App {
     +expressApp: express.Application
     -middleware(): void
-    -handleErrors(error: any, req: any, res: any, next: express.NextFunction): void
+    -handleErrors(error: Error, req: Request, res: Response, next: NextFunction): void
+  }
 }
-AuthController "1" --> "1" SgbClient
-CoursController "1" --> "1" SgbClient
-CoursController "1" ..> "1" CoursModele
-QuestionsController "1" ..> "1" CoursModele
-QuestionsController "1" ..> "1" QuestionnaireModele
-QuestionsController "1" ..> "1" QuestionVraiFauxModele
-QuestionsController "1" ..> "1" QuestionChoixMultipleModele
-QuestionsController "1" ..> "1" QuestionNumeriqueModele
-QuestionsController "1" ..> "1" QuestionReponseCourteModele
-QuestionsController "1" ..> "1" QuestionMiseEnCorrespondanceModele
-QuestionsController "1" ..> "1" QuestionEssaiModele
-QuestionnaireModele "1" ..> "1" CoursModele
-QuestionnairesController "1" ..> "1" QuestionnaireModele
-QuestionnairesController "1" ..> "1" CoursModele
-CoursModele "1" ..> "*" Cours
+
+Question <|-- QuestionVraiFauxModele
+Question <|-- QuestionChoixMultipleModele
+Question <|-- QuestionMiseEnCorrespondanceModele
+Question <|-- QuestionReponseCourteModele
+Question <|-- QuestionNumeriqueModele
+Question <|-- QuestionEssaiModele
+
+QuestionChoixMultipleModele "1" *-- "*" ReponseChoixMultiple
+QuestionMiseEnCorrespondanceModele "1" *-- "*" PairDeCorrespondance
 Cours "1" o-- "*" Question
-App "1" ..> "1" CoursModele
-App "1" ..> "1" QuestionnaireModele
+Cours "1" o-- "*" Questionnaire
+Questionnaire "1" o-- "*" ResultatEtudiantQuestionnaire
+Questionnaire "*" -- "*" Question
+
+AuthController --> SgbClient
+CoursController --> SgbClient
+CoursController ..> CoursModele
+QuestionsController ..> CoursModele
+QuestionsController ..> QuestionnaireModele
+QuestionsController ..> QuestionVraiFauxModele
+QuestionsController ..> QuestionChoixMultipleModele
+QuestionsController ..> QuestionNumeriqueModele
+QuestionsController ..> QuestionReponseCourteModele
+QuestionsController ..> QuestionMiseEnCorrespondanceModele
+QuestionsController ..> QuestionEssaiModele
+QuestionnaireModele ..> CoursModele
+QuestionnaireModele ..> Questionnaire
+QuestionnaireModele ..> QuestionnaireTemp
+QuestionnaireModele ..> QuestionTagInfo
+QuestionnairesController ..> QuestionnaireModele
+QuestionnairesController ..> CoursModele
+CoursModele ..> Cours
+App ..> CoursModele
+App ..> QuestionnaireModele
+
 @enduml
