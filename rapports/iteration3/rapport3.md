@@ -129,9 +129,11 @@
 Ajouté le traitement pour chaque type de question dans le diagramme
 ![DSS Ajouter Question ](../../docs/modeles/exports/dss-ajouter-question-updt-v1.png "DSS Ajouter Question")
 
+Ajouté le traitement pour chaque type de question modifié
+
 ### Contrats Mis a jour 
 
-Contrats Ajouté et modifié pour le traitement de l'ajout de chaque tpe de question
+Contrats 32 à 37 Ajouté ou modifiés pour le traitement de l'ajout de chaque type de question
 
 ### Contrat CO32 - Ajouter une question Vrai ou faux
 ---
@@ -168,7 +170,7 @@ Contrats Ajouté et modifié pour le traitement de l'ajout de chaque tpe de ques
 - nom n'est pas déja utilisé pour une question
 
 **PostConditions:**
-- une instance de q QuestionChoixMultiple a été créé
+- une instance q de QuestionChoixMultiple a été créé
 - q.nom est devenu nom
 - q.enonce est devenu enonce
 - q.retroactionValide est devenu retroactionValide
@@ -176,14 +178,100 @@ Contrats Ajouté et modifié pour le traitement de l'ajout de chaque tpe de ques
 - q.tags est devenu tags
 - q.reponseChoixMultiple est devenu reponses  
 
+### Contrat CO34 - Ajouter une question Réponse Courte
+---
+**Opération: ajouterQuestionReponseCourte(nom : String, enonce : String, reponse : String, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02a Ajouter une question
+- DSS Ajouter une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance q de QuestionReponseCourte a été créé
+- q.nom est devenu nom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+- q.reponse est devenu reponse
+
+### Contrat CO35 - Ajouter une question Réponse Numérique
+---
+**Opération:  ajouterQuestionReponseNumerique(nom : String, enonce : String, reponse : number, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02a Ajouter une question
+- DSS Ajouter une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance q de QuestionReponseNumerique a été créé
+- q.nom est devenu nom
+- q.enonce est devenu enonce
+- q.reponse est devenu reponse
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+
+### Contrat CO36 - Ajouter une question Essai
+---
+**Opération: ajouterQuestionEssai(nom : String, enonce : String, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02a Ajouter une question
+- DSS Ajouter une question
+- MDD 
+
+**Préconditions:**
+- Un cours est sélectionné
+- nom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance q de QuestionEssai a été créé
+- q.nom est devenu nom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+
+### Contrat CO37 - Ajouter une question Mise en Correspondance
+---
+**Opération: ajouterQuestionMiseCorrespondance(nom : String, enonce : String, pairesQuestion : String[], pairesReponse : String[], retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02a Ajouter une question
+- DSS Ajouter une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+
+- une instance q de QuesionMiseCorrespondance a été créé
+- q.nom est devenu nom
+- q.enonce est devenu énoncé
+- q.pairesQuestion est devenu pairesQuestion
+- q.pairesReponse est devenu pairesReponse
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+
+Les contrats 38 à  on été ajouté ou modifié pour représenter la modification de chaque type de question.
 
 
 
 
 ### RDCUs Mis a jour
-Ajouté le RDCU pour le traitement des question VF
+Ajouté le RDCU pour le traitement unique au questions VF
 
-![RDCU Ajouter question VF ](../../docs/modeles/exports/rdcu-ajouter-question-vf.png "RDCU Ajouter question VF")
+![RDCU Ajouter question VF ](../../out/docs/modeles/cu02/rdcu-ajouter-question-vf/rdcu-ajouter-question-vf.png "RDCU Ajouter question VF")
 
 Ajouté le RDCU pour le traitement des questions Choix multiple
 

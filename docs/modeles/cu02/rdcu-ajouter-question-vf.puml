@@ -2,38 +2,50 @@
 hide footbox
 title RDCU - Ajouter une question Vrai ou Faux
 
-participant "qc:QuestionsController" as QC
-participant "cs:CoursStore" as CS
+participant ":QuestionsController" as QC
+participant ":CoursModele" as CM
 participant "q:QuestionVraiFaux" as Q
 
 -> QC : ajouterQuestionVraiFaux(nom : String, enonce : String,\n reponse : bool, retroactionValide : String,\n retroactionInvalide : String, tags : String[])
 note right: GRASP: Controller
 activate QC
 
-QC -> QC : validerDonnees(nom, enonce, reponse, tags)
+QC -> QC ++: validerChampsObligatoires(nom : String, enonce : String, reponse : bool) : void
+note right: GRASP: Expert
+deactivate QC
+
+QC -> QC ++: validerNomQuestionUnique(idGroupe: String, nom: String) : void
 note right: GRASP: Expert
 
-QC -> CS : existeNomQuestion(groupId: String, nom: String)
-note right: GRASP: Expert
-activate CS
-CS --> QC : nomExiste:boolean
-deactivate CS
+QC -> QC ++: nomQuestionExiste(idGroupe: String, nom: String) : boolean
 
-alt Donnees valides et nom unique
+QC -> CM ++: obtenirQuestionsDuCours(idGroupe) : Question[]
+note right: GRASP: Expert
+CM --> QC --: questions: Question[]
+note left: Lance une exception si nomQuestionExiste est true
+
+deactivate QC
+
+deactivate QC
+QC -> QC ++: validerTagsObligatoires(tags: String[]) : tags : String[]
+note right: GRASP: Expert
+deactivate QC
+
+alt Donnees valides et nom unique (Aucune exception n'est lancée dans les fonctions précédentes)
     create Q
     QC -> Q : <<create>> QuestionVraiFaux(nom, enonce, reponse,\n retroactionValide, retroactionInvalide, tags)
     note right: GRASP: Creator
     activate Q
     deactivate Q
 
-    QC -> CS : ajouterQuestionAuCours(groupId: String, q)
+    QC -> CM : ajouterQuestionAuCours(groupId: String, q : QuestionVraiFaux) : void
     note right: GRASP: Expert
-    activate CS
-    deactivate CS
+    activate CM
+    deactivate CM
 
-    <-- QC : confirmationAjout(questionCreee)
+    <-- QC : confirmation d'ajout
 else Nom deja utilise ou donnees invalides
-    <-- QC : signalerErreurAjoutQuestion()
+    <-- QC : Signalement d'erreur ajout question
 end
 
 deactivate QC
