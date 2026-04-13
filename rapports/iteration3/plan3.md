@@ -46,7 +46,7 @@ Les éléments de travail suivants seront abordés dans cette itération:
 | Cible d'évaluation                    | Itération 3
 | Date d'évaluation  |   2026/03/30 |
 | Participants       | **Coéquipiers** : Alex Boulianne, Alexandre Gamache, Raphael Hoffmann, (Kassem Kandil et Yahya Ardy avaient des absences justifiées),<br> **Auxiliaire d'enseignement** : Thierry Fokou Toukam |
-| État du projet     | 🟢 <!-- 🔴🟠🟢 *Rouge, Orange, ou Vert.* --> |
+| État du projet     | 🟢 
 
 ### Questions d'évaluation
 Regardez votre diagramme TPLANT et répondez aux questions suivantes?

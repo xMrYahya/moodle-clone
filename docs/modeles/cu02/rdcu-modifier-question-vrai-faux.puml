@@ -6,8 +6,8 @@ participant "qc:QuestionsController" as QC
 participant "cm:CoursModele" as CM
 participant "q:QuestionVraiFauxModele" as Q
 
--> QC : modifierQuestionVraiFaux(nomOriginal : String, nom : String,\n enonce : String, reponse : bool, retroactionValide : String, \nretroactionInvalide : String, tags : String[])
-note right: GRASP: Controller
+-> QC : modifierQuestionVraiFaux(type: String, nom: String, enonce : String, retroactionValide : String, retroactionInvalide : String, tags : String[], reponse : Boolean)
+note right: GRASP: Controller (Le nom de la fonction dans QuestionController est modifierQuestion)
 activate QC
 
 QC -> CM : obtenirQuestionParNom(idGroupe : String, nomOriginal : String)
@@ -16,8 +16,9 @@ activate CM
 CM --> QC : questionExistante : AnyQuestion
 deactivate CM
 
-QC -> QC : validerChampsObligatoires(type:String, nom:String, enonce:String)
+QC -> QC ++: validerChampsObligatoires(type:String, nom:String, enonce:String)
 note right: GRASP: Expert
+deactivate QC
 
 QC -> CM : validerNomQuestionUnique(idGroupe: String, nomFinal: String, nomOriginal: String)
 note right: GRASP: Expert

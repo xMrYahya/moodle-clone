@@ -4,7 +4,7 @@ title RDCU – Supprimer une question (Confirmation)
 
 participant "qc:QuestionsController" as QC
 participant "cs:CoursModele" as CS
-participant "questionsModeles:QUestion[]" as QM
+participant "questionsModeles:Question[]" as QM
 participant "question:Question" as Q
 
 -> QC : confirmerSuppression()

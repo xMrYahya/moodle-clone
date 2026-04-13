@@ -133,6 +133,8 @@ Ajouté le traitement pour chaque type de question modifié
 
 ### Contrats Mis a jour 
 
+Le contrat CO21 à été supprimé et le Code de gererQuestionnaire correspond maintenant au CO15 (il affiche seulement les questionnaires et ne modifie pas l'information)
+
 Contrats 32 à 37 Ajouté ou modifiés pour le traitement de l'ajout de chaque type de question
 
 ### Contrat CO32 - Ajouter une question Vrai ou faux
@@ -263,40 +265,175 @@ Contrats 32 à 37 Ajouté ou modifiés pour le traitement de l'ajout de chaque t
 - q.retroactionInvalide est devenu retroactionInvalide
 - q.tags est devenu tags
 
-Les contrats 38 à  on été ajouté ou modifié pour représenter la modification de chaque type de question.
+Les contrats 38 à 43  on été ajouté ou modifié pour représenter la modification de chaque type de question.
 
+### Contrat CO38 - Modifier une question Vrai ou faux
+---
+**Opération:modifierQuestionVraiFaux(nouveauNom : String, enonce : String, reponse : bool, retroactionValide : String, retroactionInvalide : String, tags : String[])**  
+**Références croisées:**
+- CU02c modifier une question
+- DSS Modifier une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nouveauNom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance de q QuestionVraiFaux a été créé
+- q.nom est devenu nouveauNom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+- q.reponse est devenu reponse
+- q a été associé au cours sélectionné
+
+### Contrat CO39 - Modifier une question Choix multiple
+---
+**Opération:modifierQuestionChoixMultiple(nouveauNom : String, enonce : String, reponses : String[], retroactionValide : String, retroactionInvalide : String, tags : String[],seulementUnChoix : bool)**  
+**Références croisées:**
+- CU02c Modifier une question
+- DSS Modifier une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nouveauNom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance q de QuestionChoixMultiple a été créé
+- q.nom est devenu nouveauNom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+- q.reponseChoixMultiple est devenu reponses  
+
+### Contrat CO40 - Modifier une question Réponse Courte
+---
+**Opération: modifierQuestionReponseCourte(nouveauNom : String, enonce : String, reponse : String, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02c Modifier une question
+- DSS Modifier une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nouveauNom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance q de QuestionReponseCourte a été créé
+- q.nom est devenu nouveauNom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+- q.reponse est devenu reponse
+
+### Contrat CO41 - Modifier une question Réponse Numérique
+---
+**Opération:  modifierQuestionReponseNumerique(nouveauNom : String, enonce : String, reponse : number, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02c Modifier une question
+- DSS Modifier une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nouveauNom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance q de QuestionReponseNumerique a été créé
+- q.nom est devenu nouveauNom
+- q.enonce est devenu enonce
+- q.reponse est devenu reponse
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+
+### Contrat CO42 - Modifier une question Essai
+---
+**Opération: modifierQuestionEssai(nouveauNom : String, enonce : String, retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02c Modifier une question
+- DSS Modifier une question
+- MDD 
+
+**Préconditions:**
+- Un cours est sélectionné
+- nouveauNom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+- une instance q de QuestionEssai a été créé
+- q.nom est devenu nouveauNom
+- q.enonce est devenu enonce
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
+
+### Contrat CO43 - Modifier une question Mise en Correspondance
+---
+**Opération: modifierQuestionMiseCorrespondance(nouveauNom : String, enonce : String, pairesQuestion : String[], pairesReponse : String[], retroactionValide : String, retroactionInvalide : String, tags : String[])**
+**Références Croisées:**
+- CU02c Modifier une question
+- DSS Modifier une question
+- MDD
+
+**Préconditions:**
+- Un cours est sélectionné
+- nouveauNom n'est pas déja utilisé pour une question
+
+**PostConditions:**
+
+- une instance q de QuesionMiseCorrespondance a été créé
+- q.nom est devenu nouveauNom
+- q.enonce est devenu énoncé
+- q.pairesQuestion est devenu pairesQuestion
+- q.pairesReponse est devenu pairesReponse
+- q.retroactionValide est devenu retroactionValide
+- q.retroactionInvalide est devenu retroactionInvalide
+- q.tags est devenu tags
 
 
 
 ### RDCUs Mis a jour
 Ajouté le RDCU pour le traitement unique au questions VF
 
-![RDCU Ajouter question VF ](../../out/docs/modeles/cu02/rdcu-ajouter-question-vf/rdcu-ajouter-question-vf.png "RDCU Ajouter question VF")
+![RDCU Ajouter question VF ](../../docs/modeles/exports-it-3/vf/rdcu-ajouter-question-vf.png "RDCU Ajouter question VF")
 
 Ajouté le RDCU pour le traitement des questions Choix multiple
 
-![RDCU Ajouter question choix multiple ](../../docs/modeles/exports/rdcu-ajouter-question-choix-multiple.png "RDCU Ajouter question choix multiple")
+![RDCU Ajouter question choix multiple ](../../docs/modeles/exports-it-3/vf/rdcu-ajouter-question-choix-multiple.png "RDCU Ajouter question choix multiple")
 
 Ajouté le RDCU pour le traitement des questions Réponse courte
 
-![RDCU Ajouter question reponse courte ](../../docs/modeles/exports/rdcu-ajouter-question-reponse-courte.png "RDCU Ajouter question reponse courte")
+![RDCU Ajouter question reponse courte ](../../docs/modeles/exports-it-3/vf/rdcu-ajouter-question-reponse-courte.png "RDCU Ajouter question reponse courte")
 
 Ajouté le RDCU pour le traitement des questions numériques
 
-![RDCU Ajouter question numerique ](../../docs/modeles/exports/rdcu-ajouter-question-numerique.png "RDCU Ajouter question numerique")
+![RDCU Ajouter question numerique ](../../docs/modeles/exports-it-3/vf/rdcu-ajouter-question-numerique.png "RDCU Ajouter question numerique")
 
 Ajouté le RDCU pour le traitement des questions essai
 
-![RDCU Ajouter question essai ](../../docs/modeles/exports/rdcu-ajouter-question-essai.png "RDCU Ajouter question essai")
+![RDCU Ajouter question essai ](../../docs/modeles/exports-it-3/vf/rdcu-ajouter-question-essai.png "RDCU Ajouter question essai")
 
 Ajouté le RDCU pour les correpondances de questions
 
-![RDCU Ajouter question correpondance ](../../docs/modeles/exports/rdcu-ajouter-question-mise-en-correspondance.png "RDCU ajouter question correspondance")
+![RDCU Ajouter question correpondance ](../../docs/modeles/exports-it-3/vf/rdcu-ajouter-question-mise-en-correspondance.png "RDCU ajouter question correspondance")
+
+Ajouté la suppression d'une question dans le RDCU 
+
+![RDCU confirmer suppression ](../../docs/modeles/exports-it-3/vf/v2-rdcu-supprimer-question.png "RDCU confirmer suppression")
+
 
 Ajouté la suppression du questionnaire dans le RDCU
 
 ![RDCU confirmer suppression ](../../docs/modeles/exports-it-3/v2-rdcu-confirmer-suppression.png "RDCU confirmer suppression")
 
+
+Ajouté un RDCU pour la modification des questions, le CO a été fragmenté pour chaque type de question puisqu'il utilise les rdcu d'ajout de question. Ce RDCU englobe donc les CO 28 à
+![RDCU modification question ](../../docs/modeles/exports-it-3/vf/rdcu-modifier-questions-v2.png "RDCU modification question")
 
 
 

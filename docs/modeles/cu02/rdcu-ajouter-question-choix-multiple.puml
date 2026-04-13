@@ -3,38 +3,63 @@ hide footbox
 title RDCU - Ajouter une question choix multiple
 
 participant "qc:QuestionsController" as QC
-participant "cs:CoursStore" as CS
+participant ":CoursModele" as CM
 participant "q:QuestionChoixMultiple" as Q
 
--> QC : ajouterQuestionChoixMultiple(nom : String, enonce : String,\n reponses : ReponseChoixMultiple[], seulementUnChoix : bool,\n retroactionValide : String, retroactionInvalide : String, tags : String[])
+-> QC : ajouterQuestionChoixMultiple(typeQuestion : String, nom : String, enonce : String,\n retroactionValide : String, retroactonInvalide : String : tagsValides : String[],\n seulementUnChoix : boolean, reponses : String[])
 note right: GRASP: Controller
 activate QC
+QC -> QC ++: ajouterQuestionParType(typeQuestion : String, nom : String, enonce : String,\n retroactionValide : String, retroactonInvalide : String : tagsValides : String[],\n seulementUnChoix : boolean, reponses : String[] ) : void
+note right: GRASP: Controller
 
-QC -> QC : validerDonnees(nom, enonce, reponses, tags)
+
+QC -> QC ++: validerChampsObligatoires(nom:String, enonce:String) : void
 note right: GRASP: Expert
-
-QC -> CS : existeNomQuestion(groupId : String, nom : String)
-note right: GRASP: Expert
-activate CS
-CS --> QC : nomExiste : boolean
-deactivate CS
-
-alt Donnees valides et nom unique
-  create Q
-  QC -> Q : <<create>> QuestionChoixMultiple(nom, enonce,\n reponses, seulementUnChoix, retroactionValide, retroactionInvalide, tags)
-  note right: GRASP: Creator
-  activate Q
-  deactivate Q
-
-  QC -> CS : ajouterQuestionAuCours(groupId : String, q)
-  note right: GRASP: Expert
-  activate CS
-  deactivate CS
-
-  <-- QC : confirmationAjout(questionCreee)
-else Nom deja utilise ou donnees invalides
-  <-- QC : signalerErreurAjoutQuestion()
-end
 
 deactivate QC
+
+QC -> QC ++: validerNomQuestionUnique(idGroupe: String, nom: String) : void
+note right: GRASP: Expert
+
+QC -> QC ++: nomQuestionExiste(idGroupe: String, nom: String) : boolean
+note left: Lance une exception si nomQuestionExiste est true
+note right: GRASP: Expert
+
+
+QC -> CM ++: obtenirQuestionsDuCours(idGroupe) : Question[]
+note right: GRASP: Expert
+CM --> QC --: questions: Question[]
+deactivate QC
+deactivate QC
+
+QC -> QC ++: validerTagsObligatoires(tags: String[]) : tags : String[]
+note right: GRASP: Expert
+deactivate QC
+
+alt Donnees valides et nom unique (Aucune exception n'est lancée dans les fonctions précédentes)
+  QC -> QC ++: creerQuestionAutreType(typeQuestion : String, nom : String, enonce : String,\n retroactionValide : String, retroactonInvalide : String : tagsValides : String[],\n seulementUnChoix : boolean, reponses : String[])
+  note right: GRASP: CREATOR et Expert
+  
+  QC -> QC ++: lireReponsesChoixMultiple(reponses : String[]) : ReponseChoixMultiple[]
+  note right: GRASP: Expert
+  deactivate QC
+
+
+  QC -> Q **: <<create>> QuestionChoixMultiple(nom : String, enonce : String,\n, retroactionValide : String, retroactionInvalide : String \n, tags String[], seulementUnChoix : boolean, reponses : ReponseChoixMultiple[] )
+  note right: GRASP: Creator
+
+  deactivate QC
+  QC -> CM : ajouterQuestionAuCours(groupId : String, q : Question)
+  note right: GRASP: Expert
+  activate CM
+  deactivate CM
+
+    <-- QC : confirmation d'ajout
+else Nom deja utilise ou donnees invalides
+    <-- QC : Signalement d'erreur ajout question
+
+end
+deactivate QC
+deactivate QC
+
 @enduml

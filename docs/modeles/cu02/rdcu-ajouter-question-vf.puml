@@ -18,6 +18,7 @@ QC -> QC ++: validerNomQuestionUnique(idGroupe: String, nom: String) : void
 note right: GRASP: Expert
 
 QC -> QC ++: nomQuestionExiste(idGroupe: String, nom: String) : boolean
+note right: GRASP: Expert
 
 QC -> CM ++: obtenirQuestionsDuCours(idGroupe) : Question[]
 note right: GRASP: Expert

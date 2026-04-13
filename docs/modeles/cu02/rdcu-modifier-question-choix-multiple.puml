@@ -5,10 +5,10 @@ title RDCU - Modifier une question choix multiple
 participant "qc:QuestionsController" as QC
 participant "q:QuestionChoixMultipleModele" as Q
 
--> QC ++: modifierQuestionChoixMultiple(nom: string, \n enonce: string,retroactionValide: string,\n retroactionInvalide: string,tags: string[],\nautresDonnees: Record<string, unknown>)
+-> QC ++: modifierQuestionChoixMultiple(nom: string, \n enonce: string,retroactionValide: string,\n retroactionInvalide: string,tags: string[],\n autresDonnees: Record<string, unknown>)
 note right: GRASP: Controller
 
-  QC -> QC ++: lireReponsesChoixMultiple(reponses)
+  QC -> QC ++: lireReponsesChoixMultiple(autresDonnees.reponses) : ReponseChoixMultiple[]
   note right: GRASP: Expert
   deactivate QC
 

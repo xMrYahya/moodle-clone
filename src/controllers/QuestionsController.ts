@@ -312,13 +312,7 @@ export class QuestionsController {
       }
 
       if (typeFinal === "MiseEnCorrespondance") {
-        const pairesTexte = QuestionsController.lireTexte(donneesComplementaires.paires);
-        const pairesListe = Array.isArray(donneesComplementaires.paires)
-          ? donneesComplementaires.paires
-          : [];
-        if (!pairesTexte && pairesListe.length === 0) {
-          throw new InvalidParameterError("Champs manquants: paires");
-        }
+        QuestionsController.modifierQuestionMiseCorrespondance(donneesComplementaires);
       }
 
       const questionMiseAJour = QuestionsController.creerQuestionAutreType(
@@ -350,6 +344,16 @@ export class QuestionsController {
         res.status(500).json({ error: erreur?.message ?? "Erreur lors de la modification de la question" });
       }
       return;
+    }
+  }
+
+  private static modifierQuestionMiseCorrespondance(donneesComplementaires: any) {
+    const pairesTexte = QuestionsController.lireTexte(donneesComplementaires.paires);
+    const pairesListe = Array.isArray(donneesComplementaires.paires)
+      ? donneesComplementaires.paires
+      : [];
+    if (!pairesTexte && pairesListe.length === 0) {
+      throw new InvalidParameterError("Champs manquants: paires");
     }
   }
 

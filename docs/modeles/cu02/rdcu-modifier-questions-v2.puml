@@ -1,10 +1,10 @@
 @startuml
 hide footbox
-title RDCU - Modifier une question choix multiple
+title RDCU - Modifier une question
 
 participant "qc:QuestionsController" as QC
 participant "cm:CoursModele" as CM
-participant "q:QuestionChoixMultipleModele" as Q
+participant "q: Question" as q
 
 -> QC : modifierQuestion(type:String, nomOriginal : String,\n nom : String, enonce : String,\n retroactionValide : String, retroactionInvalide : String, tags : String[],donneesComplementairesBrutes:String)
 note right: GRASP: Controller
@@ -27,23 +27,27 @@ CM --> QC : nomExiste : boolean
 deactivate CM
 
 alt Nom unique et donnees valides
-  QC -> QC ++: creerQuestionAutreType(type: string, nom: string, enonce: \nstring,retroactionValide: string, \nretroactionInvalide: string, tags: string[], autresDonnees: Record<string, unknown>)
-  alt type === "VraiFaux"
-    ref over QC:   RDCU - Modifier une question vrai/faux
-    else type === "ReponseCourte"
-    ref over QC:   RDCU - Modifier une question reponse courte
-    else type === "Numerique"
-    ref over QC:   RDCU - Modifier une question numerique
-    else type === "ChoixMultiple"
-    ref over QC:   RDCU - Modifier une question choix multiple
-    else type === "Essai"
-    ref over QC:   RDCU - Modifier une question essai
-    else type === "MiseEnCorrespondance"
-    ref over QC:   RDCU - Modifier une question mise en correspondance
 
+  alt type === "VraiFaux"
+    ref over QC:   RDCU - Ajouter une question vrai/faux
+    else type === "ReponseCourte"
+    ref over QC:   RDCU - Ajouter une question reponse courte
+    else type === "Numerique"
+    ref over QC:   RDCU - Ajouter une question numerique
+    else type === "ChoixMultiple"
+    ref over QC:   RDCU - Ajouter une question choix multiple
+    else type === "Essai"
+    ref over QC:   RDCU - Ajouter une question essai
+    else type === "MiseEnCorrespondance"
+    ref over QC:   RDCU - Ajouter une question mise en correspondance
+    note left: Pour creer la question qui remplacera la version précédente, nous réusilisons les RDCU pour ajouter des questions
   end alt;
-    deactivate QC
-  QC -> CM : modifierQuestionDuCours(idGroupe : String, nomOriginal : String, q)
+  QC -> QC ++: creerQuestionAutreType(typeFinal : String,nomFinal : String,enonceFinal : String,\nretroactionValideFinale : String,retroactionInvalideFinale \n: String,tagsFinaux : String[],donneesComplementaires: String[]) : Question
+  note right: GRASP: Expert
+  QC -> q **: <<create>>(typeFinal : String,nomFinal : String,enonceFinal : String,\nretroactionValideFinale : String,retroactionInvalideFinale \n: String,tagsFinaux : String[],donneesComplementaires: String[])
+
+  deactivate QC
+  QC -> CM : modifierQuestionDuCours(idGroupe : String, nomOriginal : String, q : Question)
   note right: GRASP: Expert
   activate CM
   deactivate CM
