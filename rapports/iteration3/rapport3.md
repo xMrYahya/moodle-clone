@@ -135,8 +135,14 @@ Ajouté le traitement pour chaque type de question modifié
 
 Mise à jour des artefacts du CU01 pour réaligner les diagrammes avec le code:
 
-Retrait de la boucle "tant qu'un cours existe déjà" et remplacement par une liste filtrée des cours non ajoutés, puis confirmation d'ajout.
+Modification du DSS d'ajout de cours pour retirer la boucle "tant qu'un cours existe déjà" et la remplacer par une liste filtrée des cours non ajoutés, puis une confirmation d'ajout.
 ![DSS Ajouter Cours ](../../docs/modeles/exports-it-3/dss-ajouter-cours.png "DSS Ajouter Cours")
+
+Modification du DSS de récupération de cours pour inclure la liste des questions avec les informations du cours et les étudiants inscrits.
+![DSS Recuperer Cours ](../../docs/modeles/exports-it-3/dss-recuperer-cours.png "DSS Recuperer Cours")
+
+Modification du DSS de retrait de cours pour représenter les étapes réelles du code: demande de confirmation, affichage de la confirmation, puis suppression du cours.
+![DSS Retirer Cours ](../../docs/modeles/exports-it-3/dss-retirer-cours.png "DSS Retirer Cours")
 
 
 ### Contrats Mis a jour 
@@ -408,11 +414,23 @@ Les contrats 38 à 43  on été ajouté ou modifié pour représenter la modific
 ### RDCUs Mis a jour
 
 
-ajout des paramètres `teacherId` / `token` et de l'appel à `SgbClient.getCours`.
+Modification du RDCU de démarrage d'ajout de cours pour ajouter les paramètres `teacherId` / `token` et l'appel à `SgbClient.getCours`.
 ![RDCU Demarrer Ajout Cours ](../../docs/modeles/exports-it-3/rdcu-demarrerAjoutCours.png "RDCU Demarrer Ajout Cours")
 
-ajout du flux réel `getCoursParGroupe`, `getEtudiantsParGroupe`, construction du `Cours`, puis `ajouterCoursStocke`.
+Modification du RDCU de sélection d'un groupe-cours pour ajouter le flux réel `getCoursParGroupe`, `getEtudiantsParGroupe`, construction du `Cours`, puis `ajouterCoursStocke`.
 ![RDCU selectionnerGroupeCours ](../../docs/modeles/exports-it-3/rdcu-sélectionnerGroupeCours.png "RDCU selectionnerGroupeCours")
+
+Modification du RDCU d'affichage de la liste des cours pour correspondre au chargement des cours stockés et au rendu de la page d'accueil.
+![RDCU Afficher Liste Cours ](../../docs/modeles/exports-it-3/rdcu-afficherListeCours.png "RDCU Afficher Liste Cours")
+
+Modification du RDCU d'affichage des détails d'un cours pour inclure les questions et le rendu de la page des questions.
+![RDCU Afficher Details Cours ](../../docs/modeles/exports-it-3/rdcu-afficherDetailsCours.png "RDCU Afficher Details Cours")
+
+Modification du RDCU de retrait de cours pour représenter la redirection vers l'étape de confirmation.
+![RDCU Retirer Cours ](../../docs/modeles/exports-it-3/rdcu-retirer-cours.png "RDCU Retirer Cours")
+
+Modification du RDCU de confirmation de retrait pour représenter la suppression réelle du cours et la redirection avec message de succès.
+![RDCU Confirmation Retrait Cours ](../../docs/modeles/exports-it-3/rdcu-confirmation-retrait-cours.png "RDCU Confirmation Retrait Cours")
 
 Ajouté le RDCU pour le traitement unique au questions VF
 
