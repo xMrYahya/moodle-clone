@@ -120,8 +120,10 @@
 ![RDCU Repondre Question choix multiple ](../../docs/modeles/exports-it-3/rdcu-repondre-question-choix-multiple.png "Repondre Question choix multiple")
 
 ### Diagramme de classe TPLANT
-- Générer un diagramme de classe avec l'outil TPLANT et commenter celui-ci par rapport à votre MDD.
-- https://www.npmjs.com/package/tplant
+![Diagramme Tplant](../../docs/modeles/exports/diagramme-classe.png "Diagramme Tplant")
+
+C'est possible de constater, en obbservant le diagramme de classe généré par TPLANT, que les fonctions de nos rdcus sont présent dans nos controlleurs. Il est possible de constater que les différences majeurs avec le MDD sont les Modèles qui nous permettent de récuperer facilement les cours qu'on peut stocker dans un fichier json. Ils sont donc des représentations des classes et nous permettent de suivre l'architecture MVC. De plus, l'étudiant, comme l'enseignant n'ont pas de classes propre a eux dans le code puisque seul le courriel est utilisé afin de récuperer les Questions,Cours, Questionnaires et notes. Cela nous permet de simplifier la structure de notre code en utilisant le courriel pour les correspondances.
+
   
 ## Retour sur la correction du rapport précédent
 
@@ -135,15 +137,6 @@ Mise à jour des artefacts du CU01 pour réaligner les diagrammes avec le code:
 
 Retrait de la boucle "tant qu'un cours existe déjà" et remplacement par une liste filtrée des cours non ajoutés, puis confirmation d'ajout.
 ![DSS Ajouter Cours ](../../docs/modeles/exports-it-3/dss-ajouter-cours.png "DSS Ajouter Cours")
-
-
-### RDCU Mis a jour 
-
-ajout des paramètres `teacherId` / `token` et de l'appel à `SgbClient.getCours`.
-![RDCU Demarrer Ajout Cours ](../../docs/modeles/exports-it-3/rdcu-demarrerAjoutCours.png "RDCU Demarrer Ajout Cours")
-
-ajout du flux réel `getCoursParGroupe`, `getEtudiantsParGroupe`, construction du `Cours`, puis `ajouterCoursStocke`.
-![RDCU selectionnerGroupeCours ](../../docs/modeles/exports-it-3/rdcu-sélectionnerGroupeCours.png "RDCU selectionnerGroupeCours")
 
 
 ### Contrats Mis a jour 
@@ -413,6 +406,14 @@ Les contrats 38 à 43  on été ajouté ou modifié pour représenter la modific
 
 
 ### RDCUs Mis a jour
+
+
+ajout des paramètres `teacherId` / `token` et de l'appel à `SgbClient.getCours`.
+![RDCU Demarrer Ajout Cours ](../../docs/modeles/exports-it-3/rdcu-demarrerAjoutCours.png "RDCU Demarrer Ajout Cours")
+
+ajout du flux réel `getCoursParGroupe`, `getEtudiantsParGroupe`, construction du `Cours`, puis `ajouterCoursStocke`.
+![RDCU selectionnerGroupeCours ](../../docs/modeles/exports-it-3/rdcu-sélectionnerGroupeCours.png "RDCU selectionnerGroupeCours")
+
 Ajouté le RDCU pour le traitement unique au questions VF
 
 ![RDCU Ajouter question VF ](../../docs/modeles/exports-it-3/vf/rdcu-ajouter-question-vf.png "RDCU Ajouter question VF")
