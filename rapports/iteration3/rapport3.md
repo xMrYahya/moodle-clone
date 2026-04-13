@@ -131,6 +131,21 @@ Ajouté le traitement pour chaque type de question dans le diagramme
 
 Ajouté le traitement pour chaque type de question modifié
 
+Mise à jour des artefacts du CU01 pour réaligner les diagrammes avec le code:
+
+Retrait de la boucle "tant qu'un cours existe déjà" et remplacement par une liste filtrée des cours non ajoutés, puis confirmation d'ajout.
+![DSS Ajouter Cours ](../../docs/modeles/exports-it-3/dss-ajouter-cours.png "DSS Ajouter Cours")
+
+
+### RDCU Mis a jour 
+
+ajout des paramètres `teacherId` / `token` et de l'appel à `SgbClient.getCours`.
+![RDCU Demarrer Ajout Cours ](../../docs/modeles/exports-it-3/rdcu-demarrerAjoutCours.png "RDCU Demarrer Ajout Cours")
+
+ajout du flux réel `getCoursParGroupe`, `getEtudiantsParGroupe`, construction du `Cours`, puis `ajouterCoursStocke`.
+![RDCU selectionnerGroupeCours ](../../docs/modeles/exports-it-3/rdcu-sélectionnerGroupeCours.png "RDCU selectionnerGroupeCours")
+
+
 ### Contrats Mis a jour 
 
 Le contrat CO21 à été supprimé et le Code de gererQuestionnaire correspond maintenant au CO15 (il affiche seulement les questionnaires et ne modifie pas l'information)
