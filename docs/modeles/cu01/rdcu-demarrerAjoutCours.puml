@@ -4,11 +4,15 @@ skinparam Style strictuml
 skinparam sequenceMessageAlign center
 
 participant ":CoursController" as coursController
+participant ":SgbClient" as sgbClient
 
--> coursController : demarrerAjoutCours()
+-> coursController : demarrerAjoutCours(teacherId : String, token : String)
 note right: GRASP: Controller
 activate coursController
-coursController -->> coursController : appel service SGB (boite noire)
-<<-- coursController : listeGC:Groupe-Cours[]
+coursController -> sgbClient : getCours(teacherId, token)
+activate sgbClient
+sgbClient -->> coursController : listeCours : Cours[]
+deactivate sgbClient
+<<-- coursController : listeCours : Cours[]
 deactivate coursController
 @enduml
