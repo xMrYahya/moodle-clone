@@ -129,13 +129,33 @@ Nous avons vérifier avec les chargés de laboratoire pour des meilleures façon
 
 ## Évaluation du travail d'équipe
 
+Tout d'abord notre troisième itération a été beaucoup plus petite que les deux précédente. En effet, nous avions déjà atteint le nombre minimum de point nécessaire pour le projet avec le 10% bonus. Alors, notre troisième itérations a surtout été porté sur la correction de l'itération 2 et sur l'ajout d'une fonctionnalité obligatoire. Nous avons choisi la CU08a.
 
-> Évaluez la contribution de chaque membre de l'équipe au projet durant l'itération. Pour vous aider, utilisez `gitinspector` (voir les notes du cours). Toutefois, tenez aussi compte des éléments qui ne peuvent être évalués par l'outil (apprentissage, connaissances préalables, etc.)
+   - Raphael et Alexandre a fait les DSS, les CO et a mis à jour le MDD
+   - Alex a fait la correction des RDCU des itérations précédente.
+   - Kassem et Yahya ont fait le code.
+   - Alex et Alexandre ont fait le plan et le rapport.
 
-Selon les statistiques générées par `gitinspector` Pierre et Jérémie font 90 % de la programmation et les deux autres membres doivent contribuer plus. Voir le script contribution.sh dans le répertoire scripts du projet.
+Ensuite, pour l'évaluation du projet dans sa globalité, nous avons utiliser l'outil "gitinspector" pour nous aider avec l'évaluation du travail d'équipe. Nous avons commencer par regarder le nombre de commit qui ont été fait par chacune des personnes de l'équipe.
 
-Nous devons trouver un autre moyen de faire les commits (peut-être avec des branches et PR), car il y avait trop de merges difficiles de la documentation.
+![Capture d'écran du Nombre de Commit ](../../docs/modeles/exports-it-3/Gitinspector-Nombre-commit.png "Capture d'écran du Nombre de Commit" )
+
+Toutefois, ceci n'est pas très précis si nous regardons seulement par nombre de commit, alors nous sommes aussi allez chercher combien de ligne de code avait été écrite.
+
+![Capture d'écran du nombre de ligne écrite ](../../docs/modeles/exports-it-3/Gitinspector-Line-Commit-Files.png "Capture d'écran du nombre de ligne écrite")
+
+Selon les statistiques qui ont pu être généré par l'outil, nous pouvons voir que le plus grand nombre de code a été écrit par Kassem et Yahya. En effet, ce sont eu qui était en charge d'écrire la grande majorité du code pour le projet. Donc, pour eux le gitinspector semble suffisant pour comprendre leur partie du travail.
+
+Ensuite, ce sont les autres membres de l'équipe qui ont pris en charge les plans, la conception des diagrammes, les rapports ainsi que les rencontres lors des présentations avec les chargés de laboratoire pour essayer de leur donner le moins de tâches possible en dehors de l'écriture du code.
+
+Pour la séparation de celle-ci:
+
+   - Les plans d'itération ainsi que les rapports ont majoritairement été fait par Alex et Alexandre.
+   - Les DSS et CO, étaient majoritairement fait par Alexandre.
+   - Les RDCUs et leurs corrections ont majoritairement été fait par Alex et Raphael.
+   - Les modèles Tplant était fait par Raphael.
+
 
 ### Retrait d'un membre de l'équipe pour contribution non significative
 
-Aucun membre de l'équipe n'a été retiré
+Aucun membre de l'équipe n'a été retiré.
