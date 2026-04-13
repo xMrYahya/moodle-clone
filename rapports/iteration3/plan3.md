@@ -51,60 +51,73 @@ Les éléments de travail suivants seront abordés dans cette itération:
 ### Questions d'évaluation
 Regardez votre diagramme TPLANT et répondez aux questions suivantes?
 1. Est-ce qu'il y a un décalage de représentation?
+      
+      Nous pensons que la nouvelle représentation Tplant représente assez bien notre projet et que s'il reste encore des décalage, ils ont été minimiser le plus possible.
+
+
   - Est-ce que tous les noms de classe ont un rapport avec le domaine?
       
-     **Les noms de chaque classes ont un rapport avec le domaine incluant les modeles et les contrôleurs** 
+      Oui, les noms que nous avons choisi sont en lien avec la situation ou la fonctionnalité qu'elle essaye d'accomplir.
+
 
 2. Est-ce que l'architecture en couche est respectée?
+      
+      Durant tout le projet, nous avons essayer de suivre une architecture qui suit le principe MVC.
+
+
    - Est-ce que les contrôleurs GRASP sont bien identifiés?
       
-      **Nous avons biens indiqué les contrôleurs et les modeles dans les noms des classes et les rdcus**
+      Oui, nous avons biens indiqué les contrôleurs et les modèles dans les noms de classes et les rdcus.
+
 
    - Est-ce que les paramètres des opérations système sont tous de type primitif ou sont des objets de paramètres de type primitif?
       
-      **Chaque Parametre d'opération système traite uniquement des types primitifs**
+      Oui, chacun des paramètres d'opération système traite uniquement des types primitifs
    
+
    - Est-ce que vous avez un fichier de route par contrôleur?
       
-      **Chaque contrôleur a un fichier de route qui avec un nom correspondant**
+      Oui, chacun des contrôleurs a un fichier de route selon le nom correspondant
+
 
 3. Évaluer votre conception par rapport aux GRASP "forte cohésion" et "faible couplage"
    - Avez-vous des classes qui sont couplées avec "beaucoup" d'autres classes?
 
-      **Nos controlleurs, surtout le QuestionController,  on beaucoup de couplage avec des classes qu'il ne devraient possiblement pas directement gérer. Il faudrait plutôt faire appel au autres contrôleurs**
+      Plusieurs de nos contrôleurs ont un couplage assez élevé, particulièrement le QuestionController. Ils ont le contrôle sur plusieurs classes qu'il ne devrait pas nécessairement avoir directement le contrôle.
 
    - Avez-vous des classes qui ont beaucoup de responsabilités (d'opérations)?
 
-      **Les modêles ont beaucoup de responsabilités qui ne sont pas totalement approprié, comme mentionné avant, le QuestionController a plus de responsabilités qu'il devrait avoir**
+      Oui, nous avons essayer de centraliser les responsabilité de chacun des modèles. Toutefois, ceci a aussi eu pour effet de faire, comme mentionner plus haut avec le QuestionController de leur donner accès a plus de responsabilité qu'il devrait normalement avoir.
 
 4. Y a-t-il des problèmes de Code smell à identifier avec l'aide de TPLANT
    1. Mysterious name relié au décalage des représentations ou pas
       1. Identifier le renommage (réusinage) éventuel de classe et/ou méthodes
 
-      **Les méthodes de nos classes suivent correctement les noms des CO, il n'y aurait donc pas de réusinage a faire de ce type**
+      Toutes les méthodes de nos classes suivent correctement les noms des CO, il n'y aurait donc pas de réusinage pour ceux-ci.
+
 
    2. Large class (cohésion)
       1. Proposer d'appliquer le réusinage Extract class / GRAPS fabrication pure 
 
-      **Les modèles sont très grands et devraient séparer leurs responsabilités en plusieures classes**
+      Comme mentionner plus haut, nous avons plusieurs classes qui ont beaucoup de responsabilité, il faudrait les séparer de manière à avoir de plus petite classes.
 
    3. Trop de paramètres (4+)
       1. Proposer d'appliquer le réusinage Objet de paramètre
 
-      **Aucune nouvelle fonction n'a trop de paramêtres. Les autres on déja été adressé dans le rapport précédent**
+      Nous ne pensons pas que nous avons de nouvelle fonction qui contiennent trop de paramètres. Celle qui en contenait déjà trop ont déjà été modifier dans le rapport précédent.
 
 ### Évaluation par rapport aux objectifs
 
 - Présenter une démonstration technique de CU08 avec tests.
    - Nous avons correctement présenté une démo satisfaisant tout les critères du CU08 et nous avons ajouté les tets manquant
 - Mettre à jour la documentation
-   - Nous avons mis a jour les RDCU, DSS et CO qui contenaient des erreurs.
+   - Nous avons mis a jour les RDCU, DSS et CO qui contenaient des erreurs, selon les rétroactions obtenus.
 - Régler le décalage entre le code et les modèles
-   - L'écart entre notre code et la documentation a été réduit le plus possible gâce a la mise a jour de la documentation
+   - L'écart entre notre code et la documentation a été réduit le plus possible grâce a la mise à jour de la documentation et la correction des erreurs dans le code.
 
 ### Éléments de travail: prévus vs réalisés
 
-Tous les éléments ont été complétés, mais certains des RDCUs pourraient être amélioré.
+Nous avons essayer de faire le mieux possible pour chacun des éléments qui ont été complétés. Toutefois, nous pensons que certains des diagrammes, surtout les RDCUs pourraient être amélioré.
 
 ### Évaluation par rapport aux résultats selon les critères d'évaluation
 
@@ -112,9 +125,10 @@ Notre code et nos tests suivent correctement les critères d'évaluations.
 
 ## Autres préoccupations et écarts
 
-Nous avons vérifier avec les chargé de lab pour des meilleurs facon de gérer la modification de question
+Nous avons vérifier avec les chargés de laboratoire pour des meilleures façon de gérer la modification de question, car notre première manière ne fonctionnait pas de la manière souhaiter.
 
 ## Évaluation du travail d'équipe
+
 
 > Évaluez la contribution de chaque membre de l'équipe au projet durant l'itération. Pour vous aider, utilisez `gitinspector` (voir les notes du cours). Toutefois, tenez aussi compte des éléments qui ne peuvent être évalués par l'outil (apprentissage, connaissances préalables, etc.)
 
