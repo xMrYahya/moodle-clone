@@ -515,11 +515,11 @@ Retirer un participant inutile
   - [X] Chaque DSS a un titre
   - [X] Chaque opération synchrone a un retour d'opération
   - [X] L'utilisation d'une boucle (LOOP) est justifiée par les exigences
-- [ ] Vous avez autant de contrats que d'opérations système (pour les cas d'utilisation nécessitant des contrats)
-  - [ ] Les postconditions des contrats sont écrites au passé
-- [ ] Vous avez autant de RDCU que d'opérations système
-  - [ ] Chaque décision de conception (affectation de responsabilité) est identifiée et surtout **justifiée** (par un GRASP ou autre heuristique)
-  - [ ] Votre code source (implémentation) est cohérent avec la RDCU (ce n'est pas juste un diagramme)
-- [ ] Vous avez un seul diagramme de classes
-- [ ] Vous avez remis la version PDF de ce document dans votre répertoire
+- [X] Vous avez autant de contrats que d'opérations système (pour les cas d'utilisation nécessitant des contrats)
+  - [X] Les postconditions des contrats sont écrites au passé
+- [X] Vous avez autant de RDCU que d'opérations système
+  - [X] Chaque décision de conception (affectation de responsabilité) est identifiée et surtout **justifiée** (par un GRASP ou autre heuristique)
+  - [X] Votre code source (implémentation) est cohérent avec la RDCU (ce n'est pas juste un diagramme)
+- [X] Vous avez un seul diagramme de classes
+- [X] Vous avez remis la version PDF de ce document dans votre répertoire
 - [X] [Vous avez regardé cette petite présentation pour l'architecture en couche et avez appliqué ces concepts](https://log210-cfuhrman.github.io/log210-valider-architecture-couches/#/) 
