@@ -3,12 +3,26 @@ hide footbox
 title RDCU - selectionnerGroupeCours(idGroupe : String)
 
 participant ":CoursController" as ctrl
+participant ":SgbClient" as sgbClient
 participant ":CoursModele" as modele
 
 -> ctrl : selectionnerGroupeCours(idGroupe:String)
 note right: GRASP: Controller
 activate ctrl
-ctrl -> modele : ajouterCoursStocke(cours:Cours)
+
+ctrl -> sgbClient : getCoursParGroupe(idGroupe, token, idEnseignant)
+activate sgbClient
+sgbClient -->> ctrl : coursSelectionne : Cours
+deactivate sgbClient
+
+ctrl -> sgbClient : getEtudiantsParGroupe(token, idGroupe)
+activate sgbClient
+sgbClient -->> ctrl : etudiants : Etudiant[]
+deactivate sgbClient
+
+ctrl -> ctrl : construire Cours(coursSelectionne, etudiants, questions = [])
+
+ctrl -> modele : ajouterCoursStocke(cours : Cours)
 note right: GRASP: Expert
 activate modele
 modele -->> ctrl : confirmationAjout
