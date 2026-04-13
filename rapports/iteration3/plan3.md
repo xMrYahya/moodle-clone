@@ -45,57 +45,74 @@ Les éléments de travail suivants seront abordés dans cette itération:
 | ------------------------------------- | ------------------------------------------------------------------------ |
 | Cible d'évaluation                    | Itération 3
 | Date d'évaluation  |   2026/03/30 |
-| Participants       | **Coéquipiers** : Alex Boulianne, Alexandre Gamache, Raphael Hoffmann, (Kassem Kandil et Yahya Ardy avaient des absences justifiées),<br> **Auxiliaire d'enseignement** : Thierry Fokou Toukam |
+| Participants       | **Coéquipiers** : Alex Boulianne, Alexandre Gamache, Raphael Hoffmann, Kassem Kandil et Yahya Ardy<br> **Auxiliaire d'enseignement** : Thierry Fokou Toukam |
 | État du projet     | 🟢 
 
 ### Questions d'évaluation
 Regardez votre diagramme TPLANT et répondez aux questions suivantes?
 1. Est-ce qu'il y a un décalage de représentation?
   - Est-ce que tous les noms de classe ont un rapport avec le domaine?
+      
+     **Les noms de chaque classes ont un rapport avec le domaine incluant les modeles et les contrôleurs** 
+
 2. Est-ce que l'architecture en couche est respectée?
    - Est-ce que les contrôleurs GRASP sont bien identifiés?
+      
+      **Nous avons biens indiqué les contrôleurs et les modeles dans les noms des classes et les rdcus**
+
    - Est-ce que les paramètres des opérations système sont tous de type primitif ou sont des objets de paramètres de type primitif?
+      
+      **Chaque Parametre d'opération système traite uniquement des types primitifs**
+   
    - Est-ce que vous avez un fichier de route par contrôleur?
+      
+      **Chaque contrôleur a un fichier de route qui avec un nom correspondant**
+
 3. Évaluer votre conception par rapport aux GRASP "forte cohésion" et "faible couplage"
    - Avez-vous des classes qui sont couplées avec "beaucoup" d'autres classes?
+
+      **Nos controlleurs, surtout le QuestionController,  on beaucoup de couplage avec des classes qu'il ne devraient possiblement pas directement gérer. Il faudrait plutôt faire appel au autres contrôleurs**
+
    - Avez-vous des classes qui ont beaucoup de responsabilités (d'opérations)?
-     - Faite surtout attention aux responsabilités que vous avez données à vos contrôleurs.
+
+      **Les modêles ont beaucoup de responsabilités qui ne sont pas totalement approprié, comme mentionné avant, le QuestionController a plus de responsabilités qu'il devrait avoir**
+
 4. Y a-t-il des problèmes de Code smell à identifier avec l'aide de TPLANT
    1. Mysterious name relié au décalage des représentations ou pas
       1. Identifier le renommage (réusinage) éventuel de classe et/ou méthodes
+
+      **Les méthodes de nos classes suivent correctement les noms des CO, il n'y aurait donc pas de réusinage a faire de ce type**
+
    2. Large class (cohésion)
       1. Proposer d'appliquer le réusinage Extract class / GRAPS fabrication pure 
+
+      **Les modèles sont très grands et devraient séparer leurs responsabilités en plusieures classes**
+
    3. Trop de paramètres (4+)
       1. Proposer d'appliquer le réusinage Objet de paramètre
-   
+
+      **Aucune nouvelle fonction n'a trop de paramêtres. Les autres on déja été adressé dans le rapport précédent**
+
 ### Évaluation par rapport aux objectifs
 
-> Documentez si vous avez abordé les objectifs précisés dans le plan d'itération. *(on reprend les objectifs)*
-
-- Résoudre les problèmes de la dernière itération soulevés par l'auxiliaire d'enseignement.
-  - La rétroaction de l'auxiliaire d'enseignement a été positive. Bon travail l'équipe!
-- Présenter une démonstration technique.
-  - Le CU06 a été convaincant pour l'auxiliaire d'enseignement, mais il a trouvé que les tests pour le CU07 n'étaient pas assez étoffés. On doit corriger ça à la prochaine itération si on veut que le CU07 compte pour l'implémentation finale.
+- Présenter une démonstration technique de CU08 avec tests.
+   - Nous avons correctement présenté une démo satisfaisant tout les critères du CU08 et nous avons ajouté les tets manquant
+- Mettre à jour la documentation
+   - Nous avons mis a jour les RDCU, DSS et CO qui contenaient des erreurs.
+- Régler le décalage entre le code et les modèles
+   - L'écart entre notre code et la documentation a été réduit le plus possible gâce a la mise a jour de la documentation
 
 ### Éléments de travail: prévus vs réalisés
 
-> Résumez si tous les éléments de travail prévus dans l'itération ont été abordés, et des éléments de travail qui ont été reportés ou ajoutés.
-
-Tous les éléments ont été complétés, mais il faut étoffer les tests du CU07:
-
-- CU07 - test et implémentation assignés à Hélène
+Tous les éléments ont été complétés, mais certains des RDCUs pourraient être amélioré.
 
 ### Évaluation par rapport aux résultats selon les critères d'évaluation
 
-> Documentez si vous avez satisfait les critères d'évaluation précisés dans le plan d'itération. Cela pourrait inclure des informations telles que «&nbsp;Démo pour le département X a été bien accueilli, avec quelques préoccupations soulevées autour de la convivialité&nbsp;», ou, «&nbsp;495 cas de tests ont été automatisés avec un taux de réussite de 98&nbsp;%. 9 cas de test ont été reportés parce que les éléments de travail correspondants ont été reportés.&nbsp;»
-
-La solution a répondu à tous les critères, mais attention: il faut rajouter des cas de tests.
+Notre code et nos tests suivent correctement les critères d'évaluations. 
 
 ## Autres préoccupations et écarts
 
-> Documentez d'autres domaines qui ont été évalués, tels que la finance ou un type de programme, ainsi que la rétroaction des intervenants qui n'a pas été saisie ailleurs
-
-Nous avons discuté avec plusieurs professeurs pour comprendre le flux de travail de construction des devoirs à faire en ligne (CU06).
+Nous avons vérifier avec les chargé de lab pour des meilleurs facon de gérer la modification de question
 
 ## Évaluation du travail d'équipe
 
@@ -107,14 +124,4 @@ Nous devons trouver un autre moyen de faire les commits (peut-être avec des bra
 
 ### Retrait d'un membre de l'équipe pour contribution non significative
 
-- C'est ici que vous mettez le nom de la personne ainsi que les raisons du retrait. Cette section doit nécessairement inclure une liste d'objectifs que cette personne doit respecter pour pouvoir s'assurer de faire partie de l'itération suivante. 
-
-
----
-
-<a name="commentPlanifier">Comment planifier une itération selon le
-    processus unifié :</a>
-    <https://etsmtl365-my.sharepoint.com/:w:/g/personal/christopher_fuhrman_etsmtl_ca/EWVA3MlzFHdElIMlduUvg6oBSAlrgHO7hjM2J93D1LGPSg?e=kCbXch>
-
-<a name="commentEstimer">Comment estimer la taille :</a>
-    <https://etsmtl365-my.sharepoint.com/:w:/g/personal/christopher_fuhrman_etsmtl_ca/EaEe2fDK94RAkfWthKX1pr4B7KBgbD9BW4UMrzwtQzOrkg?e=XMf4IK>
+Aucun membre de l'équipe n'a été retiré
