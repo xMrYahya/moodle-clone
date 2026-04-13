@@ -13,10 +13,10 @@ activate ctrl
 ctrl -> sgbClient : getCoursParGroupe(idGroupe, token, idEnseignant)
 activate sgbClient
 sgbClient -->> ctrl : coursSelectionne : Cours
-deactivate sgbClient
+
 
 ctrl -> sgbClient : getEtudiantsParGroupe(token, idGroupe)
-activate sgbClient
+
 sgbClient -->> ctrl : etudiants : Etudiant[]
 deactivate sgbClient
 
