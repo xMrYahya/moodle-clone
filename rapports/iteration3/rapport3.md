@@ -452,7 +452,41 @@ Ajouté un RDCU pour la modification des questions, le CO a été fragmenté pou
 ![RDCU modification question ](../../docs/modeles/exports-it-3/vf/rdcu-modifier-questions-v2.png "RDCU modification question")
 
 
+Modification du retour pour qu'il ne soit pas un appel de méthode
+![RDCU consulter question d'un cours ](../../docs/modeles/exports-it-3/rdcu-afficher-liste-question.png "RDCU consulter les questions d'un cours")
 
+Modification pour suivre le nom des classes et fonction dans le code
+![RDCU modifier une question à choix multiple ](../../docs/modeles/exports-it-3/rdcu-modifier-question-choix-multiple.png "RDCU modifier une question à choix multiple")
+
+Modification pour suivre le nom des classes et fonction dans le code
+![RDCU modifier une question essai ](../../docs/modeles/exports-it-3/rdcu-modifier-question-essai.png "RDCU modifier une question essai")
+
+Modification pour suivre le nom des classes et fonction dans le code
+![RDCU modifier une question mise en correspondance ](../../docs/modeles/exports-it-3/rdcu-modifier-question-mise-en-correspondance.png "RDCU modifier une question mise en correspondance")
+
+Modification pour suivre le nom des classes et fonction dans le code
+![RDCU modifier une question numérique ](../../docs/modeles/exports-it-3/rdcu-modifier-question-numerique.png "RDCU modifier une question numérique")
+
+Modification pour suivre le nom des classes et fonction dans le code
+![RDCU modifier une question réponse courte ](../../docs/modeles/exports-it-3/rdcu-modifier-question-reponse-courte.png "RDCU modifier une question réponse courte")
+
+Modification pour suivre le nom des classes et fonction dans le code
+![RDCU modifier une question Vrai ou Faux ](../../docs/modeles/exports-it-3/rdcu-modifier-question-vrai-faux.png "RDCU modifier une question Vrai ou Faux")
+
+Modification du retour pour qu'il ne soit pas un appel de méthode
+![RDCU sélectionner une question ](../../docs/modeles/exports-it-3/rdcu-selectionner-question.png "RDCU sélectionner une question")
+
+Modification du retour pour qu'il ne soit pas un appel de méthode
+![RDCU sélectionner une question à modifier ](../../docs/modeles/exports-it-3/rdcu-selection-modifier-questionnaire.png "RDCU sélectionner une question à modifier")
+
+Ajout des flèches de retour
+![RDCU dissocier une question d'un questionnaire ](../../docs/modeles/exports-it-3/rdcu-dissocier-question.png "RDCU dissocier une question d'un questionnaire")
+
+Ajout des flèches de retour
+![RDCU modifier l'ordre des questions ](../../docs/modeles/exports-it-3/rdcu-modifier-ordre-questions.png "RDCU modifier l'ordre des questions")
+
+Retirer un participant inutile
+![RDCU sauvegarder un questionnaire ](../../docs/modeles/exports-it-3/rdcu-sauvegarder-questionnaire.png "RDCU sauvegarder un questionnaire")
 
 ## Vérification finale
 
