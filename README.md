@@ -86,6 +86,14 @@ Data persistence:
 
 SGA requires two services running simultaneously: SGB (external service) and SGA (this application). Follow these steps to set up both.
 
+### External Dependency
+
+This project depends on the external SGB service repository:
+
+[LOG210 - Système de Gestion des Bordereaux (SGB)](https://github.com/profcfuhrmanets/log210-systeme-gestion-bordereaux.git)
+
+SGA and SGB must run simultaneously for the application to function correctly.
+
 ### Prerequisites
 
 - Node.js and npm
