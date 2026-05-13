@@ -84,45 +84,109 @@ Data persistence:
 
 ## Setup and Installation
 
+SGA requires two services running simultaneously: SGB (external service) and SGA (this application). Follow these steps to set up both.
+
 ### Prerequisites
 
 - Node.js and npm
-- A running SGB service (external dependency)
+- Two separate repositories:
+  - SGB (external service)
+  - SGA (this application)
 
 ### 1) Install dependencies
+
+In the **SGB repository**:
 
 ```bash
 npm install
 ```
 
-### 2) Configure environment
+In the **SGA repository** (moodle-clone):
 
-Optional environment variables:
+```bash
+npm install
+```
+
+### 2) Start SGB (Terminal 1)
+
+Navigate to the SGB repository and start the service:
+
+```bash
+npm start
+```
+
+SGB will run on `http://localhost:3200`. You can verify it is running by visiting `http://localhost:3200/docs/index.html` for the API documentation.
+
+### 3) Build and start SGA (Terminal 2)
+
+Navigate to the SGA repository (moodle-clone) and build the TypeScript:
+
+```bash
+npm run build
+```
+
+Then start the application:
+
+```bash
+npm start
+```
+
+SGA will run on `http://localhost:3000`.
+
+### 4) Configure environment (optional)
+
+You can override the default behavior with environment variables:
 
 - `SGB_BASE_URL` (default: `http://localhost:3200`)
 - `PORT` (default: `3000`)
 
-### 3) Run both required services (two terminals)
-
-Terminal A: start SGB (in the SGB repository)
+Example (Linux/macOS):
 
 ```bash
-# Example only: run SGB with its own startup command
-# (Use the exact command from the SGB project)
-```
-
-Terminal B: build and start SGA
-
-```bash
-npm run build
+export SGB_BASE_URL=http://localhost:3200
+export PORT=3000
 npm start
 ```
 
-Development watch mode:
+Example (Windows PowerShell):
+
+```powershell
+$env:SGB_BASE_URL="http://localhost:3200"
+$env:PORT="3000"
+npm start
+```
+
+### 5) Development mode
+
+For development, use the watch mode in Terminal 2 (instead of `npm start`):
 
 ```bash
 npm run start:watch
 ```
+
+This will automatically rebuild and restart the application when you modify source files.
+
+### Troubleshooting
+
+**Error: Cannot find module 'dist/index.js'**
+
+The TypeScript must be compiled to JavaScript before running. Run this before `npm start`:
+
+```bash
+npm run build
+```
+
+**Error: 'tsc' is not recognized**
+
+Dependencies are not installed. Run this first:
+
+```bash
+npm install
+```
+
+**SGB is not responding**
+
+Ensure SGB is running in Terminal 1 and is accessible at `http://localhost:3200`. If you changed the SGB port, update `SGB_BASE_URL` before starting SGA.
 
 ## Testing
 
@@ -168,7 +232,7 @@ npm run circular
 ![Question Bank Management](./screenshots/question-bank.png)
 
 ### Questionnaire Management
-![Questionnaire Creation and Editing](./screenshots/questionnaire-creation-editing.png)
+![Questionnaire Creation and Editing](./screenshots/questionnaire-management.png)
 
 ### Student Questionnaire Attempt
 ![Student Questionnaire Attempt](./screenshots/student-questionnaire-attempt.png)
